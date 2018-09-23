@@ -26,8 +26,8 @@ This hack includes:
 * No more need to use a smartphone application
 * Telnet server - _Disabled by default._
 * Web server with PHP support - _Enabled by default._
-* RTSP server - _Disabled by default._
-* SSH server - _Disabled by default._
+* RTSP server - _Enabled by default._
+* SSH server - _Enabled by default._
 * FTP server - _Disabled by default._
 * Samba Server - _Disabled by default._
 * Syslog to memory card - _Disabled by default._
@@ -35,7 +35,6 @@ This hack includes:
 
 Planed futures:
 * Configuration over web server
-* Motor control
 * Replace Chinese voice files with English
 
 Installation on the Chuangmi 720P camera
