@@ -116,7 +116,8 @@ fi
 ## Start enabled Services
 ##################################################################################
 if ! [ -f /mnt/data/test/boot.sh ]; then
-  ln -s ${sd_mountdir}/chuangmi-720p-hack/scripts/.boot.sh /mnt/data/test/boot.sh
+  ln -s -f ${sd_mountdir}/chuangmi-720p-hack/scripts/.boot.sh /mnt/data/test/boot.sh
 fi
 
 ) >> "${LOGFILE}" 2>&1
+
