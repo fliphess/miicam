@@ -104,7 +104,7 @@ If enabled the telnet server is on port 23.
 
 Default login/password:
 * login = root
-* password = 1234qwer (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
+* password = Chuangmi720pCam666 (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
 
 SSH server
 ----------
@@ -113,7 +113,7 @@ If enabled the SSH server is on port 22.
 
 Default login/password:
 * login = root
-* password = 1234qwer (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
+* password = Chuangmi720pCam666 (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
 
 RTSP Server
 -----------
@@ -141,7 +141,7 @@ The share is readable by everyone.
 
 Default login/password for read/write access:
 * login = root
-* password = 1234qwer (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
+* password = Chuangmi720pCam666 (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
 
 
 Cloud Services
