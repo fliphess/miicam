@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -13,8 +13,8 @@ fi
 
 NAME="lighttpd"
 DESC="web server"
-DAEMON="${sd_mountdir}/mijia-720p-hack/bin/${NAME}"
-DAEMON_OPTS="-f ${sd_mountdir}/mijia-720p-hack/etc/lighttpd.conf"
+DAEMON="${sd_mountdir}/chuangmi-720p-hack/bin/${NAME}"
+DAEMON_OPTS="-f ${sd_mountdir}/chuangmi-720p-hack/etc/lighttpd.conf"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
 
@@ -22,8 +22,8 @@ check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
   start)
-    if [ ! -d "${sd_mountdir}/mijia-720p-hack/tmp" ]; then
-      mkdir -p "${sd_mountdir}/mijia-720p-hack/tmp"
+    if [ ! -d "${sd_mountdir}/chuangmi-720p-hack/tmp" ]; then
+      mkdir -p "${sd_mountdir}/chuangmi-720p-hack/tmp"
     fi
     start_daemon
     ;;

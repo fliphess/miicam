@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -15,8 +15,8 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   cat << EOF
 Usage of ${0} [<WIFI_SSID> [<WIFI_PASS>]]
 Configure WiFi to connect to WIFI_SSID. WIFI_PASS is needed for WPA-PSK secured WiFis.
-If no argument is given the values from mijia-720p-hack.cfg are used.
-Otherwise the WiFi setup and mijia-720p-hack.cfg will be updated.
+If no argument is given the values from chuangmi-720p-hack.cfg are used.
+Otherwise the WiFi setup and chuangmi-720p-hack.cfg will be updated.
 EOF
   exit
 fi

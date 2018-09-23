@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -25,7 +25,7 @@ disable_cloud() {
   #/mnt/data/imi/imi_init/S95miio_smb
   disable_binary "/mnt/data/miio_smb/miio_smb" "miio_smb"
   # cron
-  disable_binary "/mnt/data/miot/logmi.sh" 
+  disable_binary "/mnt/data/miot/logmi.sh"
   if pgrep restartd >/dev/null; then
     /mnt/data/imi/imi_init/S99restartd restart
   fi
@@ -45,7 +45,7 @@ enable_cloud() {
   #/mnt/data/imi/imi_init/S95miio_smb
   enable_binary "/mnt/data/miio_smb/miio_smb" "miio_smb"
   # cron
-  enable_binary "/mnt/data/miot/logmi.sh" 
+  enable_binary "/mnt/data/miot/logmi.sh"
   if pgrep restartd >/dev/null; then
     /mnt/data/imi/imi_init/S99restartd restart
   fi

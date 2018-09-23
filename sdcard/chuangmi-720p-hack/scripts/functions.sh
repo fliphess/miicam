@@ -6,8 +6,8 @@
 
 sd_mountdir="/tmp/sd"
 LOGDIR="${sd_mountdir}/log"
-BASECFG="${sd_mountdir}/mijia-720p-hack.cfg"
-MIJIACTRL="${sd_mountdir}/mijia-720p-hack/bin/mijia_ctrl"
+BASECFG="${sd_mountdir}/chuangmi-720p-hack.cfg"
+CHUANGMICTRL="${sd_mountdir}/chuangmi-720p-hack/bin/chuangmi_ctrl"
 if [ -f "${BASECFG}" ]; then
   . "${BASECFG}"
 fi
@@ -17,7 +17,7 @@ create_disable_binary() {
     if [ ! -f /tmp/disable-binary ]; then
     cat > /tmp/disable-binary << EOF
 #!/bin/sh
-echo "\$0 disabled with mijia-720p-hack"
+echo "\$0 disabled with chuangmi-720p-hack"
 EOF
     chmod +x /tmp/disable-binary
   fi
@@ -61,7 +61,7 @@ enable_binary() {
 # Print start-stop-daemon return status
 ok_fail() {
   if [ "$1" = 0 ]; then
-    echo "OK" 
+    echo "OK"
   else
     echo "FAIL"
   fi
@@ -100,7 +100,7 @@ stop_daemon() {
 
 # Stop background daemon
 stop_daemon_background() {
-  if stop_daemon; then 
+  if stop_daemon; then
     if [ -f "${PIDFILE}" ]; then
       rm "${PIDFILE}"
     fi
@@ -153,14 +153,14 @@ set_nvram() {
   return "${RC}"
 }
 
-# Get ISP328 values 
+# Get ISP328 values
 get_isp328() {
   variable="$1"
   echo r ${variable} > /proc/isp328/command
   cat /proc/isp328/command
 }
 
-# Set ISP328 values 
+# Set ISP328 values
 set_isp328() {
   variable="$1"
   value="$2"
@@ -198,21 +198,21 @@ set_basecfg() {
 
 # Control the blue LED
 blue_led(){
-  #if ! [ -x "${MIJIACTRL}" ]; then
-  #  echo "could not find ${MIJIACTRL}"
+  #if ! [ -x "${CHUANGMICTRL}" ]; then
+  #  echo "could not find ${CHUANGMICTRL}"
   #  return 1
   #fi
   case "$1" in
     on)
-      #${MIJIACTRL} LEDSTATUS 0 0; RC="${?}"
+      #${CHUANGMICTRL} LEDSTATUS 0 0; RC="${?}"
       /mnt/data/miot/ledctl 0 50 0 0 0 2 > /dev/null; RC="$((RC|$?))"
       ;;
     off)
-      #${MIJIACTRL} LEDSTATUS 0 1; RC="${?}"
+      #${CHUANGMICTRL} LEDSTATUS 0 1; RC="${?}"
       /mnt/data/miot/ledctl 0 50 1 0 0 2 > /dev/null; RC="$((RC|$?))"
       ;;
     blink)
-      #${MIJIACTRL} LEDSTATUS 0 2; RC="${?}"
+      #${CHUANGMICTRL} LEDSTATUS 0 2; RC="${?}"
       /mnt/data/miot/ledctl 0 50 2 0 0 2 > /dev/null; RC="$((RC|$?))"
       ;;
     *)
@@ -225,21 +225,21 @@ blue_led(){
 
 # Control the yellow LED
 yellow_led(){
-  #if ! [ -x "${MIJIACTRL}" ]; then
-  #  echo "could not find ${MIJIACTRL}"
+  #if ! [ -x "${CHUANGMICTRL}" ]; then
+  #  echo "could not find ${CHUANGMICTRL}"
   #  return 1
   #fi
   case "$1" in
     on)
-      #${MIJIACTRL} LEDSTATUS 1 0; RC="${?}"
+      #${CHUANGMICTRL} LEDSTATUS 1 0; RC="${?}"
       /mnt/data/miot/ledctl 1 50 0 0 0 2 > /dev/null; RC="$((RC|$?))"
       ;;
     off)
-      #${MIJIACTRL} LEDSTATUS 1 1; RC="${?}"
+      #${CHUANGMICTRL} LEDSTATUS 1 1; RC="${?}"
       /mnt/data/miot/ledctl 1 50 1 0 0 2 > /dev/null; RC="$((RC|$?))"
       ;;
     blink)
-      #${MIJIACTRL} LEDSTATUS 1 2; RC="${?}"
+      #${CHUANGMICTRL} LEDSTATUS 1 2; RC="${?}"
       /mnt/data/miot/ledctl 1 50 2 0 0 2 > /dev/null; RC="$((RC|$?))"
       ;;
     *)
@@ -252,16 +252,16 @@ yellow_led(){
 
 # Control the infrared LED
 ir_led(){
-  if ! [ -x "${MIJIACTRL}" ]; then
-    echo "could not find ${MIJIACTRL}"
+  if ! [ -x "${CHUANGMICTRL}" ]; then
+    echo "could not find ${CHUANGMICTRL}"
     return 1
   fi
   case "$1" in
     on)
-      ${MIJIACTRL} IRLED 255 > /dev/null; RC="$((RC|$?))"
+      ${CHUANGMICTRL} IRLED 255 > /dev/null; RC="$((RC|$?))"
       ;;
     off)
-      ${MIJIACTRL} IRLED 0 > /dev/null; RC="$((RC|$?))"
+      ${CHUANGMICTRL} IRLED 0 > /dev/null; RC="$((RC|$?))"
       ;;
     *)
       echo "Option $1 not supported"
@@ -273,19 +273,19 @@ ir_led(){
 
 # Control the infrared filter
 ir_cut(){
-  #if ! [ -x "${MIJIACTRL}" ]; then
-  #  echo "could not find ${MIJIACTRL}"
+  #if ! [ -x "${CHUANGMICTRL}" ]; then
+  #  echo "could not find ${CHUANGMICTRL}"
   #  return 1
   #fi
   case "$1" in
     on)
-      #${MIJIACTRL} IRCUT 1; RC="$((RC|$?))"
+      #${CHUANGMICTRL} IRCUT 1; RC="$((RC|$?))"
       set_gpio 14 1; RC="$((RC|$?))"
       set_gpio 15 0; RC="$((RC|$?))"
       echo 1 > /var/run/ircut
       ;;
     off)
-      #${MIJIACTRL} IRCUT 0; RC="$((RC|$?))"
+      #${CHUANGMICTRL} IRCUT 0; RC="$((RC|$?))"
       set_gpio 14 0; RC="$((RC|$?))"
       set_gpio 15 1; RC="$((RC|$?))"
       echo 0 > /var/run/ircut
@@ -313,21 +313,21 @@ EOF
 
 # Control the night mode
 night_mode(){
-  #if ! [ -x "${MIJIACTRL}" ]; then
-  #  echo "could not find ${MIJIACTRL}"
+  #if ! [ -x "${CHUANGMICTRL}" ]; then
+  #  echo "could not find ${CHUANGMICTRL}"
   #  return 1
   #fi
   case "$1" in
     on)
       ir_led on; RC="$((RC|$?))"
       ir_cut off; RC="$((RC|$?))"
-      #${MIJIACTRL} DAYNIGHT 1; RC="$((RC|$?))"
+      #${CHUANGMICTRL} DAYNIGHT 1; RC="$((RC|$?))"
       set_isp328 daynight 1; RC="$((RC|$?))"
       ;;
     off)
       ir_led off; RC="$((RC|$?))"
       ir_cut on; RC="$((RC|$?))"
-      #${MIJIACTRL} DAYNIGHT 0; RC="$((RC|$?))"
+      #${CHUANGMICTRL} DAYNIGHT 0; RC="$((RC|$?))"
       set_isp328 daynight 0; RC="$((RC|$?))"
       ;;
     status)
@@ -413,8 +413,8 @@ EOF
 
 # Calibrate and control the motor
 motor(){
-  if ! [ -x "${MIJIACTRL}" ]; then
-    echo "could not find ${MIJIACTRL}"
+  if ! [ -x "${CHUANGMICTRL}" ]; then
+    echo "could not find ${CHUANGMICTRL}"
     return 1
   fi
   #Motor will not move if PWM is in use
@@ -422,9 +422,9 @@ motor(){
     echo "motor only supported while  cloud is disabled"
     return 1
   elif [ "$1" = "up" ] || [ "$1" = "down" ] ||
-       [ "$1" = "left" ] || [ "$1" = "right" ] || 
+       [ "$1" = "left" ] || [ "$1" = "right" ] ||
        [ "$1" = "calibrate" ]; then
-    ${sd_mountdir}/mijia-720p-hack/scripts/S99auto_night_mode stop > /dev/null; RC="$((RC|$?))"
+    ${sd_mountdir}/chuangmi-720p-hack/scripts/S99auto_night_mode stop > /dev/null; RC="$((RC|$?))"
   fi
   ptz_x="$(get_nvram ptz-x)"
   ptz_y="$(get_nvram ptz-y)"
@@ -443,44 +443,44 @@ motor(){
   case "$1" in
     up)
       if [ "${ptz_y}" -lt 15 ]; then
-        ${MIJIACTRL} MOVE 0 +1 > /dev/null; RC="$((RC|$?))"
+        ${CHUANGMICTRL} MOVE 0 +1 > /dev/null; RC="$((RC|$?))"
         set_nvram ptz-y $((ptz_y+1)); RC="$((RC|$?))"
       fi
       ;;
     down)
       if [ "${ptz_y}" -ge 0 ]; then
-        ${MIJIACTRL} MOVE 0 -1 > /dev/null; RC="$((RC|$?))"
+        ${CHUANGMICTRL} MOVE 0 -1 > /dev/null; RC="$((RC|$?))"
         set_nvram ptz-y $((ptz_y-1)); RC="$((RC|$?))"
       fi
       ;;
     left)
       if [ "${ptz_x}" -lt 31 ]; then
-        ${MIJIACTRL} MOVE +1 0 > /dev/null; RC="$((RC|$?))"
+        ${CHUANGMICTRL} MOVE +1 0 > /dev/null; RC="$((RC|$?))"
         set_nvram ptz-y $((ptz_x+1)); RC="$((RC|$?))"
       fi
       ;;
     right)
       if [ "${ptz_x}" -ge 0 ]; then
-        ${MIJIACTRL} MOVE -1 0 > /dev/null; RC="$((RC|$?))"
+        ${CHUANGMICTRL} MOVE -1 0 > /dev/null; RC="$((RC|$?))"
         set_nvram ptz-y $((ptz_x-1)); RC="$((RC|$?))"
       fi
       ;;
     calibrate)
-      ${MIJIACTRL} MOVE +31 +15 > /dev/null; RC="$((RC|$?))"
+      ${CHUANGMICTRL} MOVE +31 +15 > /dev/null; RC="$((RC|$?))"
       sleep 1
-      ${MIJIACTRL} MOVE -31 -15 > /dev/null; RC="$((RC|$?))"
+      ${CHUANGMICTRL} MOVE -31 -15 > /dev/null; RC="$((RC|$?))"
       sleep 1
-      ${MIJIACTRL} MOVE +"${ptz_x}" +"${ptz_y}" > /dev/null; RC="$((RC|$?))"
+      ${CHUANGMICTRL} MOVE +"${ptz_x}" +"${ptz_y}" > /dev/null; RC="$((RC|$?))"
       sleep 3
       ;;
     status)
-      status="$(${MIJIACTRL} MOVE 0 0  2> /dev/null | tr ',' '\n')"
+      status="$(${CHUANGMICTRL} MOVE 0 0  2> /dev/null | tr ',' '\n')"
       vpos="$(echo "${status}" | awk -F'=' '/VPOS/ {print $2}')"
       hpos="$(echo "${status}" | awk -F'=' '/HPOS/ {print $2}')"
       cat << EOF
 {
   "motor":
-  { "horizontal": 
+  { "horizontal":
     { "nvram": "${ptz_x}",
       "HPOS": "${hpos}"
     },
@@ -510,14 +510,14 @@ EOF
      [ "$1" = "left" ] || [ "$1" = "right" ] ||
      [ "$1" = "calibrate" ]; then
     if [ "$(get_nvram night_mode)" -eq 0 ]; then
-      ${sd_mountdir}/mijia-720p-hack/scripts/S99auto_night_mode start > /dev/null; RC="$((RC|$?))"
+      ${sd_mountdir}/chuangmi-720p-hack/scripts/S99auto_night_mode start > /dev/null; RC="$((RC|$?))"
     fi
   fi
   return "${RC}"
 }
 
 
-if [ ! -d /var/run ]; then 
-  mkdir -p /var/run 
-fi 
+if [ ! -d /var/run ]; then
+  mkdir -p /var/run
+fi
 

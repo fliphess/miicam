@@ -1,20 +1,20 @@
 #!/bin/sh
-## purpose: Init script for RTSP server
+## purpose: Init and config script for night vison mode
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
-## author: Jan Sperling , 2017
+## author: Jan Sperling , 2018
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
 fi
 
-NAME="rtspd"
-DESC="RTSP server"
-DAEMON="${sd_mountdir}/mijia-720p-hack/bin/${NAME}"
-DAEMON_OPTS="-s"
+NAME="auto_night_mode"
+DESC="Auto Night Mode"
+DAEMON="/usr/sbin/ir_sample"
+DAEMON_OPTS="200 5"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
 
@@ -22,7 +22,11 @@ check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
   start)
-    start_daemon_background
+    if ! pgrep ${DAEMON##*/} >/dev/null; then
+      start_daemon_background
+    else
+      echo "${DESC} already running."
+    fi
     ;;
   stop)
     stop_daemon_background

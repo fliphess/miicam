@@ -12,6 +12,7 @@ RUN apt-get update                                                              
       build-essential                                                                                              \
       curl                                                                                                         \
       wget                                                                                                         \
+      vim                                                                                                          \
       git-core                                                                                                     \
       lib32z1-dev                                                                                                  \
       make                                                                                                         \

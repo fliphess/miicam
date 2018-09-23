@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -20,10 +20,10 @@ disable_ota() {
 }
 
 enable_ota() {
-  if [ -f "${sd_mountdir}/mijia-720p-hack/scripts/.pre-ota.sh" ] &&
+  if [ -f "${sd_mountdir}/chuangmi-720p-hack/scripts/.pre-ota.sh" ] &&
      ! mount | grep -q /mnt/data/miio_ota/pre-ota.sh; then
     echo "Improve OTA script"
-    mount --bind "${sd_mountdir}/mijia-720p-hack/scripts/.pre-ota.sh" /mnt/data/miio_ota/pre-ota.sh
+    mount --bind "${sd_mountdir}/chuangmi-720p-hack/scripts/.pre-ota.sh" /mnt/data/miio_ota/pre-ota.sh
   fi
   #/mnt/data/imi/imi_init/S95miio_ota
   enable_binary "/mnt/data/miio_ota/miio_ota" "miio_ota"

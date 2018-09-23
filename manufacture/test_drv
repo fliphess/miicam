@@ -9,8 +9,8 @@ elif [ -d /mnt/media/mmcblk0 ]; then
   mmcdir="/mnt/media/mmcblk0"
 fi
 
-if [ -f "${mmcdir}/mijia-720p-hack.cfg" ]; then
-  . "${mmcdir}/mijia-720p-hack.cfg"
+if [ -f "${mmcdir}/chuangmi-720p-hack.cfg" ]; then
+  . "${mmcdir}/chuangmi-720p-hack.cfg"
 fi
 
 if [ "${DISABLE_HACK}" -eq 1 ]; then

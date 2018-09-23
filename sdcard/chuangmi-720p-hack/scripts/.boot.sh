@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -17,9 +17,9 @@ LOGFILE="${LOGDIR}/ft_boot.log"
 echo "Executing /mnt/data/test/boot.sh"
 
 ## Put our bins into PATH
-if [ -d "${sd_mountdir}/mijia-720p-hack/bin" ] &&
+if [ -d "${sd_mountdir}/chuangmi-720p-hack/bin" ] &&
    ! mountpoint -q /tmp/sd/ft; then
-  mount --rbind "${sd_mountdir}/mijia-720p-hack/bin" /tmp/sd/ft
+  mount --rbind "${sd_mountdir}/chuangmi-720p-hack/bin" /tmp/sd/ft
 fi
 
 ## Start enabled services
@@ -27,25 +27,25 @@ if [ "${ENABLE_TELNETD}" -eq 1 ]; then
   /mnt/data/imi/imi_init/_S50telnet start
   if ! grep -q telnetd /tmp/etc/restartd.conf; then
     echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/_S50telnet restart\" \"/bin/echo 'telnetd is running'\"" >> /tmp/etc/restartd.conf
-    if pgrep /mnt/data/restartd/restartd > /dev/null; then  
-      /mnt/data/imi/imi_init/S99restartd restart    
-    fi  
+    if pgrep /mnt/data/restartd/restartd > /dev/null; then
+      /mnt/data/imi/imi_init/S99restartd restart
+    fi
   fi
 fi
 if [ "${ENABLE_SSHD}" -eq 1 ]; then
-  ${sd_mountdir}/mijia-720p-hack/scripts/S99dropbear start
+  ${sd_mountdir}/chuangmi-720p-hack/scripts/S99dropbear start
 fi
 if [ "${ENABLE_HTTPD}" -eq 1 ]; then
-  ${sd_mountdir}/mijia-720p-hack/scripts/S99lighttpd start
+  ${sd_mountdir}/chuangmi-720p-hack/scripts/S99lighttpd start
 fi
 if [ "${ENABLE_FTPD}" -eq 1 ]; then
-  ${sd_mountdir}/mijia-720p-hack/scripts/S99ftpd start
+  ${sd_mountdir}/chuangmi-720p-hack/scripts/S99ftpd start
 fi
 if [ "${ENABLE_SAMBA}" -eq 1 ]; then
-  ${sd_mountdir}/mijia-720p-hack/scripts/S99samba start
+  ${sd_mountdir}/chuangmi-720p-hack/scripts/S99samba start
 fi
 if [ "${ENABLE_RTSP}" -eq 1 ]; then
-  ${sd_mountdir}/mijia-720p-hack/scripts/S99rtsp start
+  ${sd_mountdir}/chuangmi-720p-hack/scripts/S99rtsp start
 fi
 
 #Starting serices in non cloud configuration
@@ -56,7 +56,7 @@ if [ "${DISABLE_CLOUD}" -eq 1 ]; then
   echo "Done"
   case $night_mode in
     0)
-      ${sd_mountdir}/mijia-720p-hack/scripts/S99auto_night_mode start
+      ${sd_mountdir}/chuangmi-720p-hack/scripts/S99auto_night_mode start
       ;;
     1)
       night_mode off

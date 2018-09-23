@@ -1,5 +1,5 @@
 #!/bin/sh
-## purpose: Initialize the Mijia 720P hack
+## purpose: Initialize the Chuangmi 720P hack
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
 ## author: Jan Sperling , 2017
 
@@ -9,8 +9,8 @@ fi
 
 ## Config
 ##################################################################################
-if [ -f "${sd_mountdir}/mijia-720p-hack.cfg" ]; then
-  . "${sd_mountdir}/mijia-720p-hack.cfg"
+if [ -f "${sd_mountdir}/chuangmi-720p-hack.cfg" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack.cfg"
 fi
 
 if [ "${DISABLE_HACK}" -eq 1 ]; then
@@ -23,9 +23,9 @@ fi
 (
 cat << EOF
 
-Running Mijia 720P hack
+Running Chuangmi 720P hack
 
-Mijia 720P hack configuration
+Chuangmi 720P hack configuration
   ROOT_PASSWORD=${ROOT_PASSWORD}
   WIFI_SSID=${WIFI_SSID}
   WIFI_PASS=${WIFI_PASS}
@@ -67,7 +67,7 @@ fi
 if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd; then
   mount --bind /tmp/S99restartd /mnt/data/imi/imi_init/S99restartd
 fi
-if ! [ -f /tmp/etc/restartd.conf.org ] && 
+if ! [ -f /tmp/etc/restartd.conf.org ] &&
      mountpoint -q /etc; then
   cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf.org
   cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf
@@ -87,12 +87,12 @@ fi
 if [ -n "${ROOT_PASSWORD}" ]; then
   echo "Setting root password"
   (echo "${ROOT_PASSWORD}"; echo "${ROOT_PASSWORD}") | passwd
-  if [ -f "${sd_mountdir}/mijia-720p-hack/bin/smbpasswd" ]; then
-    if ! [ -d "${sd_mountdir}/mijia-720p-hack/tmp/samba" ]; then
-      mkdir -p "${sd_mountdir}/mijia-720p-hack/tmp/samba"
+  if [ -f "${sd_mountdir}/chuangmi-720p-hack/bin/smbpasswd" ]; then
+    if ! [ -d "${sd_mountdir}/chuangmi-720p-hack/tmp/samba" ]; then
+      mkdir -p "${sd_mountdir}/chuangmi-720p-hack/tmp/samba"
     fi
     echo "Setting Samba root password"
-    (echo "${ROOT_PASS}"; echo "${ROOT_PASS}") | "${sd_mountdir}/mijia-720p-hack/bin/smbpasswd" -a -s
+    (echo "${ROOT_PASS}"; echo "${ROOT_PASS}") | "${sd_mountdir}/chuangmi-720p-hack/bin/smbpasswd" -a -s
   fi
 else
   echo "WARN: root password must be set for SSH and SAMBA"
@@ -100,23 +100,23 @@ fi
 
 ## WIFI
 ##################################################################################
-sh "${sd_mountdir}/mijia-720p-hack/scripts/configure_wifi"
+sh "${sd_mountdir}/chuangmi-720p-hack/scripts/configure_wifi"
 
 ## Disable Cloud Services and OTA
 ##################################################################################
-if [ "${DISABLE_CLOUD}" -eq 1 ]; then 
-  sh "${sd_mountdir}/mijia-720p-hack/scripts/S50disable_cloud" start
-  sh "${sd_mountdir}/mijia-720p-hack/scripts/S50disable_ota" start
+if [ "${DISABLE_CLOUD}" -eq 1 ]; then
+  sh "${sd_mountdir}/chuangmi-720p-hack/scripts/S50disable_cloud" start
+  sh "${sd_mountdir}/chuangmi-720p-hack/scripts/S50disable_ota" start
 elif [ "${DISABLE_OTA}" -eq 1 ]; then
-  sh "${sd_mountdir}/mijia-720p-hack/scripts/S50disable_ota" start
+  sh "${sd_mountdir}/chuangmi-720p-hack/scripts/S50disable_ota" start
 else
-  sh "${sd_mountdir}/mijia-720p-hack/scripts/S50disable_ota" stop
+  sh "${sd_mountdir}/chuangmi-720p-hack/scripts/S50disable_ota" stop
 fi
 
 ## Start enabled Services
 ##################################################################################
 if ! [ -f /mnt/data/test/boot.sh ]; then
-  ln -s ${sd_mountdir}/mijia-720p-hack/scripts/.boot.sh /mnt/data/test/boot.sh
+  ln -s ${sd_mountdir}/chuangmi-720p-hack/scripts/.boot.sh /mnt/data/test/boot.sh
 fi
 
 ) >> "${LOGFILE}" 2>&1

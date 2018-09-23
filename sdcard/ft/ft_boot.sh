@@ -1,5 +1,5 @@
 #!/bin/sh
-## purpose: Initialize the Mijia 720P hack
+## purpose: Initialize the Chuangmi 720P hack
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
 ## author: Jan Sperling , 2017
 
@@ -13,7 +13,7 @@ do_vg_boot() {
   sh "${CONFIG_PARTITION}/vg_boot.sh" "${CONFIG_PARTITION}"
 }
 
-echo "Initialize Mijia 720P hack"
+echo "Initialize Chuangmi 720P hack"
 
 ## Find Block device
 ##################################################################################
@@ -47,12 +47,12 @@ fi
 
 ## Execute custom code
 ##################################################################################
-if [ ! -f "${sd_mountdir}/mijia-720p-hack/scripts/.ft_boot.sh" ];then
+if [ ! -f "${sd_mountdir}/chuangmi-720p-hack/scripts/.ft_boot.sh" ];then
   echo "Error starting ft_boot.sh. Do normal boot."
   do_vg_boot
   exit
 else
-  . "${sd_mountdir}/mijia-720p-hack/scripts/.ft_boot.sh"
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/.ft_boot.sh"
 fi
 
 ## Simulate S50gm standard flow

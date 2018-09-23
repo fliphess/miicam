@@ -15,12 +15,12 @@ TOPDIR := $(CURDIR)
 SOURCEDIR := src
 PREFIXDIR := prefix
 BUILDDIR := build
-INSTALLDIR := sdcard/mijia-720p-hack/bin
+INSTALLDIR := sdcard/chuangmi-720p-hack/bin
 GMLIBDIR := gm_lib/gm_graph/gm_lib
 RTSPDDIR := gm_lib/gm_graph/product/GM8136_1MP/samples
 GMSAMPLEDIR := $(GMLIBDIR)/samples
 
-BINS = smbpasswd scp dbclient arm-php arm-php-cgi mijia_ctrl
+BINS = smbpasswd scp dbclient arm-php arm-php-cgi
 SBINS = dropbear lighttpd smbd
 
 ZLIBVERSION = 1.2.11
@@ -53,9 +53,6 @@ PHPURI = http://php.net/get/$(PHPARCHIVE)/from/this/mirror
 SAMBAVERSION = 3.6.25
 SAMBAARCHIVE = samba-$(SAMBAVERSION).tar.gz
 SAMBAURI = https://download.samba.org/pub/samba/$(SAMBAARCHIVE)
-MIJIACTRLVERSION = master
-MIJIACTRLARCHIVE = mijia-720p-ctrl-$(MIJIACTRLVERSION).zip
-MIJIACTRLURI = https://github.com/cck56/mijia-720p-ctrl/archive/$(MIJIACTRLVERSION).zip
 
 SAMPLES := gm_lib/display_with_encode \
            gm_lib/liveview_with_clearwin \
@@ -83,11 +80,11 @@ SAMPLES := gm_lib/display_with_encode \
 
 .PHONY: all libs fetch-sources
 
-all: $(BUILDDIR)/dropbear $(BUILDDIR)/lighttpd $(BUILDDIR)/php $(BUILDDIR)/samba $(BUILDDIR)/mijia_ctrl sdcard/manufacture.bin gm_lib/rtspd
+all: $(BUILDDIR)/dropbear $(BUILDDIR)/lighttpd $(BUILDDIR)/php $(BUILDDIR)/samba sdcard/manufacture.bin gm_lib/rtspd
 
 libs: $(BUILDDIR)/zlib $(BUILDDIR)/libxml2 $(BUILDDIR)/libjpeg-turbo $(BUILDDIR)/libpng $(BUILDDIR)/libgd $(BUILDDIR)/pcre
 
-fetch-sources: $(SOURCEDIR)/$(ZLIBARCHIVE) $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(SOURCEDIR)/$(LIBJPEGARCHIVE) $(SOURCEDIR)/$(LIBPNGARCHIVE) $(SOURCEDIR)/$(LIBGDARCHIVE) $(SOURCEDIR)/$(PCREARCHIVE) $(SOURCEDIR)/$(DROPBEARARCHIVE) $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(SOURCEDIR)/$(PHPARCHIVE) $(SOURCEDIR)/$(SAMBAARCHIVE) $(SOURCEDIR)/$(MIJIACTRLARCHIVE)
+fetch-sources: $(SOURCEDIR)/$(ZLIBARCHIVE) $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(SOURCEDIR)/$(LIBJPEGARCHIVE) $(SOURCEDIR)/$(LIBPNGARCHIVE) $(SOURCEDIR)/$(LIBGDARCHIVE) $(SOURCEDIR)/$(PCREARCHIVE) $(SOURCEDIR)/$(DROPBEARARCHIVE) $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(SOURCEDIR)/$(PHPARCHIVE) $(SOURCEDIR)/$(SAMBAARCHIVE)
 
 samples: $(SAMPLES)
 
@@ -130,10 +127,6 @@ $(SOURCEDIR)/$(PHPARCHIVE):
 $(SOURCEDIR)/$(SAMBAARCHIVE):
 	mkdir -p $(TOPDIR)/$(SOURCEDIR) && \
 	wget -t 2 -T 10 -c -O $@ $(SAMBAURI) || rm -f $@
-
-$(SOURCEDIR)/$(MIJIACTRLARCHIVE):
-	mkdir -p $(TOPDIR)/$(SOURCEDIR) && \
-	wget -t 2 -T 10 -c -O $@ $(MIJIACTRLURI) || rm -f $@
 
 
 $(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
@@ -352,8 +345,8 @@ $(BUILDDIR)/samba: $(SOURCEDIR)/$(SAMBAARCHIVE)
 			--enable-swat=no \
 			--enable-shared-libs=no \
 			--disable-cups \
-			--with-configdir=/tmp/sd/mijia-720p-hack/etc \
-			--with-nmbdsocketdir=/tmp/sd/mijia-720p-hack/tmp/samba \
+			--with-configdir=/tmp/sd/chuangmi-720p-hack/etc \
+			--with-nmbdsocketdir=/tmp/sd/chuangmi-720p-hack/tmp/samba \
 			--with-winbind=no \
 			--with-sys-quotas=no \
 			--without-krb5 \
@@ -371,21 +364,12 @@ $(BUILDDIR)/samba: $(SOURCEDIR)/$(SAMBAARCHIVE)
 	rm -rf $@-$(SAMBAVERSION)
 	touch $@
 
-$(BUILDDIR)/mijia_ctrl: $(SOURCEDIR)/$(MIJIACTRLARCHIVE)
-	mkdir -p $(TOPDIR)/$(BUILDDIR) && rm -rf $(TOPDIR)/$(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)
-	unzip $(TOPDIR)/$(SOURCEDIR)/$(MIJIACTRLARCHIVE) -d $(TOPDIR)/$(BUILDDIR)
-	cd $(TOPDIR)/$(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION) && \
-		make && \
-	  cp mijia_ctrl $(TOPDIR)/$(PREFIXDIR)/bin/
-	rm -rf $(TOPDIR)/$(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)
-	touch $@
-
 
 sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
 
 
-gm_lib/rtspd: 
+gm_lib/rtspd:
 	$(TARGET)-gcc -Wall -I$(GMLIBDIR)/inc $(RTSPDDIR)/$(@F).c $(RTSPDDIR)/librtsp.a -L$(GMLIBDIR)/lib -lpthread -lm -lrt -lgm -o $@
 
 $(SAMPLES):
@@ -403,8 +387,8 @@ install: all
 uninstall:
 	cd $(TOPDIR)/$(INSTALLDIR) && rm -f $(BINS) $(SBINS) rtspd
 
-mijia-720p-hack.zip: install
-	rm -f mijia-720p-hack.zip && zip -r mijia-720p-hack.zip README.md sdcard
+chuangmi-720p-hack.zip: install
+	rm -f chuangmi-720p-hack.zip && zip -r chuangmi-720p-hack.zip README.md sdcard
 
 .PHONY: sourceclean clean distclean
 
@@ -417,5 +401,5 @@ clean:
 distclean: clean sourceclean uninstall
 	rm -rf $(TOPDIR)/$(PREFIXDIR)
 	rm -f gm_lib/rtsp $(SAMPLES)
-	rm -f mijia-720p-hack.zip
+	rm -f chuangmi-720p-hack.zip
 

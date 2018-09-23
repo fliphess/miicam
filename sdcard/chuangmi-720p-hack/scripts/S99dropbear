@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -13,7 +13,7 @@ fi
 
 NAME="dropbear"
 DESC="SSH server"
-DAEMON="${sd_mountdir}/mijia-720p-hack/bin/${NAME}"
+DAEMON="${sd_mountdir}/chuangmi-720p-hack/bin/${NAME}"
 DAEMON_OPTS="-R -p 22"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
@@ -26,16 +26,16 @@ case "$1" in
       mkdir -p /etc/dropbear
     fi
     ## Security Purpose: recover previoys RSA keys from SDCARD
-    if [ -s "${sd_mountdir}/mijia-720p-hack/etc/dropbear_ecdsa_host_key" ]; then 
-      cp "${sd_mountdir}/mijia-720p-hack/etc/dropbear_ecdsa_host_key" /etc/dropbear
+    if [ -s "${sd_mountdir}/chuangmi-720p-hack/etc/dropbear_ecdsa_host_key" ]; then
+      cp "${sd_mountdir}/chuangmi-720p-hack/etc/dropbear_ecdsa_host_key" /etc/dropbear
     fi
 
     start_daemon
 
     ## Security Purpose: Save the keys in the SDCARD
-    if [ ! -s "${sd_mountdir}/mijia-720p-hack/etc/dropbear_ecdsa_host_key" ] &&
+    if [ ! -s "${sd_mountdir}/chuangmi-720p-hack/etc/dropbear_ecdsa_host_key" ] &&
        [ -s /etc/dropbear/dropbear_ecdsa_host_key ]; then
-      cp /etc/dropbear/dropbear_ecdsa_host_key "${sd_mountdir}/mijia-720p-hack/etc/"
+      cp /etc/dropbear/dropbear_ecdsa_host_key "${sd_mountdir}/chuangmi-720p-hack/etc/"
     fi
     ;;
   stop)

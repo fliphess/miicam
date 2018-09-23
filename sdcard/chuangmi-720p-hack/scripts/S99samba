@@ -4,8 +4,8 @@
 ## author: Jan Sperling , 2017
 
 sd_mountdir="/tmp/sd"
-if [ -r "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh" ]; then
-  . "${sd_mountdir}/mijia-720p-hack/scripts/functions.sh"
+if [ -r "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh" ]; then
+  . "${sd_mountdir}/chuangmi-720p-hack/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -13,7 +13,7 @@ fi
 
 NAME="samba"
 DESC="CIFS server"
-DAEMON="${sd_mountdir}/mijia-720p-hack/bin/smbd"
+DAEMON="${sd_mountdir}/chuangmi-720p-hack/bin/smbd"
 DAEMON_OPTS="-D"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/samba/log.smbd"
@@ -22,8 +22,8 @@ check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
   start)
-    if [ ! -d "${sd_mountdir}/mijia-720p-hack/tmp/samba" ]; then
-      mkdir -p "${sd_mountdir}/mijia-720p-hack/tmp/samba"
+    if [ ! -d "${sd_mountdir}/chuangmi-720p-hack/tmp/samba" ]; then
+      mkdir -p "${sd_mountdir}/chuangmi-720p-hack/tmp/samba"
     fi
     if [ ! -d "${LOGDIR}/samba" ]; then
       mkdir -p "${LOGDIR}/samba"
