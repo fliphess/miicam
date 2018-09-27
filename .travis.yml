@@ -4,4 +4,15 @@ sudo: required
 services:
   - docker  
 
-script: ./build.sh
+before_install:
+  - docker pull quay.io/fliphess/chuangmi-720p-hack
+  - docker ps -a
+
+script: 
+  - test -f result.tgz && rm result.tgz
+  - docker build --cache-from quay.io/fliphess/chuangmi-720p-hack -t fliphess/chuangmi-720p-hack .
+  - docker run -i -v "$(pwd):/result" --detach=false --tty=true --dns "8.8.8.8" fliphess/chuangmi-720p-hack /bin/bash -c 'make && make install && tar czf /result/image.tgz /build/sdcard'
+
+
+notifications:
+  email : false
