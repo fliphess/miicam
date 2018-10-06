@@ -1,0 +1,54 @@
+#!/bin/sh
+## purpose: Init script for Samba server
+## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
+## author: Jan Sperling , 2017
+
+SD_MOUNTDIR="/tmp/sd"
+if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+then
+    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+else
+    echo "Unable to load basic functions"
+    exit 1
+fi
+
+NAME="samba"
+DESC="CIFS server"
+DAEMON="${SD_MOUNTDIR}/firmware/bin/smbd"
+DAEMON_OPTS="-D"
+PIDFILE="/var/run/${NAME}.pid"
+LOGFILE="${LOGDIR}/samba/log.smbd"
+
+check_daemon_bin "${DAEMON}" "${DESC}"
+
+case "$1" in
+  start)
+    if [ ! -d "${SD_MOUNTDIR}/firmware/tmp/samba" ]
+    then
+        mkdir -p "${SD_MOUNTDIR}/firmware/tmp/samba"
+    fi
+
+    if [ ! -d "${LOGDIR}/samba" ]
+    then
+        mkdir -p "${LOGDIR}/samba"
+    fi
+
+    start_daemon
+    ;;
+  stop)
+    stop_daemon
+    ;;
+  restart|reload)
+    "$0" stop
+    "$0" start
+    ;;
+  status)
+    status_daemon
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit $?

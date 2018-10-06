@@ -1,0 +1,10 @@
+SHELL=/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+# min hour day_of_month month day_of_week command
+
+# cron test
+*   *   *   *   *   /bin/date > /tmp/crontest
+
+# Check if ntp is running otherwise start
+*/10 *  *   *   *  pgrep ntpd || /tmp/sd/firmware/etc/init/S51ntpd start

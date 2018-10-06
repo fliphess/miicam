@@ -1,12 +1,13 @@
-Chuangmi-720P-hack project
-=======================
+[![Build Status](https://travis-ci.org/fliphess/chuangmi-720p-hack.svg?branch=master)](https://travis-ci.org/fliphess/chuangmi-720p-hack)
+[![Docker Repository on Quay](https://quay.io/repository/fliphess/chuangmi-720p-hack/status "Docker Repository on Quay")](https://quay.io/repository/fliphess/chuangmi-720p-hack)
 
-WARNING - DISCLAIMER
-====================
+# Chuangmi-720P-hack project
+
+## WARNING - DISCLAIMER
+
 **Many files on the Chuangmi 720P are writable. Be very careful when you modify files on it, you might brick it forever.**
 
-Purpose
-=======
+## Purpose
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
 
@@ -37,13 +38,11 @@ Planed futures:
 * Configuration over web server
 * Replace Chinese voice files with English
 
-Installation on the Chuangmi 720P camera
-=====================================
+## Installation on the Chuangmi 720P camera
 
 The memory card must stay in the camera ! If you remove it, the camera will start without using the hack.
 
-Build the binaries
-------------------
+### Build the binaries
 
 To build the binaries the GM8136 SDK toolchain must be installed in /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE
 
@@ -53,35 +52,34 @@ Clone this repository on a computer:
 
 Then change into the cloned directory, build the binaries and install them to the sdcard base directory
 
-    cd chuangmi-720p-hack
+    cd firmware
     make
     make install
 
-Prepare the memory card
------------------------
+Or use the docker container by running `./build.sh` on a computer running docker.
+
+### Prepare the memory card
 
 You can use the self compiled image from the cloned repository or download a precompiled release.
 
-Then, format a micro SD card in fat32 (vfat) format and copy the content of the **chuangmi-720p-hack/sdcard/** folder at the root of your memory card.
+Then, format a micro SD card in fat32 (vfat) format and copy the content of the **firmware/sdcard/** folder at the root of your memory card.
 
 The memory card will so contain:
 
 * ft: folder which contains the hack entry point
 * ft_config.ini and manufacture.bin: files needed to enable the hack
-* chuangmi-720p-hack: the folder which contains the hack scripts and binaries
-* chuangmi-720p-hack.cfg: configuration file to configure the hack
+* firmware: the folder which contains the hack scripts and binaries
+* config.cfg: configuration file to configure the hack
 * log: this folder will contains some log files from the hack and if enabled the system logs
 * CHUANGMI_RECORD_VIDEO: this folder will only be created when some video records will be added on the memory card by the camera
 
-Configure the Chuangmi camera on the memory card
----------------------------------------------
+### Configure the Chuangmi camera on the memory card
 
-To configure the wifi network to use, edit the file **chuangmi-720p-hack.cfg**.
+To configure the wifi network to use, edit the file **config.cfg**.
 
-To configure the services which should run on the camera, open the file **chuangmi-720p-hack.cfg** and set the values.
+To configure the services which should run on the camera, open the file **config.cfg** and set the values.
 
-Start the camera
-----------------
+## Start the camera
 
 * If plugged, unplug the Chuangmi camera
 * Insert the memory card in the Chuangmi camera
@@ -94,29 +92,25 @@ The camera will start. The led will indicate the current status:
 
 You can test is your camera is up and running this hack with your browser on url **http://your-camera-ip/**.
 
-Use the camera
-==============
+## Use the camera
 
-Telnet server
--------------
+### Telnet server
 
 If enabled the telnet server is on port 23.
 
 Default login/password:
 * login = root
-* password = Chuangmi720pCam666 (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
+* password = Chuangmi720pCam123 (unless you specified another password in **config.cfg** file)
 
-SSH server
-----------
+### SSH server
 
 If enabled the SSH server is on port 22.
 
 Default login/password:
 * login = root
-* password = Chuangmi720pCam666 (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
+* password = Chuangmi720pCam123 (unless you specified another password in **config.cfg** file)
 
-RTSP Server
------------
+### RTSP Server
 
 If enabled the RTSP server is on port 554.
 
@@ -126,26 +120,29 @@ rtsp://your-camera-ip/live/ch00_0
 
 For stability reasons it is recommend to disable cloud services while using RTSP.
 
-FTP server
-----------
+### FTP server
 
 If enabled the FTP server is on port 21.
 
 There is no login/password required.
 
-Samba
------
+### MQTT Support
+
+If enabled the MQTT support, a status update is pushed to the broker every N seconds.
+By pushing commands to $TOPIC/set, many values can be changed.
+
+
+### Samba
 
 If enabled the CHUANGMI_RECORD_VIDEO directory can be accessed via CIFS.
 The share is readable by everyone.
 
 Default login/password for read/write access:
 * login = root
-* password = Chuangmi720pCam666 (unless you specified another password in **chuangmi-720p-hack.cfg.cfg** file)
+* password = Chuangmi720pCam123 (unless you specified another password in **config.cfg** file)
 
 
-Cloud Services
---------------
+## Cloud Services
 
 Disabling the cloud services disables the following functions:
 
@@ -155,10 +152,9 @@ Disabling the cloud services disables the following functions:
 
 For stability reasons it is recommend to disable cloud services while using RTSP.
 
-I want more !
-=============
+## I want more !
 
-Some scripts are provided in the **sd/chuangmi-720p-hack/scripts** folder. Please read the **README.md** file in this folder for more informations.
+Some scripts are provided in the **sd/firmware/scripts** folder. Please read the **README.md** file in this folder for more informations.
 
 Uninstall the hack
 ==================
@@ -176,11 +172,11 @@ Hack content
 ft/                            Folder that contains the start script for the hack
 ft_config.ini                  Neccessary configuration file for the hack boot
 manufacture.bin                Archive that contains the script test_drv that will enable the hack
-chuangmi-720p-hack/               Chuangmi 720O hack folder
+firmware/            Chuangmi 720O hack folder
  bin/                          Contains server and system binaries for the hack
  etc/                          Configuration files for the services provided by the hack
  scripts/                      Some scripts
  www/                          root of the erb server
-chuangmi-720p-hack.cfg            Chuangmi 720O hack configuration file
+config.cfg                     Chuangmi 720O hack configuration file
 ````
 

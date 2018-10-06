@@ -1,10 +1,13 @@
 build
 prefix
 src
-chuangmi-720p-hack.zip
-sdcard/chuangmi-720p-hack/bin/*
+sdcard/firmware/bin/*
 sdcard/manufacture.bin
 gm_lib/*
 !gm_lib/README
-image.tgz
 sdk/
+sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key
+sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key.pub
+chuangmi-720p-hack.zip
+chuangmi-720p-hack.tgz
+.idea/

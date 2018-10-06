@@ -1,0 +1,73 @@
+#!/bin/sh
+## purpose: controll OTA
+## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
+## author: Jan Sperling , 2017
+
+SD_MOUNTDIR="/tmp/sd"
+if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+then
+    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+else
+    echo "Unable to load basic functions"
+    exit 1
+fi
+
+
+disable_ota() {
+  echo "*** Disabling OTA... "
+
+  disable_binary "/mnt/data/miio_ota/miio_ota" "miio_ota"
+
+  if pgrep restartd >/dev/null
+  then
+      sh /mnt/data/imi/imi_init/S99restartd restart
+  fi
+
+}
+
+enable_ota() {
+  echo "*** Enabling OTA... "
+
+  if [ -f "${SD_MOUNTDIR}/firmware/scripts/.pre-ota.sh" ] && ! mount | grep -q /mnt/data/miio_ota/pre-ota.sh
+  then
+      printf "*** Improve OTA script... "
+      mount --bind "${SD_MOUNTDIR}/firmware/scripts/.pre-ota.sh" /mnt/data/miio_ota/pre-ota.sh
+      ok_fail "$?"
+  fi
+
+  #/mnt/data/imi/imi_init/S95miio_ota
+  enable_binary "/mnt/data/miio_ota/miio_ota" "miio_ota"
+
+  if pgrep restartd >/dev/null
+  then
+      sh /mnt/data/imi/imi_init/S99restartd restart
+  fi
+
+}
+
+
+case "$1" in
+  start)
+    disable_ota
+    ;;
+  stop)
+    enable_ota
+    ;;
+  status)
+    if pgrep miio_ota
+    then
+        echo "OTA not disabled"
+        return 3
+    else
+        echo "OTA disabled"
+        return 0
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status}"
+    exit 1
+    ;;
+esac
+
+exit $?
+

@@ -11,14 +11,16 @@ RUN apt-get update                                                              
       autoconf                                                                                                     \
       build-essential                                                                                              \
       curl                                                                                                         \
-      wget                                                                                                         \
-      vim                                                                                                          \
+      gawk                                                                                                         \
       git-core                                                                                                     \
       lib32z1-dev                                                                                                  \
       make                                                                                                         \
       ncurses-dev                                                                                                  \
       unrar                                                                                                        \
       unzip                                                                                                        \
+      vim                                                                                                          \
+      wget                                                                                                         \
+      zip                                                                                                          \
  && apt-get clean
 
 
@@ -28,7 +30,7 @@ RUN apt-get update                                                              
 
 RUN curl --output /usr/src/toolchain.rar https://fliphess.com/GM8136_SDK_release_v1.0.rar                          \
  && cd /usr/src                                                                                                    \
- && unrar x toolchain.rar
+ && unrar x toolchain.rar > /dev/null
 
 
 ####################################################

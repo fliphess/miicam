@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# Start logging
+#
+
+SD_MOUNTDIR="/tmp/sd"
+if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+then
+    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+else
+    echo "Unable to load basic functions"
+    exit 1
+fi
+
+FT_MODE=`cat /tmp/ft_mode`
+
+if [ "$FT_MODE" == "4" ]
+then
+    [ -x /etc/init.d/S10mdev  ] && /etc/init.d/S10mdev start
+
+    if [ -d "/mnt/media/mmcblk0p1" ]
+    then
+        LOGDIR="/mnt/media/mmcblk0p1/log"
+    else
+        LOGDIR="/tmp/log"
+    fi
+
+    [ -d $LOGDIR ] || mkdir -p $LOGDIR
+fi
+
+
+start() {
+    printf "*** Starting logging... "
+    if [ "$FT_MODE" == "4" ]
+    then
+        start-stop-daemon -b -S -q -m -p /var/run/syslogd.pid --exec /sbin/syslogd -- -n -b 99 -s 2097151 -S -O $LOGDIR/syslog
+    else
+        start-stop-daemon -b -S -q -m -p /var/run/syslogd.pid --exec /sbin/syslogd -- -n -b 10 -S
+    fi
+
+    start-stop-daemon -b -S -q -m -p /var/run/klogd.pid --exec /sbin/klogd -- -n
+    ok_fail "$?"
+}
+
+
+stop() {
+    printf "*** Stopping logging... "
+    start-stop-daemon -K -q -p /var/run/syslogd.pid
+    start-stop-daemon -K -q -p /var/run/klogd.pid
+    ok_fail "$?"
+}
+
+
+case "$1" in
+    start)
+        start
+    ;;
+    stop)
+        stop
+    ;;
+    restart|reload)
+        stop
+        start
+    ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+    ;;
+esac
+
+
+exit $?

@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# restartd
+#
+
+
+SD_MOUNTDIR="/tmp/sd"
+if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]; then
+  . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+else
+  echo "Unable to load basic functions"
+  exit 1
+fi
+
+NAME="restartd"
+DESC="Restartd daemon"
+DAEMON="/mnt/data/restartd/restartd"
+DAEMON_OPTS="-i 30 -c /etc/restartd.conf"
+PIDFILE="/var/run/${NAME}.pid"
+LOGFILE="${LOGDIR}/${NAME}.log"
+
+check_daemon_bin "${DAEMON}" "${DESC}"
+
+case "$1" in
+    start)
+	start_daemon
+    ;;
+    stop)
+	stop_daemon "${PIDFILE}"
+    ;;
+    restart|reload)
+        "$0" stop
+        "$0" start
+    ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+    ;;
+esac
+
+exit $?

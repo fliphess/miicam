@@ -47,12 +47,12 @@ fi
 
 ## Execute custom code
 ##################################################################################
-if [ ! -f "${sd_mountdir}/chuangmi-720p-hack/scripts/.ft_boot.sh" ];then
+if [ ! -f "${sd_mountdir}/firmware/scripts/.ft_boot.sh" ];then
   echo "Error starting ft_boot.sh. Do normal boot."
   do_vg_boot
   exit
 else
-  . "${sd_mountdir}/chuangmi-720p-hack/scripts/.ft_boot.sh"
+  . "${sd_mountdir}/firmware/scripts/.ft_boot.sh"
 fi
 
 ## Simulate S50gm standard flow

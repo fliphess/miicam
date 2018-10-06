@@ -1,0 +1,49 @@
+#!/bin/sh
+## purpose: Init script for Chuangmi MQTT Control
+## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
+## author: Jan Sperling , 2017
+
+SD_MOUNTDIR="/tmp/sd"
+if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+then
+    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+else
+    echo "Unable to load basic functions"
+    exit 1
+fi
+
+NAME="mqtt-interval"
+DESC="MQTT Status Daemon"
+DAEMON="${SD_MOUNTDIR}/firmware/scripts/mqtt-interval.sh"
+
+PIDFILE="/var/run/${NAME}.pid"
+LOGFILE="${LOGDIR}/${NAME}.log"
+
+check_daemon_bin "${DAEMON}" "${DESC}"
+
+case "$1" in
+    start)
+        if ! pgrep ${DAEMON##*/} >/dev/null
+        then
+            start_daemon_background
+        else
+            echo "${DESC} already running."
+        fi
+    ;;
+    stop)
+        stop_daemon
+    ;;
+    restart|reload)
+        "$0" stop
+        "$0" start
+    ;;
+    status)
+        status_daemon
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit $?
