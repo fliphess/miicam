@@ -12,7 +12,6 @@ services:
   - docker
 
 before_install:
-  - rm image.tgz || true
   - docker ps -a
   - docker pull quay.io/fliphess/chuangmi-720p-hack
   - docker build --cache-from quay.io/fliphess/chuangmi-720p-hack -t fliphess/chuangmi-720p-hack .
