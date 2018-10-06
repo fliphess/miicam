@@ -27,6 +27,9 @@ deploy:
   provider: releases
   api_key:
     secure: Hwq2sDcKA3bB+gCsboWHg/9wZDRj0MUBaX2fs52BHDOuA+EPbde96cf+msYVeH3ttMU77qfGNbFmE2+0FGgxA+BGkFY1uQOC+UI8Nk5/aDyTHR6EXD4FCu+8tgaw1ZMHGLE1YqjaRe1DDiAB1ZcL9TZxH4FGoynzK7P1LdttaOstyD6foz7kpp0i+BZb6fIGl0ggizFCYP84TD+VkMPD1DaEVOVma3ikGNsQgWfrpBPQowp7nph+rcAgB0FXsx9XCMCaBc2691b1ntrr61Xc37MHf5BzZ2lcKaFK9RTcOuJSMtlQb3qMLAUQazACdwJBsU8p60ILFBa0z5ci5uYqUcJJTauQcWVnkCkdNSAuNvpnh7o3pB/kGNgxJ8jeNziDr/9AyrbUcNccxzIim09mdufwdtEGL8sSJJCPO5KZc1BxdATZSSyj3gNfLy1iC1O5XLHtdZoEqVWAUnfnFbWwriX6WvI36htYgh3RbBalRbVhCYV2gUZHafq5qOW0qVwh/wq8Xrlh0nRN1RcCzzXt+mBlfGvER13Mpve5Mxdhwbmp2diYBbGqevvzh2tTJmc/Q+o2Tze13w9MXshDvkbdwmSN4e9YYzdpX0hqKXSzbdHhICJB1iFF+96pV4KKM79gHfiUVd2C0W/F4EYzLQhpeQhtkf+vDt0j2JzkUZu1gaI=
-  file: image.tgz
-  on:
+  file_glob: true
+  file: chuangmi-720p-hack.*
+  skip_cleanup: true
+
+on:
     tags: true
