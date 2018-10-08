@@ -5,7 +5,7 @@
 
 This projects aims at providing an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
-With this firmware we i'll try to offer other methods of using this webcam that do not require an internet uplink.
+With this firmware I'll try to offer other methods of using this webcam that do not require an internet uplink.
 
 ![Alt text](chuangmi.jpg?raw=true "Chuangmi 720P camera")
 
@@ -52,7 +52,7 @@ This hack includes:
 * MQTT Control
 
 
-Planed futures:
+Planned futures:
 * Configuration over web server
 * Replace Chinese voice files with English
 * reintroduction of motion detection
