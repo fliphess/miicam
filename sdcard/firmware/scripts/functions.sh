@@ -9,7 +9,7 @@
 SD_MOUNTDIR="/tmp/sd"
 
 LOGDIR="${SD_MOUNTDIR}/log"
-LOGFILE="${LOGDIR}/functions.log"
+LOGFILE="${LOGDIR}/ft_boot.log"
 BASECFG="${SD_MOUNTDIR}/config.cfg"
 CTRL="${SD_MOUNTDIR}/firmware/bin/chuangmi_ctrl"
 

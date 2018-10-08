@@ -1,0 +1,6 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^2.5",
+        "cekurte/environment": "^0.3.0"
+    }
+}

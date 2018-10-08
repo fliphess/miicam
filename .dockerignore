@@ -6,6 +6,7 @@ Dockerfile
 manage.sh
 chuangmi.jpg
 sdcard/firmware/bin/*
+sdcard/firmware/www/vendor
 src/*
 prefix/*
 image.tgz

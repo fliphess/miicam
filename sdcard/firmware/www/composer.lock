@@ -1,0 +1,122 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "bdd9b441cf23b1ca19dd43e1e5f3a3ae",
+    "packages": [
+        {
+            "name": "cekurte/environment",
+            "version": "v0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jpcercal/environment.git",
+                "reference": "6be36b0585b1c856a86247e5d335063ba4f150f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jpcercal/environment/zipball/6be36b0585b1c856a86247e5d335063ba4f150f9",
+                "reference": "6be36b0585b1c856a86247e5d335063ba4f150f9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "cekurte/tdd": "^1.0.1",
+                "phpunit/phpunit": "^4.8",
+                "sensiolabs/security-checker": "^3.0",
+                "squizlabs/php_codesniffer": "^2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Cekurte\\Environment\\": "src/"
+                },
+                "files": [
+                    "src/env.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "João Paulo Cercal",
+                    "email": "jpcercal@gmail.com"
+                }
+            ],
+            "description": "A library to get the values from environment variables and process to php data types",
+            "keywords": [
+                "config",
+                "data",
+                "env",
+                "environment",
+                "process",
+                "types",
+                "variables"
+            ],
+            "time": "2016-05-27T15:00:31+00:00"
+        },
+        {
+            "name": "vlucas/phpdotenv",
+            "version": "v2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vlucas/phpdotenv.git",
+                "reference": "8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e",
+                "reference": "8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dotenv\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Vance Lucas",
+                    "email": "vance@vancelucas.com",
+                    "homepage": "http://www.vancelucas.com"
+                }
+            ],
+            "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
+            "keywords": [
+                "dotenv",
+                "env",
+                "environment"
+            ],
+            "time": "2018-07-29T20:33:41+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

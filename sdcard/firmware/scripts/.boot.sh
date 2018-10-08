@@ -167,7 +167,7 @@ fi
 ## MQTT                           ##
 ####################################
 
-if [ "${MQTT_ENABLED}" -eq 1 ]
+if [ "${MQTT_ENABLED}" -eq 1 ] && [ -x /usr/bin/mosquitto_pub ] && [ -x /usr/bin/mosquitto_sub ]
 then
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-interval start
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-control start

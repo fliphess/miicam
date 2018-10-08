@@ -12,10 +12,12 @@ RUN apt-get update                                                              
       build-essential                                                                                              \
       curl                                                                                                         \
       gawk                                                                                                         \
-      git-core                                                                                                     \
+      git                                                                                                          \
       lib32z1-dev                                                                                                  \
       make                                                                                                         \
       ncurses-dev                                                                                                  \
+      php-cli                                                                                                      \
+      php-mbstring                                                                                                 \
       unrar                                                                                                        \
       unzip                                                                                                        \
       vim                                                                                                          \
@@ -32,6 +34,14 @@ RUN curl --output /usr/src/toolchain.rar https://fliphess.com/GM8136_SDK_release
  && cd /usr/src                                                                                                    \
  && unrar x toolchain.rar > /dev/null
 
+
+####################################################
+## Install composer                               ##
+####################################################
+
+RUN \
+     mkdir -p /usr/local/bin \
+  && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ####################################################
 ## Get repo                                       ##
