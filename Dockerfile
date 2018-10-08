@@ -6,8 +6,9 @@ FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update                                                                                                 \
- && apt-get install -y                                                                                             \
+RUN echo "*** Install required packages"                                                                           \
+ && apt-get -qq update                                                                                             \
+ && apt-get -qq install -y                                                                                         \
       autoconf                                                                                                     \
       build-essential                                                                                              \
       curl                                                                                                         \
@@ -30,7 +31,8 @@ RUN apt-get update                                                              
 ## Download and unpack toolchain                  ##
 ####################################################
 
-RUN curl --output /usr/src/toolchain.rar https://fliphess.com/GM8136_SDK_release_v1.0.rar                          \
+RUN echo "*** Downloading toolchain"                                                                               \
+ && curl -qs --output /usr/src/toolchain.rar https://fliphess.com/GM8136_SDK_release_v1.0.rar                      \
  && cd /usr/src                                                                                                    \
  && unrar x toolchain.rar > /dev/null
 
@@ -39,9 +41,10 @@ RUN curl --output /usr/src/toolchain.rar https://fliphess.com/GM8136_SDK_release
 ## Install composer                               ##
 ####################################################
 
-RUN \
-     mkdir -p /usr/local/bin \
-  && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN echo "*** Installing composer"                                                                                 \
+ && mkdir -p /usr/local/bin                                                                                        \
+ && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 
 ####################################################
 ## Get repo                                       ##

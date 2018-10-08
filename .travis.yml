@@ -17,10 +17,16 @@ before_install:
   - docker build --cache-from quay.io/fliphess/chuangmi-720p-hack -t fliphess/chuangmi-720p-hack .
 
 script:
+  - rm chuangmi-720p-hack.* || true
   - docker run -i -v "$(pwd):/result" --detach=false --tty=true --dns "8.8.8.8" fliphess/chuangmi-720p-hack /bin/bash -c 'make images clean && mv /build/chuangmi-720p-hack.zip /build/chuangmi-720p-hack.tgz /result/'
 
 notifications:
   email: false
+
+before_deploy:
+  - git config --local user.name "Travis Releases Build Bot"
+  - git config --local user.email "spam@fliphess.com"
+  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
 
 deploy:
   provider: releases
@@ -29,6 +35,5 @@ deploy:
   file_glob: true
   file: chuangmi-720p-hack.*
   skip_cleanup: true
-
-on:
+  on:
     tags: true
