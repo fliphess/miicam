@@ -493,7 +493,7 @@ $(BUILDDIR)/runas: $(SOURCEDIR)/$(RUNASARCHIVE)
 	unzip $(SOURCEDIR)/$(RUNASARCHIVE) -d $(BUILDDIR)                                  && \
 	cd $(BUILDDIR)/static-sudo-$(RUNASVERSION)                                         && \
 	$(TARGET)-gcc -static -W -Wall -Wextra -Werror -pedantic rpzsudo.c -o runas        && \
-        cp runas $(PREFIXDIR)/bin/runas                                                    && \
+	cp runas $(PREFIXDIR)/bin/runas                                                    && \
 	rm -rf $(BUILDDIR)/static-sudo-$(RUNASVERSION)                                     && \
 	cd $(TOPDIR)                                                                       && \
 	touch $@
@@ -505,10 +505,10 @@ $(BUILDDIR)/rsync: $(SOURCEDIR)/$(RSYNCARCHIVE)
 	cd $@-$(RSYNCVERSION)                                                              && \
 		$(BUILDENV)                                                                   \
 		./configure CFLAGS="-static" EXEEXT="-static"                                 \
-                        --host=$(TARGET)                                                      \
-                        --target=$(TARGET)                                                 && \
+		--host=$(TARGET)                                                              \
+		--target=$(TARGET)                                                         && \
 		make                                                                       && \
-        cp rsync $(PREFIXDIR)/bin/rsync                                                    && \
+	cp rsync $(PREFIXDIR)/bin/rsync                                                    && \
 	rm -rf $(BUILDDIR)/$@-$(RSYNCVERSION)                                              && \
 	cd $(TOPDIR)                                                                       && \
 	touch $@
