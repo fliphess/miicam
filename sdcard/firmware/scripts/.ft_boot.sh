@@ -91,11 +91,15 @@ fi
 
 echo "*** Mounting /root from sd card"
 
-if ! mountpoint -q /root
+if ! [ -d /tmp/root ]
 then
-    mount --bind ${SD_MOUNTDIR}/firmware/root /root
+    cp -r ${SD_MOUNTDIR}/firmware/root /tmp/root
 fi
 
+if ! mountpoint -q /root
+then
+    mount --rbind /tmp/root /root
+fi
 
 ##################################################################################
 ## Prepare restartd.conf                                                        ##
