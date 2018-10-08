@@ -551,7 +551,7 @@ uninstall:
 	cd $(TOPDIR)/ && find gm_lib -maxdepth 1 -type f -not -name 'README' | xargs rm -f
 
 images: install website
-	echo "*** Creating archive of sdcard/ to image.tgz"                                                                      && \
+	echo "*** Creating archive of sdcard/ to chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz"                              && \
 	zip -r --quiet chuangmi-720p-hack.zip README.md sdcard                                                                   && \
 	tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard                                                             && \
 	echo "*** chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz created"

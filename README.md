@@ -3,17 +3,30 @@
 
 # Chuangmi-720P-hack project
 
+This projects aims at providing an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
+These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
+With this firmware we i'll try to offer other methods of using this webcam that do not require an internet uplink.
+
+![Alt text](chuangmi.jpg?raw=true "Chuangmi 720P camera")
+
+
 ## WARNING - DISCLAIMER
 
 **Many files on the Chuangmi 720P are writable. Be very careful when you modify files on it, you might brick it forever.**
 
-## Purpose
+Although the hack should be fully reversible by removing the sdcard from the camera's slot, it's very easy to screw things up on this camera and create a very shiney paperweight object that doesn't do camera-ing anymore.
+
+I'll try to test every change on my "chuangmi farm" (4 cams running a cronjob that download the latest changes automagically which sourcecode I will add to the rpeo later on when it is 100% stable and idiot proof), but I cannot guarantee that sometimes something destructive slips through.
+
+Always use the releases rather than the latest master or development branches if you want to be sure of a more or less tested setup ;)
+
+
+## Features
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
 
-![Alt text](chuangmi.jpg?raw=true "Chuangmi 720P camera")
-
 This camera has the default following features:
+
 * Wifi
 * Night vision
 * Motion detection: a video file is generated if a motion have been detected in the last 60 seconds.
@@ -21,6 +34,7 @@ This camera has the default following features:
 * Setup thanks to a smartphone application.
 * Local video storage on a SD card
 * No RTSP server
+
 
 This hack includes:
 * No more cloud feature (nothing goes out of your local network)
@@ -33,10 +47,15 @@ This hack includes:
 * Samba Server - _Disabled by default._
 * Syslog to memory card - _Disabled by default._
 * Configure Timezone and use ntpclient to set date and time over Internet
+* Confgurable cronjobs
+* MQTT status updates
+* MQTT Control
+
 
 Planed futures:
 * Configuration over web server
 * Replace Chinese voice files with English
+* reintroduction of motion detection
 
 ## Installation on the Chuangmi 720P camera
 
@@ -50,18 +69,21 @@ Clone this repository on a computer:
 
     git clone https://github.com/fliphess/chuangmi-720p-hack.git
 
+
 Then change into the cloned directory, build the binaries and install them to the sdcard base directory
 
-    cd firmware
+    cd chuangmi-720p-hack
     make
     make install
+    make images
 
-Or use the docker container by running `./build.sh` on a computer running docker.
+Or use the docker container by running `./manage.sh --all` on a computer running docker to create a fully working archive containing all the needs.
+This is the recommended method as it will install and configure all dependencies for you.
+
 
 ### Prepare the memory card
 
 You can use the self compiled image from the cloned repository or download a precompiled release.
-
 Then, format a micro SD card in fat32 (vfat) format and copy the content of the **firmware/sdcard/** folder at the root of your memory card.
 
 The memory card will so contain:
@@ -76,7 +98,6 @@ The memory card will so contain:
 ### Configure the Chuangmi camera on the memory card
 
 To configure the wifi network to use, edit the file **config.cfg**.
-
 To configure the services which should run on the camera, open the file **config.cfg** and set the values.
 
 ## Start the camera
@@ -152,31 +173,12 @@ Disabling the cloud services disables the following functions:
 
 For stability reasons it is recommend to disable cloud services while using RTSP.
 
+
 ## I want more !
 
-Some scripts are provided in the **sd/firmware/scripts** folder. Please read the **README.md** file in this folder for more informations.
+Some scripts are provided in the **sd/firmware/scripts** folder.
 
-Uninstall the hack
-==================
+
+## Uninstall the hack
 
 There are no files altered on the camera so simply remove the SD card to uninstall the hack.
-
-
-How it works ?
-==============
-
-Hack content
-------------
-
-```
-ft/                            Folder that contains the start script for the hack
-ft_config.ini                  Neccessary configuration file for the hack boot
-manufacture.bin                Archive that contains the script test_drv that will enable the hack
-firmware/            Chuangmi 720O hack folder
- bin/                          Contains server and system binaries for the hack
- etc/                          Configuration files for the services provided by the hack
- scripts/                      Some scripts
- www/                          root of the erb server
-config.cfg                     Chuangmi 720O hack configuration file
-````
-

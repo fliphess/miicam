@@ -93,7 +93,7 @@ echo "*** Mounting /root from sd card"
 
 if ! mountpoint -q /root
 then
-    mount --bind /root ${SD_MOUNTDIR}/firmware/root
+    mount --bind ${SD_MOUNTDIR}/firmware/root /root
 fi
 
 
