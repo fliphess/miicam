@@ -13,7 +13,7 @@ function usage()
 
     ${0} [--build|--build-docker|--shell|--all] <arguments>
 
-    Manages the container build environment we I use
+    Manages the container build environment I use
     to cross compile binaries and build a firmware tarbal
 
     Options:
