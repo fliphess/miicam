@@ -8,6 +8,7 @@ gm_lib/*
 sdk/
 sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key
 sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key.pub
+sdcard/firmware/root/.ssh
 sdcard/firmware/www/vendor
 chuangmi-720p-hack.zip
 chuangmi-720p-hack.tgz

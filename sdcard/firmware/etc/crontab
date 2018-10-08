@@ -1,5 +1,5 @@
 SHELL=/bin/sh
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:/sbin:/bin:/usr/sbin:/usr/bin
 
 # min hour day_of_month month day_of_week command
 
