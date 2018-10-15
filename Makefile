@@ -199,7 +199,6 @@ $(SOURCEDIR)/$(RSYNCARCHIVE):
 $(SOURCEDIR)/$(RUNASARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RUNASURI)     || rm -f $@
 
-
 $(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(ZLIBVERSION)
 	tar -xzf $(SOURCEDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
@@ -513,7 +512,6 @@ $(BUILDDIR)/rsync: $(SOURCEDIR)/$(RSYNCARCHIVE)
 	cd $(TOPDIR)                                                                       && \
 	touch $@
 
-
 sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
 
@@ -531,9 +529,11 @@ $(SAMPLES):
 .PHONY: website install uninstall images clean
 
 website:
-	cd $(WEBROOT) && \
-	$(COMPOSER) install
-
+	cd $(WEBROOT)                                                                                                            && \
+	echo '*** Running composer install in $(WEBROOT)'                                                                        && \
+	$(COMPOSER) install                                                                                                      && \
+	echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues'                                      && \
+	find $(WEBROOT)/vendor -type l -delete
 
 install: all
 	mkdir -p $(INSTALLDIR)                                                                                                   && \

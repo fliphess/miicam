@@ -259,12 +259,12 @@ get_daemon_state()
     then
         if kill -0 "${PID}" >/dev/null 2>/dev/null
         then
-            echo "ON"
+            echo "on"
         else
-            echo "OFF"
+            echo "off"
         fi
     else
-        echo "OFF"
+        echo "off"
     fi
 
     return "${RC}"
@@ -321,7 +321,7 @@ get_isp328()
 
     echo r ${VARIABLE} > /proc/isp328/command
 
-    cat /proc/isp328/command
+    echo "$( cat /proc/isp328/command )"
     RC="$?"
 
     return "${RC}"
@@ -350,7 +350,7 @@ set_isp328()
 get_gpio()
 {
     PIN="$1"
-    cat /sys/class/gpio/gpio${PIN}/value
+    echo $( cat /sys/class/gpio/gpio${PIN}/value )
     RC="$?"
 
     return "${RC}"
@@ -406,22 +406,22 @@ blue_led()
 
     case "$INPUT" in
         on)
-            /mnt/data/miot/ledctl 0 50 0 0 0 2 > /dev/null
+            ${CTRL} LEDSTATUS 0 0 > /dev/null
             RC="$?"
-            echo "ON" > /var/run/blue_led
+            set_nvram blue_led on
         ;;
         off)
-            /mnt/data/miot/ledctl 0 50 1 0 0 2 > /dev/null
+            ${CTRL} LEDSTATUS 0 1 > /dev/null
             RC="$?"
-            echo "OFF" > /var/run/blue_led
+            set_nvram blue_led off
         ;;
         blink)
-            /mnt/data/miot/ledctl 0 50 2 0 0 2 > /dev/null
+            ${CTRL} LEDSTATUS 0 2 > /dev/null
             RC="$?"
-            echo "BLINK" > /var/run/blue_led
+            set_nvram blue_led blink
         ;;
         status)
-            echo "$( cat /var/run/blue_led )"
+            echo $( get_nvram blue_led )
             RC="$?"
         ;;
         *)
@@ -440,22 +440,22 @@ yellow_led()
 
     case "$INPUT" in
         on)
-            /mnt/data/miot/ledctl 1 50 0 0 0 2 > /dev/null
+            ${CTRL} LEDSTATUS 1 0 > /dev/null
             RC="$?"
-            echo "ON" > /var/run/yellow_led
+            set_nvram yellow_led on
         ;;
         off)
-            /mnt/data/miot/ledctl 1 50 1 0 0 2 > /dev/null
+            ${CTRL} LEDSTATUS 1 1 > /dev/null
             RC="$?"
-            echo "OFF" > /var/run/yellow_led
+            set_nvram yellow_led off
         ;;
         blink)
-            /mnt/data/miot/ledctl 1 50 2 0 0 2 > /dev/null
+            ${CTRL} LEDSTATUS 1 2 > /dev/null
             RC="$?"
-            echo "BLINK" > /var/run/yellow_led
+            set_nvram yellow_led blink
         ;;
         status)
-            echo "$( cat /var/run/yellow_led )"
+            echo "$( get_nvram yellow_led )"
             RC="$?"
         ;;
         *)
@@ -482,15 +482,15 @@ ir_led()
         on)
             ${CTRL} IRLED 255 > /dev/null
             RC="$?"
-            echo "ON" > /var/run/ir_led
+            set_nvram ir_led on
         ;;
         off)
             ${CTRL} IRLED 0 > /dev/null
             RC="$?"
-            echo "OFF" > /var/run/ir_led
+            set_nvram ir_led off
         ;;
         status)
-            echo $( cat /var/run/ir_led )
+            echo "$( get_nvram ir_led )"
             RC="$?"
         ;;
         *)
@@ -506,11 +506,11 @@ ir_led()
 led_status()
 {
 
-    YELLOW="$( cat /var/run/yellow_led )"
-    BLUE="$( cat /var/run/blue_led )"
-    IR_LED="$( cat /var/run/ir_led )"
+    YELLOW="$( get_nvram yellow_led )"
+    IR_LED="$( get_nvram ir_led     )"
+    BLUE="$(   get_nvram blue_led   )"
 
-    echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"IR_LED\":\"$IR_LED\"}"
+    echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
 
     return 0
 }
@@ -532,7 +532,7 @@ ir_cut()
             set_gpio 15 0
             RC="$?"
 
-            echo "ON" > /var/run/ircut
+            set_nvram ir_cut on
         ;;
         off)
             set_gpio 14 0
@@ -541,10 +541,10 @@ ir_cut()
             set_gpio 15 1
             RC="$?"
 
-            echo "OFF" > /var/run/ircut
+            set_nvram ir_cut off
         ;;
         status)
-            echo $( cat /var/run/ircut 2>/dev/null )
+            echo "$( get_nvram ir_cut )"
             RC="$?"
         ;;
         *)
@@ -592,15 +592,12 @@ night_mode()
             STATUS="$( get_isp328 daynight )"
             RC="$?"
 
-            if [ "${AUTO_NIGHT_MODE}" -eq 1 ]
+            if [ "${AUTO_NIGHT_MODE}" -eq 1 ] || [ "$STATUS" == "DAY_MODE" ]
             then
-                echo "AUTO"
-            elif [ "$STATUS" == "DAY_MODE" ]
-            then
-                echo "OFF"
+                echo "off"
             elif [ "$STATUS" == "NIGHT_MODE" ]
             then
-                echo "ON"
+                echo "on"
             else
                 echo "$STATUS"
             fi
@@ -634,10 +631,10 @@ flip()
 
             if [ "$STATUS" -eq 0 ]
             then
-                echo "OFF"
+                echo "off"
             elif [ "$STATUS" -eq 1 ]
             then
-                echo "ON"
+                echo "on"
             else
                 echo "UNKNOWN"
             fi
@@ -671,10 +668,10 @@ mirror()
 
             if [ "$STATUS" -eq 0 ]
             then
-                echo "OFF"
+                echo "off"
             elif [ "$STATUS" -eq 1 ]
             then
-                echo "ON"
+                echo "on"
             else
                 echo "UNKNOWN"
             fi

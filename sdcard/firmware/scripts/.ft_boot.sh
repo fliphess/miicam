@@ -94,6 +94,8 @@ echo "*** Mounting /root from sd card"
 if ! [ -d /tmp/root ]
 then
     cp -r ${SD_MOUNTDIR}/firmware/root /tmp/root
+    chown -R root:root /tmp/root
+    chmod -R 0750 /root
 fi
 
 if ! mountpoint -q /root

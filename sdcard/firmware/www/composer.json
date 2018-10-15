@@ -1,6 +1,13 @@
 {
     "require": {
-        "vlucas/phpdotenv": "^2.5",
-        "cekurte/environment": "^0.3.0"
+        "monolog/monolog": "^1.17",
+        "slim/slim": "^3.11",
+        "slim/twig-view": "^2.4",
+        "vlucas/phpdotenv": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "libs/"
+        }
     }
 }

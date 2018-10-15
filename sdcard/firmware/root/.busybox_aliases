@@ -1,3 +1,5 @@
 
+alias php='/tmp/sd/firmware/bin/arm-php'
+alias ssh='/tmp/sd/firmware/bin/dbclient'
 alias vim=vi
 alias view=less

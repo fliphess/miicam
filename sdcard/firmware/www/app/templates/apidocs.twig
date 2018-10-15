@@ -1,0 +1,210 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+
+    <div style="padding:0 16px;">
+    <h1>Chuangmi 720P API Docs</h1>
+    <p>Here you can find an overview of the available API endpoints. To make things easy for embedded devices, only GET requests are used where possible.</p>
+
+    <h2>Camera Control</h2>
+    <p>Endpoints:</p>
+    <ul>
+      <li><pre>GET /api/camera</pre></li>
+      <p>Returns a json of the current camera settings state.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/ir_cut</pre></li>
+      <p>Get the current state of infra red cut.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/ir_cut/set/on</pre></li>
+      <p>Turn infra red cut on.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/ir_cut/set/off</pre></li>
+      <p>Turn infra red cut off.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/night_mode</pre></li>
+      <p>Get the curent state of night mode.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/night_mode/set/on</pre></li>
+      <p>Turn night mode on.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/night_mode/set/off</pre></li>
+      <p>Turn night mode off.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/flip_mode</pre></li>
+      <p>Get the current state of flip mode.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/flip_mode/set/on</pre></li>
+      <p>Turn flip mode on.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/flip_mode/set/off</pre></li>
+      <p>Turn flip mode off.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/mirror_mode</pre></li>
+      <p>Get the current state of mirror mode.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/mirror_mode/set/on</pre></li>
+      <p>Turn mirror mode on.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/mirror_mode/set/off</pre></li>
+      <p>Turn mirror mode off.</p>
+    </ul>
+    <br/>
+
+
+    <h2>LED Control</h2>
+
+    <p>Endpoints:</p>
+    <ul>
+      <li><pre>GET /api/led</pre></li>
+      <p>Returns the current state of the leds.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/blue</pre></li>
+      <p>Returns the state of the blue led.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/blue/set/on</pre></li>
+      <p>Turn the blue led on.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/blue/set/off</pre></li>
+      <p>Turn the blue led off.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/blue/set/blink</pre></li>
+      <p>Turn the blue led to blinking.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/yellow</pre></li>
+      <p>Returns the state of the yellow led.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/yellow/set/on</pre></li>
+      <p>Turn the yellow led on.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/yellow/set/off</pre></li>
+      <p>Turn the yellow led off.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/yellow/set/blink</pre></li>
+      <p>Turn the yellow led to blinking.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/ir</pre></li>
+      <p>Returns the state of the infra red leds.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/ir/set/on</pre></li>
+      <p>Turn on the infra red leds.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/led/ir/set/off</pre></li>
+      <p>Turn off the infra red leds.</p>
+    </ul>
+    <br/>
+
+
+    <h2>ISP 328 Control</h2>
+
+    <p>Endpoints:</p>
+    <ul>
+      <li><pre>GET /api/camera</pre></li>
+      <p>Returns a json of the current camera settings state.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/isp328</pre></li>
+      <p>Returns a list with all available isp328 camera parameters</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/isp328/get/{key}</pre></li>
+      <p>Returns the value for a specific isp328 parameter</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/camera/isp328/set/{key}/{value}</pre></li>
+      <p>Sets the value for a isp328 parameter (Use with care!)</p>
+    </ul>
+    <br/>
+
+
+    <h2>System</h2>
+
+    <p>Endpoints:</p>
+    <ul>
+      <li><pre>get /api/ping</pre></li>
+      <p>testing endpoint to verify if the api is responsive.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/wifi</pre></li>
+      <p>Returns a json with the current wifi state.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/proclist</pre></li>
+      <p>Returns the processlist of the camera.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/dmesg</pre></li>
+      <p>Returns the <code>dmesg</code> output of the camera.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/diskusage</pre></li>
+      <p>Returns the output of <code>df -h</code>.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/uptime</pre></li>
+      <p>Returns the uptime of the camera.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/load</pre></li>
+      <p>Returns the system load and process count.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/reboot</pre></li>
+      <p>Initiates a reboot of the camera.</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/system/shutdown</pre></li>
+      <p>Initiates a shutdown of the camera.</p>
+    </ul>
+    <br/>
+
+
+    <h2>NVRAM Settings K/V Store</h2>
+
+    <p>Endpoints:</p>
+    <ul>
+      <li><pre>GET /api/nvram</pre></li>
+      <p>Returns a json with all key value pairs</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/nvram/get/{key}</pre></li>
+      <p>Request the value for a stored key</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/nvram/set/{key}/{value}</pre></li>
+      <p>Set the the value for a new nonexisting key</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/nvram/unset/{key}</pre></li>
+      <p>Unset the key and value of an existing key (use carefully!)</p>
+    </ul>
+    <ul>
+      <li><pre>GET /api/nvram/overwrite/{key}/{value}</pre></li>
+      <p>Set the value for an existing key</p>
+    </ul>
+    <br/>
+
+
+{% endblock %}

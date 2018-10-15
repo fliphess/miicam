@@ -8,6 +8,9 @@ chuangmi.jpg
 sdcard/firmware/root/.ssh
 sdcard/firmware/bin/*
 sdcard/firmware/www/vendor
+sdcard/firmware/composer.lock
+sdcard/logs
+sdcard/log
 src/*
 prefix/*
 tf_recovery.img
@@ -16,3 +19,4 @@ chuangmi-720p-hack.zip
 chuangmi-720p-hack.tgz
 sdk/
 .idea
+tf_recovery.img

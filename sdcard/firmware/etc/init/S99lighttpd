@@ -15,7 +15,7 @@ fi
 NAME="lighttpd"
 DESC="web server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
-DAEMON_OPTS="-f ${SD_MOUNTDIR}/firmware/etc/lighttpd.conf"
+DAEMON_OPTS="-f /etc/lighttpd.conf"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
 
@@ -25,9 +25,9 @@ case "$1" in
     start)
         [ ! -d "${SD_MOUNTDIR}/firmware/tmp" ] && mkdir -p "${SD_MOUNTDIR}/firmware/tmp"
 
-        if [ ! -s "${SD_MOUNTDIR}/firmware/etc/lighttpd.user" ] || ! ( grep -q "^root" ${SD_MOUNTDIR}/firmware/etc/lighttpd.user )
+        if [ ! -s "/etc/lighttpd.user" ] || ! ( grep -q "^root" /etc/lighttpd.user )
         then
-            echo "root:$ROOT_PASSWORD" >> "${SD_MOUNTDIR}/firmware/etc/lighttpd.user"
+            echo "root:$ROOT_PASSWORD" >> "/etc/lighttpd.user"
         fi
 
         start_daemon

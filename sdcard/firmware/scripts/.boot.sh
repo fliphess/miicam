@@ -32,6 +32,19 @@ then
     mount --rbind "${SD_MOUNTDIR}/firmware/bin" /tmp/sd/ft
 fi
 
+
+##################################################################################
+## Configure NVRAM                                                              ##
+##################################################################################
+
+echo "*** Configuring NVRAM"
+for setting in blue_led yellow_led ir_led ir_cut ; do
+    nvram set "${i}"=off
+done
+
+nvram commit
+
+
 ##################################################################################
 ## Wait for network with booting                                                ##
 ##################################################################################
@@ -41,8 +54,9 @@ then
     wait_for_network_until "$PING_RETRIES" "$PING_WAIT" "$PING_IP"
 fi
 
+
 ##################################################################################
-## Start enabled services
+## Start enabled services                                                       ##
 ##################################################################################
 
 ####################################
@@ -167,7 +181,7 @@ fi
 ## MQTT                           ##
 ####################################
 
-if [ "${MQTT_ENABLED}" -eq 1 ] && [ -x /usr/bin/mosquitto_pub ] && [ -x /usr/bin/mosquitto_sub ]
+if [ "${ENABLE_MQTT}" -eq 1 ] && [ -x /usr/bin/mosquitto_pub ] && [ -x /usr/bin/mosquitto_sub ]
 then
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-interval start
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-control start
