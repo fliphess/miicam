@@ -25,29 +25,31 @@ class LED
     public function __construct() { }
 
     // * Get the state of a led
-    public function GetState($led) {
+    public function GetState(string $led) {
         if (!in_array($led, self::$leds)) return;
         return NVRAM::Get($led);
     }
 
     // * Set the state of a led
-    public function SetState($led, $state) {
+    public function SetState(string $led, string $state) {
         if (!in_array($led, self::$leds) || !in_array($state, self::$states)) return;
         return NVRAM::Set($led, $state);
     }
 
-    public static function Ctl($arguments) {
-    	$command = sprintf("%s %s", self::$chuangmi_ctrl, $arguments);
+    public static function Ctl(string $arguments) {
+        $command = sprintf("%s %s", self::$chuangmi_ctrl, $arguments);
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing %s: %s', $command, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
         }
     }
 
     // * Returns True if led is on
-    public function IsLedOn($led) {
-    	$state = self::GetState($led);
+    public function IsLedOn(string $led) {
+        $state = self::GetState($led);
         return (($state == "on") || ($state == "blink")) ? true : false;
     }
 
@@ -221,29 +223,37 @@ class ISP328
     private function ReadValue() {
         $output = @file_get_contents("/proc/isp328/command");
         if ($output == false) {
-            throw new \Exception('Error retrieving isp328 output from /proc/isp328/command');
+            throw new \Exception(
+                'Error retrieving isp328 output from /proc/isp328/command'
+            );
         }
         return trim($output);
     }
 
-    public function Get($key) {
+    public function Get(string $key) {
         if (!in_array($key, self::$all_isp_keys)) {
-            throw new \Exception(sprintf('Invalid input: Key %s not in known keys.', $key));
+            throw new \Exception(
+                sprintf('Invalid input: Key %s not in known keys.', $key)
+            );
         }
 
         $command = sprintf("echo r %s > /proc/isp328/command", escapeshellarg($key));
 
         exec($command, $output, $return);
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing %s: %s', $command, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
         }
 
         return self::ReadValue();
     }
 
-    public function Set($key, $value) {
+    public function Set(string $key, string $value) {
         if (!in_array($key, self::$all_isp_keys)) {
-            throw new \Exception('Invalid input: Key %s not in known keys.');
+            throw new \Exception(
+                'Invalid input: Key %s not in known keys.'
+            );
         }
 
         $current_value = self::Get($key);
@@ -254,7 +264,9 @@ class ISP328
 
         exec($command, $output, $return);
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing %s: %s', $command, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
         }
 
         return self::ReadValue();

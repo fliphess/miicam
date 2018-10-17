@@ -65,14 +65,14 @@ fi
 
 if [ "${ENABLE_TELNETD}" -eq 1 ] || [ "${ENABLE_SSHD}"  -eq 0 ]
 then
-    sh ${SD_MOUNTDIR}/firmware/etc/init/S50telnet start
+    sh ${SD_MOUNTDIR}/firmware/etc/init/S99telnet start
 
     if ! grep -q '^telnetd' /tmp/etc/restartd.conf
     then
-        echo "telnetd \"/usr/sbin/telnetd\" \"${SD_MOUNTDIR}/firmware/etc/init/S50telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
+        echo "telnetd \"/usr/sbin/telnetd\" \"${SD_MOUNTDIR}/firmware/etc/init/S99telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
     fi
 else
-    sh ${SD_MOUNTDIR}/firmware/etc/init/S50telnet stop
+    sh ${SD_MOUNTDIR}/firmware/etc/init/S99telnet stop
 fi
 
 ####################################

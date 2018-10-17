@@ -3,59 +3,36 @@
 $app->group('/api', function () use ($app) {
 
     // **************************************************************
-    // ** API docs	                                               **
-    // **************************************************************
-    $app->get('', function ($request, $response, $args) {
-        $this->logger->addInfo('Serving route for /api to: ' . $_SERVER['REMOTE_ADDR']);
-
-        return $this->view->render($response, 'apidocs.twig', [
-            'title' => 'API Docs Page'
-        ]);
-    })->setName('/api');
-
-    // **************************************************************
     // ** Ping                                                     **
     // **************************************************************
     $app->get('/ping', function ($request, $response) {
-        $this->logger->addInfo('Serving route for /api/ping to: ' . $_SERVER['REMOTE_ADDR']);
-
         return $response->withJson(array("success" => true, "data" => "pong"), 200);
     })->setName('/api/ping');
 
     // **************************************************************
     // ** WIFI                                                     **
     // **************************************************************
-    $app->group('/wifi', function () use ($app) {
-
-        $app->get('', function ($request,$response) {
-            $this->logger->addInfo('Serving route for /api/wifi to: ' . $_SERVER['REMOTE_ADDR']);
-
-            $wifistate = WIFI::DataDict();
-            $data = ($wifistate) ? $wifistate : array("success" => false);
-            return $response->withJson($data);
-        })->setName('/api/wifi');
-
-    });
+    $app->get('/wifi', function ($request,$response) {
+        $wifistate = WIFI::DataDict();
+        $data = ($wifistate) ? $wifistate : array("success" => false);
+        return $response->withJson($data);
+    })->setName('/api/wifi');
 
     // **************************************************************
     // ** LEDS                                                     **
     // **************************************************************
     $app->group('/led', function () use ($app) {
 
-        $app->get('', function ($request,$response) {
-            $this->logger->addInfo('Serving route for /api/led to: ' . $_SERVER['REMOTE_ADDR']);
-
+        $app->get('/state', function ($request,$response) {
             $ledstate = LED::LedState();
             $data = ($ledstate) ? $ledstate : array("success" => false);
             return $response->withJson($data);
-        })->setName('/api/led');
+        })->setName('/api/led/state');
 
         // *********************************
         // ** Blue LED                    **
         // *********************************
         $app->get('/blue', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/blue to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                 "led"   => "blue_led",
                 "state" => (Blue_Led::IsOn()) ? "on" : "off",
@@ -64,8 +41,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/blue');
 
         $app->get('/blue/set/on', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/blue/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             Blue_Led::TurnOn();
 
             $data    = array(
@@ -77,8 +52,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/blue/set/on');
 
         $app->get('/blue/set/blink', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/blue/set/blink to: ' . $_SERVER['REMOTE_ADDR']);
-
            Blue_Led::TurnBlink();
 
             $data = array(
@@ -90,8 +63,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/blue/set/blink');
 
         $app->get('/blue/set/off', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/blue/set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             Blue_Led::TurnOff();
 
             $data = array(
@@ -106,8 +77,6 @@ $app->group('/api', function () use ($app) {
         // ** Yellow LED                  **
         // *********************************
         $app->get('/yellow', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/yellow to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                 "led"   => "yellow_led",
                 "state" => (Yellow_Led::IsOn()) ? "on" : "off",
@@ -116,8 +85,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/yellow');
 
         $app->get('/yellow/set/on', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/yellow/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             Yellow_Led::TurnOn();
             $data = array(
                 "led"     => "yellow_led",
@@ -128,8 +95,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/yellow/set/on');
 
         $app->get('/yellow/set/blink', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/yellow/set/blink to: ' . $_SERVER['REMOTE_ADDR']);
-
             Yellow_Led::TurnBlink();
             $data    = array(
                 "led"     => "yellow_led",
@@ -140,8 +105,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/yellow/set/blink');
 
         $app->get('/yellow/set/off', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/yellow/set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             Yellow_Led::TurnOff();
             $data    = array(
                 "led"     => "yellow_led",
@@ -155,8 +118,6 @@ $app->group('/api', function () use ($app) {
         // ** IR LED                      **
         // *********************************
         $app->get('/ir', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/ir to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                 "led" => "ir_led",
                 "state" => (IR_Led::IsOn()) ? "on" : "off",
@@ -165,8 +126,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/ir');
 
         $app->get('/ir/set/on', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/ir/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             IR_Led::TurnOn();
 
             $data = array(
@@ -178,8 +137,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/led/ir/set/on');
 
         $app->get('/ir/set/off', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/led/ir/set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             IR_Led::TurnOff();
 
             $data = array(
@@ -197,9 +154,7 @@ $app->group('/api', function () use ($app) {
     // **************************************************************
     $app->group('/camera', function () use ($app) {
 
-        $app->get('', function ($request,$response) {
-            $this->logger->addInfo('Serving route for /api/camera to: ' . $_SERVER['REMOTE_ADDR']);
-
+        $app->get('/state', function ($request,$response) {
             $camerastate = CameraState();
             $data = ($camerastate) ? $camerastate : array("success" => false);
             return $response->withJson($data);
@@ -209,8 +164,6 @@ $app->group('/api', function () use ($app) {
         // ** ISP328                      **
         // *********************************
         $app->get('/isp328', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/camera/isp328 to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                 "keys"   => ISP328::$all_isp_keys,
             );
@@ -218,8 +171,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/isp328');
 
         $app->get('/isp328/get/{key}', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/isp328/get to: ' . $_SERVER['REMOTE_ADDR']);
-
             $key   = $args['key'];
             $value = ISP328::Get($key);
 
@@ -232,8 +183,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/isp328/get');
 
         $app->get('/isp328/set/{key}/{value}', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/isp32/set to: ' . $_SERVER['REMOTE_ADDR']);
-
             $key    = $args['key'];
             $value  = $args['value'];
 
@@ -252,8 +201,6 @@ $app->group('/api', function () use ($app) {
         // ** IR Cut                      **
         // *********************************
         $app->get('/ir_cut', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/ir_cut to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                  "key" => "ir_cut",
                  "state" => IR_Cut::IsOn() ? "on" : "off",
@@ -262,8 +209,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/ir_cut');
 
         $app->get('/ir_cut/set/on', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/ir_cut/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             IR_Cut::TurnOn();
 
             $data = array(
@@ -275,8 +220,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/ir_cut/set/on');
 
         $app->get('/ir_cut/set/off', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/ir_cut/set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             IR_Cut::TurnOff();
             $data = array(
                 "led"     => "ir_cut",
@@ -290,8 +233,6 @@ $app->group('/api', function () use ($app) {
         // ** Night Mode                  **
         // *********************************
         $app->get('/night_mode', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/night_mode to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                  "key" => "night_mode",
                  "state" => NightMode::IsOn() ? "on" : "off",
@@ -300,8 +241,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/night_mode');
 
         $app->get('/night_mode/set/on', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/night_mode/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             NightMode::TurnOn();
 
             $data = array(
@@ -313,8 +252,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/night_mode/set/on');
 
         $app->get('/night_mode/set/off', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/night_mode_set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             NightMode::TurnOff();
             $data = array(
                 "led"     => "night_mode",
@@ -328,8 +265,6 @@ $app->group('/api', function () use ($app) {
         // ** Flip Mode                   **
         // *********************************
         $app->get('/flip_mode', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/flip_mode to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                  "key" => "flip_mode",
                  "state" => FlipMode::IsOn() ? "on" : "off",
@@ -338,8 +273,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/flip_mode');
 
         $app->get('/flip_mode/set/on', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/flip_mode/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             FlipMode::TurnOn();
             $data = array(
                 "key"     => "flip_mode",
@@ -350,8 +283,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/flip_mode/set/on');
 
         $app->get('/flip_mode/set/off', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/flip_mode/set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             FlipMode::TurnOff();
             $data = array(
                 "led"     => "flip_mode",
@@ -365,8 +296,6 @@ $app->group('/api', function () use ($app) {
         // ** Mirror Mode                 **
         // *********************************
         $app->get('/mirror_mode', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/mirror_mode to: ' . $_SERVER['REMOTE_ADDR']);
-
             $data = array(
                  "key" => "mirror_mode",
                  "state" => MirrorMode::IsOn() ? "on" : "off",
@@ -375,8 +304,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/mirror_mode');
 
         $app->get('/mirror_mode/set/on', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/mirror_mode/set/on to: ' . $_SERVER['REMOTE_ADDR']);
-
             MirrorMode::TurnOn();
             $data = array(
                 "key"     => "mirror_mode",
@@ -387,8 +314,6 @@ $app->group('/api', function () use ($app) {
         })->setName('/api/camera/mirror_mode/set/on');
 
         $app->get('/mirror_mode/set/off', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/camera/mirror_mode/set/off to: ' . $_SERVER['REMOTE_ADDR']);
-
             MirrorMode::TurnOff();
             $data = array(
                 "led"     => "mirror_mode",
@@ -405,17 +330,13 @@ $app->group('/api', function () use ($app) {
     // **************************************************************
     $app->group('/nvram', function () use ($app) {
 
-        $app->get('', function ($request,$response) {
-            $this->logger->addInfo('Serving route for /api/nvram to: ' . $_SERVER['REMOTE_ADDR']);
-
+        $app->get('/state', function ($request,$response) {
             $nvram = NVRAM::Show();
             $data  = ($nvram) ? $nvram : array("success" => false);
             return $response->withJson($data);
-        });
+        })->setName('/api/nram');
 
         $app->get('/get/{key}', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/nvram/get to: ' . $_SERVER['REMOTE_ADDR']);
-
             $key = $args['key'];
             $exists = NVRAM::Exists($key);
 
@@ -433,11 +354,9 @@ $app->group('/api', function () use ($app) {
                 );
             }
             return $response->withJson($data);
-        });
+        })->setName('/api/nvram/get');
 
         $app->get('/set/{key}/{value}', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/nvram/set to: ' . $_SERVER['REMOTE_ADDR']);
-
             $key    = $args['key'];
             $value  = $args['value'];
 
@@ -454,11 +373,9 @@ $app->group('/api', function () use ($app) {
                 );
             }
             return $response->withJson($data);
-        });
+        })->setName('/api/nvram/set');
 
         $app->get('/unset/{key}', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/nvram/unset to: ' . $_SERVER['REMOTE_ADDR']);
-
             $key = $args['key'];
 
             if (!NVRAM::Exists($key)) {
@@ -470,11 +387,9 @@ $app->group('/api', function () use ($app) {
                     "success" => NVRAM::Unset_Key($key));
             }
             return $response->withJson($data);
-        });
+        })->setName('/api/nvram/unset');
 
         $app->get('/overwrite/{key}/{value}', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/nvram/overwrite to: ' . $_SERVER['REMOTE_ADDR']);
-
             $key    = $args['key'];
             $value  = $args['value'];
 
@@ -490,7 +405,7 @@ $app->group('/api', function () use ($app) {
                 "value"   => $value,
             );
             return $response->withJson($data);
-        });
+        })->setName('/api/nvram/overwrite');
 
     });
 
@@ -501,8 +416,6 @@ $app->group('/api', function () use ($app) {
     $app->group('/system', function () use ($app) {
 
         $app->get('/proclist', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/system/proclist to: ' . $_SERVER['REMOTE_ADDR']);
-
             $proclist = OS::Proclist();
             $success  = ($proclist) ? true : false;
             $data     = array(
@@ -513,8 +426,6 @@ $app->group('/api', function () use ($app) {
         });
 
         $app->get('/dmesg', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/system/dmesg to: ' . $_SERVER['REMOTE_ADDR']);
-
             $dmesg    = OS::Dmesg();
             $success  = ($dmesg) ? true : false;
             $data     = array(
@@ -523,11 +434,9 @@ $app->group('/api', function () use ($app) {
             );
 
             return $response->withJson($data);
-        });
+        })->setName('/api/system/dmesg');
 
         $app->get('/diskusage', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/system/diskusage to: ' . $_SERVER['REMOTE_ADDR']);
-
             $diskusage = OS::DiskUsage();
             $success   = ($diskusage) ? true : false;
             $data      = array(
@@ -536,11 +445,9 @@ $app->group('/api', function () use ($app) {
             );
 
             return $response->withJson($data);
-        });
+        })->setName('/api/system/diskusage');
 
         $app->get('/uptime', function ($request, $response) {
-            $this->logger->addInfo('Serving route for /api/system/uptime to: ' . $_SERVER['REMOTE_ADDR']);
-
             $uptime   = OS::Uptime();
             $success  = ($uptime) ? true : false;
             $data     = array(
@@ -549,11 +456,9 @@ $app->group('/api', function () use ($app) {
             );
 
             return $response->withJson($data);
-        });
+        })->setName('/api/system/uptime');
 
         $app->get('/load', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/system/load to: ' . $_SERVER['REMOTE_ADDR']);
-
             $load    = OS::Load();
             $success = ($load) ? true : false;
             $data    = array(
@@ -561,11 +466,9 @@ $app->group('/api', function () use ($app) {
                 "success" => $success,
             );
             return $response->withJson($data);
-        });
+        })->setName('/api/system/load');
 
         $app->get('/reboot', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/system/reboot to: ' . $_SERVER['REMOTE_ADDR']);
-
             $reboot   = OS::Reboot();
             $success  = ($reboot) ? true : false;
             $data     = array(
@@ -573,11 +476,9 @@ $app->group('/api', function () use ($app) {
                 "success" => $success,
             );
             return $response->withJson($data);
-        });
+        })->setName('/api/system/reboot');
 
         $app->get('/shutdown', function ($request, $response, $args) {
-            $this->logger->addInfo('Serving route for /api/system/shutdown to: ' . $_SERVER['REMOTE_ADDR']);
-
             $shutdown = OS::Shutdown();
             $success  = ($shutdown) ? true : false;
             $data = array(
@@ -585,9 +486,78 @@ $app->group('/api', function () use ($app) {
                 "success" => $success,
             );
             return $response->withJson($data);
-        });
+        })->setName('/api/system/shutdown');
 
     });
 
+    // **************************************************************
+    // ** Services                                                 **
+    // **************************************************************
+    $app->group('/services', function () use ($app) {
+        $app->get('/state', function ($request, $response) {
+            $data = Services::ServicesState();
+            return $response->withJson($data);
+        })->setName('/api/services');
 
+        $app->get('/{service}/running', function ($request, $response, $args) {
+            $service = $args['service'];
+            $data    = array(
+                 "service" => $service,
+                 "state" => (Services::IsRunning($service)) ? "on" : "off",
+             );
+            return $response->withJson($data);
+        })->setName('/api/service/running');
+
+        $app->get('/{service}/status', function ($request, $response, $args) {
+            $service = $args['service'];
+            $output  = Services::Status($service);
+
+            $data    = array(
+                "service" => $service,
+                "output"  => $output,
+                "success" => ($output) ? true : false,
+            );
+            return $response->withJson($data);
+        })->setName('/api/service/status');
+
+        $app->get('/{service}/start', function ($request, $response, $args) {
+            $service = $args['service'];
+            $output  = Services::Start($service);
+
+            $data    = array(
+                "service" => $service,
+                "output"  => $output,
+                "success" => ($output) ? true : false,
+            );
+
+            return $response->withJson($data);
+        })->setName('/api/service/start');
+
+        $app->get('/{service}/stop', function ($request, $response, $args) {
+            $service = $args['service'];
+            $output  = Services::Stop($service);
+
+            $data    = array(
+                "service" => $service,
+                "output"  => $output,
+                "success" => ($output) ? true : false,
+            );
+            return $response->withJson($data);
+        })->setName('/api/service/stop');
+
+        $app->get('/{service}/restart', function ($request, $response, $args) {
+            $service = $args['service'];
+            $output  = Services::Restart($service);
+
+            $data    = array(
+                "service" => $service,
+                "output"  => $output,
+                "success" => ($output) ? true : false,
+            );
+            return $response->withJson($data);
+        })->setName('/api/service/restart');
+
+    });
 });
+
+

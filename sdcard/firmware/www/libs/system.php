@@ -8,28 +8,32 @@ class GPIO
 {
     public function __construct() {}
 
-    public function Get($pin) {
-        $command = sprintf("cat '/sys/class/gpio/gpio%s/value' 2>&1", $pin);
+    public function Get(int $pin) {
+        $command = sprintf("cat '/sys/class/gpio/gpio%d/value' 2>&1", $pin);
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error retrieving GPIO value: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error retrieving GPIO value: %s', implode(" ", $output))
+            );
         }
 
         return trim(implode(" ", $output));
     }
 
-    public function Set($pin, $value) {
+    public function Set(int $pin, int $value) {
 
         $current = self::Get($pin);
 
         if ($current == $value) return true;
 
-        $command = sprintf("echo %s > '/sys/class/gpio/gpio%s/value'", $value, $pin);
+        $command = sprintf("echo %d > '/sys/class/gpio/gpio%d/value'", $value, $pin);
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error setting GPIO value for pin %s: %s', $pin, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error setting GPIO value for pin %d: %s', $pin, implode(" ", $output))
+            );
         }
 
         return true;
@@ -47,19 +51,21 @@ class NVRAM
 
     public function __construct() {}
 
-    public function Get($key) {
+    public function Get(string $key) {
         $command = sprintf('%s get %s 2>&1', self::$nvram, escapeshellarg($key));
 
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error retrieving NVRAM value for key %s: %s', $key, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error retrieving NVRAM value for key %s: %s', $key, implode(" ", $output))
+            );
         }
 
         return trim(implode("", $output));
     }
 
-    public function Set($key, $value) {
+    public function Set(string $key, string $value) {
         $current = self::Get($key);
 
         if ($current == $value) return true;
@@ -68,20 +74,24 @@ class NVRAM
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error setting NVRAM value for key %s: %s', $key, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error setting NVRAM value for key %s: %s', $key, implode(" ", $output))
+            );
         }
 
         $command = sprintf('%s commit 2>&1', self::$nvram);
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error committing NVRAM changes: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error committing NVRAM changes: %s', implode(" ", $output))
+            );
         }
 
         return true;
     }
 
-    public function Exists($key) {
+    public function Exists(string $key) {
         $data = self::Show();
 
         if ($data) {
@@ -96,7 +106,9 @@ class NVRAM
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception('Error retrieving NVRAM show data: ' . implode(" ", $output));
+            throw new \Exception(
+                sprintf('Error retrieving NVRAM show data: %s', implode(" ", $output))
+            );
         }
 
         $data = array();
@@ -107,21 +119,25 @@ class NVRAM
         return $data;
     }
 
-    public function Unset_Key($key) {
+    public function Unset_Key(string $key) {
         if (!self::Exists($key)) return false;
 
         $command = sprintf("%s unset %s 2>&1", self::$nvram, escapeshellarg($key));
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error unsetting NVRAM key %s: %s', $key, implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error unsetting NVRAM key %s: %s', $key, implode(" ", $output))
+            );
         }
 
         $command = sprintf('%s commit 2>&1', self::$nvram);
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception('Error committing NVRAM changes: ' . implode(" ", $output));
+            throw new \Exception(
+                sprintf('Error committing NVRAM changes: %s', implode(" ", $output))
+            );
         }
 
         return true;
@@ -195,14 +211,16 @@ class Net_Wifi
     var $REG_WPA_IE_STRING        = 'WPA Version 1';
     var $REG_WPA2_IE_STRING       = 'IEEE 802.11i/WPA2 Version 1';
 
-    function get($strInterface)
+    function get(string $strInterface)
     {
         $arLines = array();
         $command = sprintf('/sbin/iwconfig %s 2>&1', escapeshellarg($strInterface));
         exec($command, $arLines, $return);
 
         if ($return != 0) {
-            throw new \Exception('Error retrieving iwconfig output: ' . implode(" ", $arLines));
+            throw new \Exception(
+                sprintf('Error retrieving iwconfig output: %s', implode(" ", $arLines))
+            );
         }
 
         $strAll = implode("\n", $arLines);
@@ -211,7 +229,7 @@ class Net_Wifi
     }
 
 
-    private function parse($strAll)
+    private function parse(string $strAll)
     {
         $objConfig = new Net_Wifi_Config();
 
@@ -388,7 +406,9 @@ class OS
         exec("/sbin/reboot -d 5 2>&1", $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing reboot: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing reboot: %s', implode(" ", $output))
+            );
         }
 
         return implode("\n", $output);
@@ -398,22 +418,12 @@ class OS
         exec("/sbin/poweroff -d 5 2>&1", $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing poweroff: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing poweroff: %s', implode(" ", $output))
+            );
         }
 
         return implode("\n", $output);
-    }
-
-    public static function IsRunning($name) {
-        if (is_executable('/usr/bin/pgrep')) {
-            $command = sprintf("/usr/bin/pgrep %s 2>&1", escapeshellarg($name));
-            exec($command, $output, $return);
-
-            if (!empty($output) && ($return == 0)) {
-                return true;
-            }
-            return false;
-        }
     }
 
     public static function Uptime() {
@@ -421,7 +431,9 @@ class OS
         $uptime = @file_get_contents( "/proc/uptime");
 
         if ($uptime == false) {
-            throw new \Exception('Error retrieving uptime from /proc/uptime');
+            throw new \Exception(
+                'Error retrieving uptime from /proc/uptime'
+            );
         }
 
         $uptime = explode(" ",$uptime);
@@ -453,7 +465,9 @@ class OS
         $content = @file_get_contents("/proc/loadavg");
 
         if (empty($content) || ($content == false)) {
-            throw new \Exception('Error retrieving load averages from /proc/loadavg');
+            throw new \Exception(
+                'Error retrieving load averages from /proc/loadavg'
+            );
         }
 
         list($now, $five, $ten, $procs, $_) = explode(" ", $content);
@@ -472,7 +486,9 @@ class OS
         exec("/bin/dmesg", $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing dmesg: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing dmesg: %s', implode(" ", $output))
+            );
         }
 
         return implode("\n", $output);
@@ -482,7 +498,9 @@ class OS
         exec("/bin/ps -ef 2>&1", $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing ps -ef: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing ps -ef: %s', implode(" ", $output))
+            );
         }
 
         return implode("\n", $output);
@@ -492,7 +510,9 @@ class OS
         exec("/bin/df -h 2>&1", $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(sprintf('Error executing df -h: %s', implode(" ", $output)));
+            throw new \Exception(
+                sprintf('Error executing df -h: %s', implode(" ", $output))
+            );
         }
 
         return implode("\n", $output);

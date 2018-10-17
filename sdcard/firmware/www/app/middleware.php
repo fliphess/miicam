@@ -14,7 +14,7 @@ $app->add(function ($req, $res, $next) {
 });
 
 
-// Trailing slash middleware
+// * Trailing slash middleware
 $app->add(function (Request $request, Response $response, callable $next) {
     $uri = $request->getUri();
     $path = $uri->getPath();
@@ -31,3 +31,24 @@ $app->add(function (Request $request, Response $response, callable $next) {
     return $next($request, $response);
 });
 
+
+// * Log al requests
+$app->add(function (Request $request, Response $response, callable $next) {
+    $route = $request->getAttribute('route');
+    $response = $next($request, $response);
+    $uri = $request->getUri();
+
+    $logline = array(
+        "remote_ip" => $_SERVER['REMOTE_ADDR'],
+        "method"    => $request->getMethod(),
+        "status"    => $response->getStatusCode(),
+        "reason"    => $response->getReasonPhrase(),
+        "host"      => $uri->getHost(),
+        "port"      => $uri->getPort(),
+        "uri"       => $uri->getPath(),
+        "query"     => $uri->getQuery(),
+    );
+
+    $this->logger->info(json_encode($logline));
+    return $response;
+});
