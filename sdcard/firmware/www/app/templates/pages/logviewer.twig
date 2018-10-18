@@ -1,0 +1,63 @@
+{% extends "base/layout.twig" %}
+
+{% block head_extra %}
+<script src="/static/js/vue.min.js"></script>
+<script src="/static/js/axios.min.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<div style="padding:0 16px;">
+        <h1>Log Viewer</h1>
+
+        <style type="text/css">
+            #app {
+                font-family: monospace;
+                font-size: 12px;
+                white-space: pre-wrap;
+                color: #333;
+            }
+            #logpicker {
+
+            }
+        </style>
+
+        <div id="app">
+               <div id="logpicker">
+                     <button v-on:click="logtype = 'syslog';   seek = 0">Select Syslog</button>
+                     <button v-on:click="logtype = 'bootlog';  seek = 0">Select Bootlog</button>
+                     <button v-on:click="logtype = 'webapp';   seek = 0">Select Webapp Logs</button>
+                     <button v-on:click="logtype = 'lighttpd'; seek = 0">Select Webserver Log</button>
+                </div>
+                <p>Now tailing ${logtype}, select a log to view.</p>
+
+               <div v-for="line in lines">${line}</div>
+        </div>
+</div>
+
+<script>
+    const app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#app',
+        data: {
+            lines: [],
+            seek: 0,
+            logtype: "syslog"
+        },
+        mounted () {
+            this.load();
+            setInterval(this.load, 4000);
+        },
+        methods: {
+            load () {
+                var url = `/logviewer/${this.logtype}/refresh?seek=${this.seek}`;
+                axios.get(url)
+                    .then(response => {
+                        this.lines = [...response.data.lines.reverse(), ...this.lines];
+                        this.seek = response.data.seek;
+                    });
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,8 +1,12 @@
 <?php
 
+use Slim\Http\Request;
+use Slim\Http\Response;
+
+
 // * Main index page
 $app->get('/', function ($request, $response, $args) {
-    return $this->view->render($response, 'index.twig', [
+    return $this->view->render($response, 'pages/index.twig', [
         'title' => 'Main Page',
     ]);
 })->setName('/');
@@ -10,7 +14,7 @@ $app->get('/', function ($request, $response, $args) {
 
 // * About page
 $app->get('/about', function ($request, $response, $args) {
-    return $this->view->render($response, 'about.twig', [
+    return $this->view->render($response, 'pages/about.twig', [
         'title'    => 'About Page',
         'hostname' => getenv('HOSTNAME'),
     ]);
@@ -25,7 +29,7 @@ $app->get('/info', function ($request, $response, $args) {
 
 // * Settings page
 $app->get('/settings', function ($request, $response, $args) {
-    return $this->view->render($response, 'settings.twig', [
+    return $this->view->render($response, 'pages/settings.twig', [
         'title' => 'Settings Page'
     ]);
 })->setName('/settings');
@@ -33,7 +37,8 @@ $app->get('/settings', function ($request, $response, $args) {
 
 // * API Docs
 $app->get('/apidocs', function ($request, $response, $args) {
-     return $this->view->render($response, 'apidocs.twig', [
+     return $this->view->render($response, 'pages/apidocs.twig', [
          'title' => 'API Docs Page'
      ]);
 })->setName('/apidocs');
+

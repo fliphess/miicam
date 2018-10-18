@@ -18,6 +18,12 @@ $app->group('/api', function () use ($app) {
         return $response->withJson($data);
     })->setName('/api/wifi');
 
+    $app->get('/wifi/ifconfig', function ($request,$response) {
+        $state = WIFI::IfConfig();
+        $data = ($state) ? $state : array("success" => false);
+        return $response->withJson($data);
+    })->setName('/api/wifi/ifconfig');
+
     // **************************************************************
     // ** LEDS                                                     **
     // **************************************************************

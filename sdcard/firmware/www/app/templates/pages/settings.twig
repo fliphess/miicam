@@ -1,6 +1,6 @@
-{% extends "layout.twig" %}
+{% extends "base/layout.twig" %}
 
-{% block content %}
+{% block body %}
     <div style="padding:0 16px;">
       <h1>Camera Settings - Not Working yet</h1>
       <table>
@@ -151,9 +151,4 @@
           </tr>
       </table>
     <div>
-    <script type="text/javascript">
-      var ip = location.host;
-      document.getElementById("ip").textContent=ip;
-      document.getElementById("ch0_0").href="rtsp://"+ip+":554/live/ch00_0";
-    </script>
 {% endblock %}

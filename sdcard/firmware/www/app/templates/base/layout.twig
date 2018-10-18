@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width" />
     <title>{{ title }}</title>
     <link rel="stylesheet" href="/static/css/chuangmi.css">
+    {% block head_extra %}{% endblock %}
   </head>
 
   <body>
-    {% include "navigation.twig" %}
-    {% block content %}{% endblock %}
+    {% include "base/navigation.twig" %}
+    {% block body %}{% endblock %}
   </body>
 </html>

@@ -1,12 +1,8 @@
 <?php
 
-use Slim\Http\Request;
-use Slim\Http\Response;
-
-// * Generic routes (/, /about, /settings, /info)
+// * routes
 require "routes/main.php";
-
-// * API routes
+require "routes/logview.php";
 require "routes/api.php";
 
 // * Last route (404)
