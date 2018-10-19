@@ -48,24 +48,28 @@
         },
         methods: {
             syslog: function() {
+                this.lines = [];
                 this.seek = 0;
                 this.logtype = 'syslog';
                 this.logdesc = "the general syslog file";
                 this.load();
             },
             bootlog: function() {
-                this.logtype = 'bootlog';
+                this.lines = [];
                 this.seek = 0;
+                this.logtype = 'bootlog';
                 this.logdesc = "the camera's bootup log file";
                 this.load();
             },
             webapp: function() {
+                this.lines = [];
                 this.seek = 0;
                 this.logtype = 'webapp';
                 this.logdesc = "the webapp's request logging";
                 this.load();
             },
             lighttpd: function() {
+                this.lines = [];
                 this.seek = 0;
                 this.logtype = 'lighttpd';
                 this.logdesc = "the webserver's error log";

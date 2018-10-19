@@ -35,6 +35,15 @@ then
     exit
 fi
 
+if [ "${PURGE_LOGFILES_AT_BOOT}" -eq 1 ]
+then
+    if [ -d "${SD_MOUNTDIR}/log" ]
+    then
+        echo "*** Purging old log files... "
+        rm ${SD_MOUNTDIR}/log/*
+    fi
+fi
+
 (
 cat << EOF
 
@@ -64,6 +73,7 @@ EOF
 ##################################################################################
 ## Syslog                                                                       ##
 ##################################################################################
+
 
 sh "${SD_MOUNTDIR}/firmware/etc/init/S01logging" restart
 
@@ -95,7 +105,7 @@ if ! [ -d /tmp/root ]
 then
     cp -r ${SD_MOUNTDIR}/firmware/root /tmp/root
     chown -R root:root /tmp/root
-    chmod -R 0750 /root
+    chmod -R 0750 /tmp/root
 fi
 
 if ! mountpoint -q /root
