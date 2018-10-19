@@ -126,10 +126,11 @@ class Services
     }
 
     public static function ServicesState() {
-        $services = array();
+        $services = [];
 
         foreach (self::$all_services as $service => $managed) {
-            $services[$service] = array(
+            $services[] = array(
+                "name"    => $service,
                 "running" => self::IsRunning($service),
                 "managed" => $managed,
              );

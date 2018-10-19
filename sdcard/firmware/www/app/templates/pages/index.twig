@@ -1,9 +1,21 @@
 {% extends "base/layout.twig" %}
 
 {% block body %}
-    <div style="padding:0 16px;">
-	<div align="center">
-      <h1>Chuangmi 720P HTTP Server</h1>
-      <img src="/static/images/chuangmi.jpg">
+
+<div style="padding:0 16px;">
+    <div align="center">
+        <h1>Chuangmi 720P HTTP Server</h1>
+        <p>This Chuangmi is powered by a custom firmware. See the github page <a href="https://github.com/fliphess/chuangmi-720p-hack"</a> for more informations</a>.</p>
+        <img src="/static/images/chuangmi.jpg">
+        <h2>RTSP stream channels</h2>
+        <p>High definition video stream: <a id="ch0_0" href=""> link</a></p>
+
+        <script type="text/javascript">
+            var ip = location.host;
+            document.getElementById("ch0_0").href="rtsp://"+ip+":554/live/ch00_0";
+         </script>
     </div
+</div
+
 {% endblock %}
+

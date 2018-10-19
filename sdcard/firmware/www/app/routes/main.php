@@ -13,9 +13,9 @@ $app->get('/', function ($request, $response, $args) {
 
 
 // * About page
-$app->get('/about', function ($request, $response, $args) {
-    return $this->view->render($response, 'pages/about.twig', [
-        'title'    => 'About Page',
+$app->get('/overview', function ($request, $response, $args) {
+    return $this->view->render($response, 'pages/overview.twig', [
+        'title'    => 'Overview Page',
         'hostname' => getenv('HOSTNAME'),
     ]);
 })->setName('/about');

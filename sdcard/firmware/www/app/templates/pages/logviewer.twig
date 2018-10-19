@@ -17,19 +17,16 @@
                 white-space: pre-wrap;
                 color: #333;
             }
-            #logpicker {
-
-            }
         </style>
 
         <div id="app">
                <div id="logpicker">
-                     <button v-on:click="logtype = 'syslog';   seek = 0">Select Syslog</button>
-                     <button v-on:click="logtype = 'bootlog';  seek = 0">Select Bootlog</button>
-                     <button v-on:click="logtype = 'webapp';   seek = 0">Select Webapp Logs</button>
-                     <button v-on:click="logtype = 'lighttpd'; seek = 0">Select Webserver Log</button>
+                     <button v-on:click="syslog">Select Syslog</button>
+                     <button v-on:click="bootlog">Select Bootlog</button>
+                     <button v-on:click="webapp">Select Webapp Logs</button>
+                     <button v-on:click="lighttpd">Select Webserver Log</button>
                 </div>
-                <p>Now tailing ${logtype}, select a log to view.</p>
+                <p>Now tailing ${logdesc}, select a log to view.</p>
 
                <div v-for="line in lines">${line}</div>
         </div>
@@ -42,13 +39,38 @@
         data: {
             lines: [],
             seek: 0,
-            logtype: "syslog"
+            logtype: "syslog",
+            logdesc: "the general syslog file",
         },
         mounted () {
             this.load();
             setInterval(this.load, 4000);
         },
         methods: {
+            syslog: function() {
+                this.seek = 0;
+                this.logtype = 'syslog';
+                this.logdesc = "the general syslog file";
+                this.load();
+            },
+            bootlog: function() {
+                this.logtype = 'bootlog';
+                this.seek = 0;
+                this.logdesc = "the camera's bootup log file";
+                this.load();
+            },
+            webapp: function() {
+                this.seek = 0;
+                this.logtype = 'webapp';
+                this.logdesc = "the webapp's request logging";
+                this.load();
+            },
+            lighttpd: function() {
+                this.seek = 0;
+                this.logtype = 'lighttpd';
+                this.logdesc = "the webserver's error log";
+                this.load();
+            },
             load () {
                 var url = `/logviewer/${this.logtype}/refresh?seek=${this.seek}`;
                 axios.get(url)
