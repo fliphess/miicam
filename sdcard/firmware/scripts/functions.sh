@@ -368,6 +368,15 @@ set_gpio()
     return "${RC}"
 }
 
+##################################################################################
+## Create Snapshot                                                              ##
+##################################################################################
+
+update_snapshot() {
+    echo "Creating snapshot to /tmp/sd/firmware/www/public/snapshot.jpg"
+    /tmp/sd/firmware/bin/ffmpeg -loglevel fatal -i rtsp://localhost:554/live/ch00_0 -vframes 1 -r 1 -y /tmp/sd/firmware/www/public/snapshot.jpg
+}
+
 
 ##################################################################################
 ## Config manipulation functions                                                ##

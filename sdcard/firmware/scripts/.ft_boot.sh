@@ -52,7 +52,6 @@ Running Chuangmi 720P hack
 Chuangmi 720P hack configuration:
 
   HOSTNAME       = ${HOSTNAME}
-  ROOT_PASSWORD  = ${ROOT_PASSWORD}
   WIFI_SSID      = ${WIFI_SSID}
   WIFI_PASS      = ${WIFI_PASS}
   TIMEZONE       = ${TIMEZONE}

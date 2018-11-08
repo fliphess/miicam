@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>System</title>
+
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+    <link rel="stylesheet" href="/static/css/chuangmi.css">
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/polyfill.min.js"></script>
+    <script src="/static/js/bootstrap-vue.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+  </head>
+
+  <body>
+      <ul class="topnav">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/snapshot.html">Snapshot</a></li>
+        <li><a href="/settings.html">Settings</a></li>
+        <li><a href="/system.html">System</a></li>
+        <li><a href="/services.html">Services</a></li>
+        <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/apidocs.html">API Docs</a></li>
+        <li class="right"><a class="active">System</a></li>
+      </ul>
+    <div class="content">
+
+
+<div style="padding:0 16px;">
+    <h1>System</h1>
+    <p>View OS system utils output</p>
+
+    <div id="app">
+        <b-alert variant="danger"
+            dismissible
+            :show="show_alert"
+            @dismissed="show_alert=false">
+            {{ alert_message }}
+        </b-alert>
+
+        <b-modal id="WarningModal" title="Please confirm to continue..." size="lg" v-model="isModalOpen" @ok="submit()">
+            <div id="question">
+                Are you sure you want to initiate a ${section}? Press OK to confirm.
+                <br/>
+            </div>
+        </b-modal>
+
+         <div id="SysViewer">
+               <b-button-group>
+                   <b-button v-on:click="select('proclist')">Process List</b-button>
+                   <b-button v-on:click="select('dmesg')">Dmesg</b-button>
+                   <b-button v-on:click="select('diskusage')">Disk Usage</b-button>
+                   <b-button v-on:click="select('uptime')">Uptime</b-button>
+                   <b-button v-on:click="select('cpuinfo')">CPU Info</b-button>
+                   <b-button v-on:click="select('meminfo')">Memory Info</b-button>
+                   <b-button v-on:click="select('memfree')">Memory Free</b-button>
+                   <b-button v-on:click="select('ifconfig')">If Config</b-button>
+                   <b-button v-on:click="select('iwconfig')">Iw Config</b-button>
+                   <b-button variant="danger" v-on:click="select('reboot')" v-b-modal="'WarningModal'">Reboot</b-button>
+                   <b-button variant="danger" v-on:click="select('shutdown')" v-b-modal="'WarningModal'">Shutdown</b-button>
+               </b-button-group>
+         </div>
+         <br/>
+
+         <p>Selected: <b>{{ section }}</b>: {{ desc }}</p>
+
+         <pre><code>
+             <div class="output" v-for="line in output">{{ line }}</div>
+         </code></pre>
+    </div>
+</div>
+
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            isModalOpen: false,
+            show_alert: false,
+            alert_message: "",
+            output: "",
+            section: "system",
+            desc: "",
+            sections: {
+                system: {
+                    desc: "Push a button :)",
+                    url: "",
+                },
+                reboot: {
+                    desc: "Press OK to initiate a reboot of the camera",
+                    url: "",
+                },
+                shutdown: {
+                    desc: "Press OK to initiate a shutdown of the camera.",
+                    url: "",
+                },
+                proclist: {
+                    desc: "Print the process list of the camera",
+                    url: `/api/system/proclist`,
+                },
+                dmesg: {
+                    desc: "Print the dmesg output of the camera",
+                    url: `/api/system/dmesg`,
+                },
+                diskusage: {
+                    desc: "Print disk usage",
+                    url: `/api/system/diskusage`,
+                },
+                uptime: {
+                    desc: "Show system uptime",
+                    url: `/api/system/uptime`,
+                },
+                cpuinfo: {
+                    desc: "Show system cpuinfo",
+                    url: `/api/system/cpuinfo`,
+                },
+                meminfo: {
+                    desc: "Show system memory info",
+                    url: `/api/system/meminfo`,
+                },
+                memfree: {
+                    desc: "Show system memory usage",
+                    url: `/api/system/memfree`,
+                },
+                ifconfig: {
+                    desc: "Show ifconfig output",
+                    url: `/api/system/ifconfig`,
+                },
+                iwconfig: {
+                    desc: "Show iwconfig output",
+                    url: `/api/system/iwconfig`,
+                },
+            },
+        },
+        methods: {
+            submit: function() {
+                var url;
+
+                if (this.section == "reboot")
+                    url = `/api/system/reboot`;
+                else if (this.section == "shutdown")
+                    url = `/api/system/shutdown`;
+
+                if (url) {
+                    axios.get(url)
+                      .then(response => {
+                          if (response.data.success) {
+                              this.output = response.data.output;
+                          } else {
+                              this.reset();
+                              this.show_alert = true;
+                              this.alert_message = response.data.output;
+                          }
+                      })
+                      .catch(error => {
+                          this.reset();
+                          this.show_alert = true;
+                          this.alert_message = error.response.data.message;
+                      });
+                }
+            },
+            reset: function() {
+                this.output = [];
+            },
+            select: function(section) {
+                this.reset();
+                this.section = section;
+                this.desc = this.sections[this.section].desc;
+
+                var url = this.sections[this.section].url;
+
+                if (url) {
+                    axios.get(url)
+                      .then(response => {
+                          if (response.data.success) {
+                              this.output = response.data.output;
+                          } else {
+                              this.reset();
+                              this.show_alert = true;
+                              this.alert_message = response.data.output;
+                          }
+                      })
+                      .catch(error => {
+                          this.reset();
+                          this.show_alert = true;
+                          this.alert_message = error.response.data.message;
+                      });
+                }
+            },
+        },
+        mounted () {
+            this.select(this.section);
+        }
+    });
+</script>
+
+
+
+
+
+    </div>
+  </body>
+</html>

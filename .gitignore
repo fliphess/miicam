@@ -9,9 +9,8 @@ sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key.pub
 sdcard/firmware/root/.ssh
 sdcard/firmware/www/vendor
 sdcard/firmware/www/composer.lock
-gm_lib/*
-!gm_lib/README
 sdk/
 chuangmi-720p-hack.zip
 chuangmi-720p-hack.tgz
 .idea/
+.vscode

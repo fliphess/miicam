@@ -25,7 +25,7 @@ class Services
         "rtsp"            => true,
         "samba"           => true,
         "syslogd"         => false,  // Syslogging can't be stopped for now
-        "telnetd"         => true,
+        "telnet"          => true,
         "udhcpc"          => false,
         "watchdog"        => false,
         "wpa_supplicant"  => false,

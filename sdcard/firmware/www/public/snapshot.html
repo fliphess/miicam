@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Snapshot</title>
+
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+    <link rel="stylesheet" href="/static/css/chuangmi.css">
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/polyfill.min.js"></script>
+    <script src="/static/js/bootstrap-vue.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+
+  </head>
+
+  <body>
+      <ul class="topnav">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/snapshot.html">Snapshot</a></li>
+        <li><a href="/settings.html">Settings</a></li>
+        <li><a href="/system.html">System</a></li>
+        <li><a href="/services.html">Services</a></li>
+        <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/apidocs.html">API Docs</a></li>
+        <li class="right"><a class="active">Snapshot</a></li>
+      </ul>
+    <div class="content">
+
+        <div style="padding:0 16px;">
+            <h1>Snapshot</h1>
+            <p>View, Take and Save snapshots of the rtsp stream.
+                This is implemented by snapshotting the rtsp stream using ffmpeg (Heavy! Slow!) and thus only works if rtsp is enabled.
+                In the future, this will be managed from the rtsp software itself.
+            </p>
+
+            <div id="app">
+                <b-alert variant="danger"
+                     dismissible
+                     :show="show_alert"
+                     @dismissed="show_alert=false">
+                     {{ alert_message }}
+                </b-alert>
+                <div id="buttons">
+                    <b-button-group>
+                    <b-button v-on:click="TakeSnapshot">Refresh Snapshot</b-button>
+                    <b-button v-on:click="SaveCurImage">Save current snapshot image</b-button>
+                    <b-button v-on:click="SaveNewImage">Save new snapshot image</b-button>
+                    </b-button-group>
+                </div>
+                <br/>
+                <img img v-bind:src="image_url" />
+                <br/>
+                <div id="output">
+                <pre v-if="output"><code>{{ output }}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const app = new Vue({
+                el: '#app',
+                data: {
+                    show_alert: false,
+                    alert_message: "",
+                    tag: 1,
+                    output: "",
+                    image_url: "./snapshot.jpg",
+                },
+                methods: {
+                    call: function(url) {
+                        axios.get(url)
+                            .then(response => {
+                                this.output = response.data;
+                                this.show_alert = false;
+                                this.image();
+
+                            })
+                            .catch(error => {
+                                this.output = "";
+                                this.show_alert = true;
+                                this.alert_message = error.response.data.message;
+                            });
+                    },
+                    image: function() {
+                        this.tag += 1;
+                        this.image_url = './snapshot.jpg?tag=' + this.tag;
+                    },
+                    SaveCurImage: function() {
+                        this.call(`/api/snapshot/save/current`);
+                    },
+                    SaveNewImage: function() {
+                        this.call(`/api/snapshot/save/new`);
+                    },
+                    TakeSnapshot: function() {
+                        this.call(`/api/snapshot/create`);
+                    },
+                }
+            });
+        </script>
+
+    </div>
+  </body>
+</html>
