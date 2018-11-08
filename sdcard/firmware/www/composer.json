@@ -2,7 +2,6 @@
     "require": {
         "monolog/monolog": "^1.17",
         "slim/slim": "^3.11",
-        "slim/twig-view": "^2.4",
         "vlucas/phpdotenv": "^2.5"
     },
     "autoload": {

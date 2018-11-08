@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Main Page</title>
+
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+    <link rel="stylesheet" href="/static/css/chuangmi.css">
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/polyfill.min.js"></script>
+    <script src="/static/js/bootstrap-vue.js"></script>
+
+  </head>
+
+  <body>
+      <ul class="topnav">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/snapshot.html">Snapshot</a></li>
+        <li><a href="/settings.html">Settings</a></li>
+        <li><a href="/system.html">System</a></li>
+        <li><a href="/services.html">Services</a></li>
+        <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/apidocs.html">API Docs</a></li>
+        <li class="right"><a class="active">Main Page</a></li>
+      </ul>
+    <div class="content">
+        <div style="padding:0 16px;">
+            <h1>Chuangmi 720P HTTP Server</h1>
+                <p>This Chuangmi is powered by a custom firmware.</p>
+                <p>See the github page <a href="https://github.com/fliphess/chuangmi-720p-hack"</a> for more informations</a>.</p>
+                <img src="/static/images/chuangmi.jpg">
+                <h2>RTSP stream channels</h2>
+                <p>High definition video stream: <a id="ch0_0" href=""> link</a></p>
+
+                <script type="text/javascript">
+                    var ip = location.host;
+                    document.getElementById("ch0_0").href="rtsp://"+ip+":554/live/ch00_0";
+                 </script>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>

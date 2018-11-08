@@ -6,15 +6,10 @@ return [
         'addContentLengthHeader'            => false, // Allow the web server to send the content-length header
         'responseChunkSize'                 => 1024,
 
-        // Renderer settings
-        'renderer' => [
-            'template_path' => '../app/templates/',
-        ],
-
         // Monolog settings
         'logger' => [
             'name' => 'chuangmi-app',
-            'path' => '../../../log/webapp.log',
+            'path' => '../../../../log/webapp.log',
             'level' => \Monolog\Logger::DEBUG,
         ],
     ],

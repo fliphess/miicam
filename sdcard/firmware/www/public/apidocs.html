@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>API Docs</title>
+
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+    <link rel="stylesheet" href="/static/css/chuangmi.css">
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/polyfill.min.js"></script>
+    <script src="/static/js/bootstrap-vue.js"></script>
+
+  </head>
+
+  <body>
+      <ul class="topnav">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/snapshot.html">Snapshot</a></li>
+        <li><a href="/settings.html">Settings</a></li>
+        <li><a href="/system.html">System</a></li>
+        <li><a href="/services.html">Services</a></li>
+        <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/apidocs.html">API Docs</a></li>
+        <li class="right"><a class="active">API Docs</a></li>
+      </ul>
+    <div class="content">
+
+        <div style="padding:0 16px;">
+            <h1>Chuangmi 720P API Docs</h1>
+            <p>Here you can find an overview of the available API endpoints. To make things easy for embedded devices, only GET requests are used where possible.</p>
+
+            <div id="app">
+                 <div id="DocViewer">
+                     <b-button-group>
+                         <b-button v-on:click="select('snapshot')">Snapshot</b-button>
+                         <b-button v-on:click="select('camera')">Camera</b-button>
+                         <b-button v-on:click="select('leds')">LEDS</b-button>
+                         <b-button v-on:click="select('system')">System</b-button>
+                         <b-button v-on:click="select('isp328')">ISP 328</b-button>
+                         <b-button v-on:click="select('services')">Services</b-button>
+                         <b-button v-on:click="select('nvram')">NVRam</b-button>
+                     </b-button-group>
+                 </div>
+                 <br/>
+
+                 <h2>{{ title }}</h2>
+
+                <p>Endpoints:</p>
+                <ul id="apidocs">
+                    <li v-for="endpoint in endpoints">
+                       <pre><code>{{ endpoint.method }} {{ endpoint.uri }}</code></pre>
+                       <p>{{ endpoint.desc }}</p>
+                   </li>
+                </ul>
+
+                <ul>
+                </ul>
+
+            </div>
+        </div>
+
+        <script>
+            const app = new Vue({
+                el: '#app',
+                data: {
+                    section: "snapshot",
+                    title: "",
+                    endpoints: [],
+                    sections: {
+                        snapshot: {
+                            title: "Snapshot Control",
+                            endpoints: [
+                               { method: 'GET', uri: '/api/snapshot/create',            desc: 'Update the snapshot image by overwriting it with a new one (only works if rtspd is running)'},
+                               { method: 'GET', uri: '/api/snapshot/save/new',          desc: 'Create a snapshot image and save it in the image directory. (only works if rtspd is running)'},
+                               { method: 'GET', uri: '/api/snapshot/save/current',      desc: 'Save the current snapshot image in the image directory.'},
+                            ]
+                        },
+                        camera: {
+                            title: "Camera Control",
+                            endpoints: [
+                               { method: 'GET', uri: '/api/camera/state',               desc: 'Returns a json of the current camera settings state.' },
+                               { method: 'GET', uri: '/api/camera/ir_cut',              desc: 'Get the current state of infra red cut.' },
+                               { method: 'GET', uri: '/api/camera/ir_cut/set/on',       desc: 'Turn infra red cut on.' },
+                               { method: 'GET', uri: '/api/camera/ir_cut/set/off',      desc: 'Turn infra red cut off' },
+                               { method: 'GET', uri: '/api/camera/night_mode',          desc: 'Get the curent state of night mode.' },
+                               { method: 'GET', uri: '/api/camera/night_mode/set/on',   desc: 'Turn night mode on' },
+                               { method: 'GET', uri: '/api/camera/night_mode/set/off',  desc: 'Turn night mode off' },
+                               { method: 'GET', uri: '/api/camera/flip_mode',           desc: 'Get the current state of flip mode.' },
+                               { method: 'GET', uri: '/api/camera/flip_mode/set/on',    desc: 'Turn flip mode on.' },
+                               { method: 'GET', uri: '/api/camera/flip_mode/set/off',   desc: 'Turn flip mode off.' },
+                               { method: 'GET', uri: '/api/camera/mirror_mode',         desc: 'Get the current state of mirror mode.' },
+                               { method: 'GET', uri: '/api/camera/mirror_mode/set/on',  desc: 'Turn mirror mode on.' },
+                               { method: 'GET', uri: '/api/camera/mirror_mode/set/off', desc: 'Turn mirror mode off.' },
+                            ],
+                        },
+                        leds: {
+                            title: "LED Control",
+                            endpoints: [
+                               { method: 'GET', uri: '/api/led/state',            desc: 'Returns the current state of the leds' },
+                               { method: 'GET', uri: '/api/led/blue',             desc: 'Returns the state of the blue led.' },
+                               { method: 'GET', uri: '/api/led/blue/set/on',      desc: 'Turn the blue led on.' },
+                               { method: 'GET', uri: '/api/led/blue/set/off',     desc: 'Turn the blue led off' },
+                               { method: 'GET', uri: '/api/led/blue/set/blink',   desc: 'Turn the blue led to blinking.' },
+                               { method: 'GET', uri: '/api/led/yellow',           desc: 'Returns the state of the yellow led.' },
+                               { method: 'GET', uri: '/api/led/yellow/set/on',    desc: 'Turn the yellow led on' },
+                               { method: 'GET', uri: '/api/led/yellow/set/off',   desc: 'Turn the yellow led off' },
+                               { method: 'GET', uri: '/api/led/yellow/set/blink', desc: 'Turn the yellow led to blinking.' },
+                               { method: 'GET', uri: '/api/led/ir',               desc: 'Returns the state of the infra red leds.' },
+                               { method: 'GET', uri: '/api/led/ir/set/on',        desc: 'Turn on the infra red leds.' },
+                               { method: 'GET', uri: '/api/led/ir/set/off',       desc: 'Turn off the infra red leds.' },
+                            ],
+                        },
+                        system: {
+                            title: "System Endpoints",
+                            endpoints: [
+                                { method: 'GET', uri: '/api/ping',             desc: 'Testing endpoint to verify if the api is responsive.' },
+                                { method: 'GET', uri: '/api/wifi',             desc: 'Returns a json with the current wifi iwconfig state.' },
+                                { method: 'GET', uri: '/api/wifi/ifconfig',    desc: 'Returns a json with the current wifi ifconfig state.' },
+                                { method: 'GET', uri: '/api/system/proclist',  desc: 'Returns the processlist of the camera.' },
+                                { method: 'GET', uri: '/api/system/dmesg',     desc: 'Returns the dmesg output of the camera.' },
+                                { method: 'GET', uri: '/api/system/diskusage', desc: 'Returns the output of df -h.' },
+                                { method: 'GET', uri: '/api/system/uptime',    desc: 'Returns the uptime and load of the camera.' },
+                                { method: 'GET', uri: '/api/system/meminfo',   desc: 'Returns the content of /proc/meminfo' },
+                                { method: 'GET', uri: '/api/system/memfree',   desc: 'Returns the systems memory usage.' },
+                                { method: 'GET', uri: '/api/system/cpuinfo',   desc: 'Returns the content of /proc/cpuinfo.' },
+                                { method: 'GET', uri: '/api/system/reboot',    desc: 'Initiates a reboot of the camera.' },
+                                { method: 'GET', uri: '/api/system/shutdown',  desc: 'Initiates a shutdown of the camera.' },
+                            ]
+                        },
+                        isp328: {
+                            title: "ISP 328 Endpoints",
+                            endpoints: [
+                                { method: 'GET', uri: '/api/camera/state',                    desc: 'Returns a json of the current camera settings state.' },
+                                { method: 'GET', uri: '/api/camera/isp328',                   desc: 'Returns a list with all available isp328 camera parameters.' },
+                                { method: 'GET', uri: '/api/camera/isp328/get/{key}',         desc: 'Returns the value for a specific isp328 parameter.' },
+                                { method: 'GET', uri: '/api/camera/isp328/set/{key}/{value}', desc: 'Sets the value for a isp328 parameter (Use with care!)' },
+                            ]
+                        },
+                        services: {
+                            title: "Manage services",
+                            endpoints: [
+                                { method: 'GET', uri: '/api/services/state',             desc: 'Returns a json with all states of services.' },
+                                { method: 'GET', uri: '/api/services/{service}/running', desc: 'Check if a service is running.' },
+                                { method: 'GET', uri: '/api/services/{service}/start',   desc: 'Start a service using its init script.' },
+                                { method: 'GET', uri: '/api/services/{service}/stop',    desc: 'Stop a service using its init script.' },
+                                { method: 'GET', uri: '/api/services/{service}/restart', desc: 'Restart a service using its init script.' },
+                                { method: 'GET', uri: '/api/services/{service}/status',  desc: 'Get the status of a service using its init script' },
+                            ]
+                        },
+                        nvram: {
+                            title: "Manage NVRAM K/V Store",
+                            endpoints: [
+                                { method: 'GET', uri: '/api/nvram/state',                   desc: 'Returns a json with all key value pairs.' },
+                                { method: 'GET', uri: '/api/nvram/get/{key}',               desc: 'Set the the value for a new nonexisting key.' },
+                                { method: 'GET', uri: '/api/nvram/set/{key}/{value}',       desc: 'Set the the value for a new nonexisting key.' },
+                                { method: 'GET', uri: '/api/nvram/unset/{key}',             desc: 'Unset the key and value of an existing key (use carefully!).' },
+                                { method: 'GET', uri: '/api/nvram/overwrite/{key}/{value}', desc: 'Set the value for an existing key.' },
+                            ],
+                        },
+                    },
+                },
+                methods: {
+                    select: function(section) {
+                        this.section = section;
+                        this.title = this.sections[this.section].title;
+                        this.endpoints = this.sections[this.section].endpoints;
+                    },
+                },
+                mounted () {
+                    this.title = this.sections[this.section].title;
+                    this.endpoints = this.sections[this.section].endpoints;
+                }
+            });
+        </script>
+    </div>
+  </body>
+</html>

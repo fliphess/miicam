@@ -40,7 +40,7 @@ table {
   border-spacing: 0;
   width: 100%;
 }
-      
+
 th, td {
   text-align: left;
   padding: 16px;
@@ -126,4 +126,22 @@ option {
   padding:.3em 1em .3em 1em;
   display: inline-block;
   color: black;
+}
+
+
+pre code {
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+
+  font-family: "courier new", courier, monospace;
+  font-size: 12px;
+  overflow-x:scroll;
+
+  background-color: #eee;
+  border: 1px solid #999;
+  display: block;
+  padding: 10px;
 }

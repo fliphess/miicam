@@ -3,16 +3,20 @@
 
 # Chuangmi-720P-hack project
 
-This projects aims at providing an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
+This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
 With this firmware I'll try to offer other methods of using this webcam that do not require an internet uplink.
+
+
+If you are looking for an affordable ip webcam and you consider this hack one of the options: It might be wise not to buy this camera at all, as it is not very secure.
+If you have one at home eating dust this project could offer some additional features that makes the camera a bit more usable,
+but do **NOT** buy this product to use it with this hack. Buy a secure camera out of the box instead :)
+
+**Please read the security considerations at the bottom of the readme.**
 
 ![Alt text](chuangmi.jpg?raw=true "Chuangmi 720P camera")
 
 
-This project exists thanks to the extensive research of [jymbob](https://github.com/jymbob/chuangmi-720-hack) and [ghoost](https://github.com/ghoost82/mijia-720p-hack) and all the hard work done on existing hacks for other Xiaomi ip camera's done by many people on the webs. Standing on the heads of giants, much respect and thanks go out to those who shared their efforts to create a more suitable firmware for their Xiaomi ip camera.
-
-If I somehow screwed up in licensing a script or tool that I've copied from your project, please file an issue, so I can add the requested changes. (I really suck at licensing, but I'd like to do it right)
 
 ## WARNING - DISCLAIMER
 
@@ -59,56 +63,32 @@ This hack includes:
 
 Planned futures:
 * Wiki showing how to integrate with home automation
+* Online Image and Video viewer
+* Build a newer `tf_recovery.img` using the toolchain
+* Capture video on motion and on command
 * Configuration over web server
-* Replace Chinese voice files with English
-* Reintroduction of motion detection without the need for cloud
+* Replace Chinese voice files with English and more important: allow playback of those voices
+* Reintroduction of motion detection without the need for cloud by extending the current rtspd code
 * Auto update mechanism for firmware
-* Capture images using http requests
 * MQTT updates and control in php using the existing mosquitto libs on the camera
 * User authentication on RTSP daemon
+* SSL for webserver and rtspd and if possible using the crypto hardware (wolfssl?)
 * Remote syslogging
-* Tamper detection
 * Audio with RTSP stream
 
-
-Please read the security considerations at the bottom of the readme.
-
-Also, it might be smart not to buy this camera at all, as it is not very secure.
-If you have some at home that are not doing anything, this project could offer some additional features that makes the camera a bit more usable, but do not buy this product to use it with this hack :)
-
-Buy a secure camera that is usable and up to date out of the box if you're smart :)
 
 
 ## Installation on the Chuangmi 720P camera
 
-The memory card must stay in the camera ! If you remove it, the camera will start without using the hack.
+The memory card must stay in the camera!
+If you remove it, the camera will start without using the hack.
 
-### Build the binaries
-
-To build the binaries the GM8136 SDK toolchain must be installed in /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE
-You can download them from [my website](https://fliphess.com/toolchain) or use the docker container to setup a build environment.
-
-Clone this repository on a computer:
-```
-git clone https://github.com/fliphess/chuangmi-720p-hack.git
-```
-
-Then change into the cloned directory, build the binaries and install them to the sdcard base directory
-
-```
-cd chuangmi-720p-hack
-make && make images
-```
-
-Or, if you use the docker container, build images by running `./manage.sh --all` on a computer running docker to create a fully working archive containing all the needs.
-This is the recommended method as it will install and configure all dependencies for you.
-
-Alternatively you can download the prebuild releases from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases) that are build by travis on every release.
 
 ### Prepare the memory card
 
 You can use the self compiled image from the cloned repository or download a precompiled release.
 Format a micro SD card in fat32 (vfat) format and copy the content of the **sdcard/** folder at the root of your memory card.
+
 
 ### Configure the Chuangmi camera on the memory card
 
@@ -149,16 +129,16 @@ Wait for 10 minutes till the blue led goes on and unplug the camera. The `tf_rec
 If enabled the telnet server is on port 23.
 
 Default login/password:
-* login = root
-* password = Chuangmi720pCam123 (unless you specified another password in **config.cfg** file)
+* login = *root*
+* password = *Chuangmi720pCam123* (unless you specified another password in **config.cfg** file)
 
 ### SSH server
 
 If enabled the SSH server is on port 22.
 
 Default login/password:
-* login = root
-* password = Chuangmi720pCam123 (unless you specified another password in **config.cfg** file)
+* login = *root*
+* password = *Chuangmi720pCam123* (unless you specified another password in **config.cfg** file)
 
 ### RTSP Server
 
@@ -177,11 +157,10 @@ If enabled the FTP server is on port 21.
 
 There is no login/password required.
 
-
 ### MQTT Support
 
 If enabled the MQTT support, a status update is pushed to the broker every N seconds.
-By pushing commands to $MQTT_TOPIC/set, many values can be changed.
+By pushing commands to `$MQTT_TOPIC/set`, many values can be changed.
 
 I'm still working on the completion of this feature. Have a look at the `MQTT_*` configuration options in `config.cfg` and file an issue if something is unclear.
 This forces me to write more extensive documentation for the new features I've added soon.
@@ -189,12 +168,12 @@ This forces me to write more extensive documentation for the new features I've a
 
 ### Samba
 
-If enabled the CHUANGMI_RECORD_VIDEO directory can be accessed via CIFS.
+If enabled the `CHUANGMI_RECORD_VIDEO` directory can be accessed via CIFS.
 The share is readable by everyone.
 
 Default login/password for read/write access:
-* login = root
-* password = Chuangmi720pCam123 (unless you specified another password in **config.cfg** file)
+* login = *root*
+* password = *Chuangmi720pCam123* (unless you specified another password in **config.cfg** file)
 
 
 ## Cloud Services
@@ -210,27 +189,52 @@ For stability reasons it is recommend to disable cloud services while using RTSP
 
 ## Security considerations
 
-The short version:
+The short version: **DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNETZ!**
 
-DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNET !
+The longer version:
 
 This is not a very secure webcam. Although it is semi-safe to use for home automation projects, exposing it to the internet would backfire quickly and is considered very [badong](https://www.urbandictionary.com/define.php?term=badong).
 
 It's running an old u-boot version, a kernel from the middle ages and was never designed to be exposed to the internet.
 The kernel has no iptables or any other traffic filtering mechanism build in, so securing this webcam from the big angry internet is not easily done.
 
-Use it with common sense: Use secure strong passwords, use a private and secure wifi network, put it behind a firewall, don't show your junk in front of the webcam and make sure don't place it in private spaces.
+Use it with common sense: Use secure strong passwords, use a private and secure wifi network, put it behind a firewall, don't show your junk in front of the webcam and make sure don't place it in private spaces that you don't want others on your wifi to see.
+
 As the rtsp daemon is not secured with authentication, anyone in your network is able to view the camera feed, which could include the guy in the hoody leeching your wifi.
 
 I use this camera's on a private wifi dedicated to IOT devices. It has no connection to the internet but NTP and is not accessible from my users wifi other than through zoneminder.
 This way i feel i've at least tried to prevent others from being able to access my webcams for evil.
 
-Although the camera was originally designed as a baby monitor, I would not recommend to use it that way without some additional security layers, with or without the hack.
-Don't look at me when your sauna pictures (or worse) show up on the internet: I warned you ;)
+Although the camera was originally designed as a baby monitor, I would not recommend to use it that way without some additional security layers, not with the hack and not without it either.
+Don't look at me when your private sauna pictures (or worse) show up on the internet: I warned you ;)
+
 
 ## Uninstall the hack
 
 There are no files altered on the camera so simply remove the SD card to uninstall the hack.
+
+## Build the binaries
+
+To build the binaries the GM8136 SDK toolchain must be installed in /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE
+You can download them from [my website](https://fliphess.com/toolchain) or use the docker container to setup a build environment.
+
+Clone this repository on a linux computer:
+```
+git clone https://github.com/fliphess/chuangmi-720p-hack.git
+```
+
+Then change directory into the cloned repository, build the binaries and install them to the sdcard base directory
+
+```
+cd chuangmi-720p-hack
+make images clean
+```
+
+Or, if you use the docker container, build images by running `./manage.sh --all` on a computer running docker to create a fully working archive containing all the needs.
+This is the recommended method as it will install and configure all dependencies for you.
+
+Alternatively you can download the prebuild releases from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases) that are build by travis on every release.
+
 
 ## Need help? Want to help? Ideas? suggestions?
 
@@ -239,9 +243,18 @@ Feel welcome to bring pull requests and feature requests on the table.
 As there are many limitations to the camera, join the [gitter channel](https://gitter.im/chuangmi-720p-hack) if you want to start a discussion on how to do things.
 I cannot guarantee that I've got (time to build) all the answers and solutions, but let's see if we can tackle some nice features together :)
 
-As I'm not that experienced with writing user interfaces, I would really appreciate it if some more experienced PHP devs and interface pro's would take a look at the web interface code for security and efficiency reasons.
+As I'm not that experienced with writing user interfaces, I would really appreciate it if some more experienced PHP devs and interface pro's would take a look at the web interface code for security and efficiency reasons. With the mirai botnet in mind and the many attacks on ip camera's a second opinion is more then welcome.
 If you're good at making a nice web interface, let me know! I'm quite tasteless when it comes to the web and layout, so I could use some help :)
 
 I love to learn, which is why i forked this project to work on a chuangmi specific firmware, but as a single developer I'm pretty sure, I make ugly mistakes.
 Please file issues and PR's if you notice something that could've been handled in a better way. I'm open to all suggestions and I would love to see some engagement of other nerds that bought this camera by accident or on purpose :)
+
+## Thanks
+
+This project exists thanks to the extensive research of many communities and individuals hacking xiaomi webcams.
+Standing on the heads of giants, much respect and thanks go out to those who shared their efforts to create a more suitable firmware for their Xiaomi ip camera.
+
+To thank 2 people in particular: [jymbob](https://github.com/jymbob/chuangmi-720-hack) and [ghoost](https://github.com/ghoost82/mijia-720p-hack): Thanks for sharing, without the many hours you've invested before me, I'd never have this nice alternative for my shitty ipcam :]
+
+If I somehow screwed up in licensing a script or tool that I've copied from your project, please file an issue, so I can add the requested changes. (I really suck at licensing, but I'd like to do it right)
 
