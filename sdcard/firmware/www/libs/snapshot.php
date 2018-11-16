@@ -8,9 +8,9 @@ class Snapshot
 {
     protected static $ffmpeg = '/tmp/sd/firmware/bin/ffmpeg';
 
-    protected static $snapshot_destination = "/tmp/sd/firmware/www/public/snapshot.jpg";
+    public static $snapshot_destination = "/tmp/sd/firmware/www/public/snapshot.jpg";
 
-    protected static $command_string = "%s -loglevel fatal -i rtsp://127.0.0.1:554/live/ch00_0 -vframes 1 -r 1 -y %s 2>&1";
+    public static $command_string = "%s -loglevel fatal -i rtsp://127.0.0.1:554/live/ch00_0 -vframes 1 -r 1 -y %s 2>&1 && echo OK";
 
     public function __construct() { }
 
