@@ -24,6 +24,10 @@ function usage()
 
       --build-docker - Only builds the container environment
 
+      --setup-web    - Create required files for running the webui locally
+
+      --run-web      - Run the php inbuild web server in www/public
+
       --shell        - Opens a shell in the container build environment
 
     Download toolchain: https://fliphess.com/toolchain/
@@ -79,6 +83,32 @@ function build()
     return $?
 }
 
+## Symlink config in /tmp/sd to prepare for running the web interface
+function setup_web() {
+    echo -ne "*** Creating directories"
+    mkdir -p /tmp/sd/log /tmp/sd/firmware/www/public
+    echo " [OK]"
+
+    echo -ne "*** Creating config file"
+    ln -sf "$(pwd)/sdcard/config.cfg"  "/tmp/sd/config.cfg"
+    echo " [OK]"
+
+    echo -ne "*** Creating logfiles   "
+    echo syslog >> /tmp/sd/log/syslog
+    echo webserver >> /tmp/sd/log/lighttpd.log
+    echo webapp >>  /tmp/sd/log/webapp.log
+    echo bootlog >> /tmp/sd/log/ft_boot.log
+    echo " [OK]"
+}
+
+
+## Run the php inbuild webserver in our www directory
+function run_web() {
+    log "Starting local php webserver."
+    cd sdcard/firmware/www
+    php -S localhost:8080 -t ./public
+}
+
 
 ## Spawn a shell in the container environment
 function shell()
@@ -103,6 +133,12 @@ function main()
         ;;
         --shell)
             shell
+        ;;
+        --setup-web)
+            setup_web
+        ;;
+        --run-web)
+            run_web
         ;;
         --all)
             build_docker
