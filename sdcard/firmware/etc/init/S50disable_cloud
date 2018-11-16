@@ -73,6 +73,7 @@ enable_cloud() {
     ok_fail "$?"
 }
 
+
 case "$1" in
   start)
     disable_cloud

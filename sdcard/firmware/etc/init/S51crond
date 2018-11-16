@@ -21,30 +21,33 @@ LOGFILE="${LOGDIR}/${NAME}.log"
 check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
-  start)
-	mkdir -p /var/run/cron
+    start)
+        mkdir -p /var/run/cron
         start_daemon
 
-	if [ -s "$SD_MOUNTDIR/firmware/etc/crontab" ]
-	then
-	    crontab $DAEMON_OPTS $SD_MOUNTDIR/firmware/etc/crontab
-	    grep '@reboot' $SD_MOUNTDIR/firmware/etc/crontab | sed -e 's/@reboot//g' | while read command
-	    do
-	        exec $command
-	    done
-	fi
-        ;;
-
-  stop)
-	stop_daemon "${PIDFILE}"
-        ;;
-  restart|reload)
+        if [ -s "$SD_MOUNTDIR/firmware/etc/crontab" ]
+        then
+            crontab $DAEMON_OPTS $SD_MOUNTDIR/firmware/etc/crontab
+            grep '@reboot' $SD_MOUNTDIR/firmware/etc/crontab | sed -e 's/@reboot//g' | while read command
+            do
+                exec $command
+            done
+        fi
+    ;;
+    stop)
+        stop_daemon "${PIDFILE}"
+    ;;
+    restart|reload)
         "$0" stop
         "$0" start
-        ;;
+    ;;
+    status)
+        status_daemon
+    ;;
   *)
         echo "Usage: $0 {start|stop|restart}"
         exit 1
+    ;;
 esac
 
 exit $?

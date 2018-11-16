@@ -37,11 +37,14 @@ RUN echo "*** Install required packages" \
  && apt-get -qq update                   \
  && apt-get -qq install -y               \
       autoconf                           \
+      bison                              \
       build-essential                    \
       curl                               \
+      flex                               \
       gawk                               \
       git                                \
       lib32z1-dev                        \
+      locales                            \
       make                               \
       ncurses-dev                        \
       php-cli                            \
@@ -52,6 +55,12 @@ RUN echo "*** Install required packages" \
       wget                               \
       zip                                \
  && apt-get clean
+
+####################################################
+## Configure locales                              ##
+####################################################
+
+RUN locale-gen en_US.UTF-8
 
 
 ####################################################

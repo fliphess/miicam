@@ -64,7 +64,6 @@ Chuangmi 720P hack configuration:
   ENABLE_FTPD    = ${ENABLE_FTPD}
   ENABLE_SAMBA   = ${ENABLE_SAMBA}
   ENABLE_RTSP    = ${ENABLE_RTSP}
-  RTSP_OPTIONS   = ${RTSP_OPTIONS}
 
 EOF
 

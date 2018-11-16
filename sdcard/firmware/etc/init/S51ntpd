@@ -21,19 +21,23 @@ LOGFILE="${LOGDIR}/${NAME}.log"
 check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
-  start)
-	start_daemon
-        ;;
-  stop)
-	stop_daemon "${PIDFILE}"
-        ;;
-  restart|reload)
+    start)
+        start_daemon
+    ;;
+    stop)
+        stop_daemon "${PIDFILE}"
+    ;;
+    status)
+        status_daemon
+    ;;
+    restart|reload)
         "$0" stop
         "$0" start
-        ;;
-  *)
+    ;;
+    *)
         echo "Usage: $0 {start|stop|restart}"
         exit 1
+    ;;
 esac
 
 exit $?

@@ -25,7 +25,7 @@ OPTIONS="-i ${HOSTNAME}.${SCRIPT}.pub -h ${MQTT_HOST} -p ${MQTT_PORT} -u ${MQTT_
 
 [ "${MQTT_STATUSINTERVAL}" -lt 30 ] && MQTT_STATUSINTERVAL=30
 
-while true
+while sleep ${MQTT_STATUSINTERVAL}
 do
     mosquitto_pub ${OPTIONS} -t "${MQTT_TOPIC}/leds/blue"   -m "$( blue_led status        )"
     mosquitto_pub ${OPTIONS} -t "${MQTT_TOPIC}/leds/yellow" -m "$( yellow_led status      )"
@@ -45,5 +45,4 @@ do
 
     mosquitto_pub ${OPTIONS} -t "${MQTT_TOPIC}/rtsp"        -m "$( get_daemon_state rtspd )"
     mosquitto_pub ${OPTIONS} -t "${MQTT_TOPIC}/system"      -m "$( system_status          )"
-    sleep ${MQTT_STATUSINTERVAL}
 done

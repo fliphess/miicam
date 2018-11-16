@@ -48,8 +48,6 @@ do
         "${MQTT_TOPIC}/leds/blue")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/leds/blue"       -m "$( blue_led status   )"
         ;;
-
-
         "${MQTT_TOPIC}/leds/yellow/set on")
             yellow_led on
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/leds/yellow"     -m "$( yellow_led status )"
@@ -61,8 +59,6 @@ do
         "${MQTT_TOPIC}/leds/yellow")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/leds/yellow"     -m "$( yellow_led status )"
         ;;
-
-
         "${MQTT_TOPIC}/leds/ir/set on")
             ir_led on
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/leds/ir"         -m "$( ir_led status     )"
@@ -74,8 +70,6 @@ do
         "${MQTT_TOPIC}/leds/ir")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/leds/ir"         -m "$( ir_led status     )"
         ;;
-
-
         "${MQTT_TOPIC}/ir_cut/set on")
             ir_cut on
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/ir_cut"          -m "$( ir_cut status     )"
@@ -87,8 +81,6 @@ do
         "${MQTT_TOPIC}/ir_cut")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/ir_cut"          -m "$( ir_cut status     )"
         ;;
-
-
         "${MQTT_TOPIC}/brightness/set *")
             set_brightness "$( get_value "$LINE" )"
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/brightness"      -m "$( get_brightness    )"
@@ -96,8 +88,6 @@ do
         "${MQTT_TOPIC}/brightness")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/brightness"      -m "$( get_brightness    )"
         ;;
-
-
         "${MQTT_TOPIC}/contrast/set *")
             set_contrast "$( get_value "$LINE" )"
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/contrast"        -m "$( get_contrast      )"
@@ -105,8 +95,6 @@ do
         "${MQTT_TOPIC}/contrast")
            mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/contrast"         -m "$( get_contrast      )"
         ;;
-
-
         "${MQTT_TOPIC}/hue/set *")
             set_hue "$( get_value "$LINE" )"
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/hue"             -m "$( get_hue           )"
@@ -114,8 +102,6 @@ do
         "${MQTT_TOPIC}/hue")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/hue"             -m "$( get_hue           )"
         ;;
-
-
         "${MQTT_TOPIC}/saturation/set *")
             set_saturation "$( get_value "$LINE" )"
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/saturation"      -m "$( get_saturation    )"
@@ -123,8 +109,6 @@ do
         "${MQTT_TOPIC}/saturation")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/saturation"      -m "$( get_saturation    )"
         ;;
-
-
         "${MQTT_TOPIC}/denoise/set *")
             set_denoise "$( get_value "$LINE" )"
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/denoise"         -m "$( get_denoise       )"
@@ -132,8 +116,6 @@ do
         "${MQTT_TOPIC}/denoise")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/denoise"         -m "$( get_denoise       )"
         ;;
-
-
         "${MQTT_TOPIC}/sharpness/set *")
             set_sharpness "$( get_value "$LINE" )"
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/sharpness"       -m "$( get_sharpness     )"
@@ -141,8 +123,6 @@ do
         "${MQTT_TOPIC}/sharpness")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/sharpness"       -m "$( get_sharpness     )"
         ;;
-
-
         "${MQTT_TOPIC}/rtsp/set on")
             /etc/init/S99rtsp start
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/rtsp"            -m "$( get_daemon_state rtspd )"
@@ -154,13 +134,9 @@ do
         "${MQTT_TOPIC}/rtsp")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/rtsp"            -m "$( get_daemon_state rtspd )"
         ;;
-
-
         "${MQTT_TOPIC}/system")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/system"          -m "$( system_status     )"
         ;;
-
-
         "${MQTT_TOPIC}/night_mode/set on")
             night_mode on
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/night_mode"      -m "$( night_mode status )"
@@ -172,8 +148,6 @@ do
         "${MQTT_TOPIC}/night_mode")
             mosquitto_pub ${PUB_OPTIONS} -t "${MQTT_TOPIC}/night_mode"      -m "$( night_mode status )"
         ;;
-
-
         "${MQTT_TOPIC}/night_mode/auto/set on")
             set_basecfg "AUTO_NIGHT_MODE" 1
             /etc/init/S99auto_night_mode start

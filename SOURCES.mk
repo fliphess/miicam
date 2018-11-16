@@ -25,6 +25,18 @@ PCREVERSION = 8.41
 PCREARCHIVE = pcre-$(PCREVERSION).zip
 PCREURI = https://ftp.pcre.org/pub/pcre/$(PCREARCHIVE)
 
+NCURSESVERSION = 6.1
+NCURSESARCHIVE = ncurses-$(NCURSESVERSION).tar.gz
+NCURSESURI = https://ftp.gnu.org/pub/gnu/ncurses/$(NCURSESARCHIVE)
+
+LIBPCAPVERSION = 1.7.3
+LIBPCAPARCHIVE = libpcap-$(LIBPCAPVERSION).tar.gz
+LIBPCAPURI = http://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
+
+TCPDUMPVERSION = 4.7.4
+TCPDUMPARCHIVE = tcpdump-$(TCPDUMPVERSION).tar.gz
+TCPDUMPURI = http://www.tcpdump.org/release/$(TCPDUMPARCHIVE)
+
 DROPBEARVERSION = 2017.75
 DROPBEARARCHIVE = dropbear-$(DROPBEARVERSION).tar.bz2
 DROPBEARURI = https://matt.ucc.asn.au/dropbear/releases/$(DROPBEARARCHIVE)
@@ -45,6 +57,10 @@ MIJIACTRLVERSION = master
 MIJIACTRLARCHIVE = mijia-720p-ctrl-$(MIJIACTRLVERSION).zip
 MIJIACTRLURI = https://github.com/cck56/mijia-720p-ctrl/archive/$(MIJIACTRLVERSION).zip
 
+NANOVERSION = 2.9.8
+NANOARCHIVE = nano-$(NANOVERSION).tar.gz
+NANOURI = https://www.nano-editor.org/dist/v2.9/$(NANOARCHIVE)
+
 RUNASVERSION = master
 RUNASARCHIVE = runas.zip
 RUNASURI = https://github.com/remram44/static-sudo/archive/$(RUNASVERSION).zip
@@ -55,11 +71,19 @@ RSYNCURI = https://download.samba.org/pub/rsync/src/$(RSYNCARCHIVE)
 
 X264VERSION = snapshot-20181028-2245-stable
 X264ARCHIVE = x264-$(X264VERSION).tar.bz2
-X264URI = http://download.videolan.org/pub/x264/snapshots/$(X264ARCHIVE)
+X264URI = https://download.videolan.org/pub/x264/snapshots/$(X264ARCHIVE)
 
 FFMPEGVERSION = 4.0.2
 FFMPEGARCHIVE = ffmpeg-$(FFMPEGVERSION).tar.bz2
 FFMPEGURI = https://ffmpeg.org/releases/$(FFMPEGARCHIVE)
+
+STRACEVERSION = 4.10
+STRACEARCHIVE = strace-$(STRACEVERSION).tar.xz
+STRACEURI = https://downloads.sourceforge.net/project/strace/strace/$(STRACEVERSION)/$(STRACEARCHIVE)
+
+LSOFVERSION = master
+LSOFARCHIVE = $(LSOFVERSION).tar.gz
+LSOFURI = https://github.com/Distrotech/lsof/archive/$(LSOFVERSION).tar.gz
 
 
 $(SOURCEDIR)/$(ZLIBARCHIVE):
@@ -86,6 +110,14 @@ $(SOURCEDIR)/$(X264ARCHIVE):
 $(SOURCEDIR)/$(OPENJPEGARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(OPENJPEGURI)  || rm -f $@
 
+$(SOURCEDIR)/$(NCURSESARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(NCURSESURI)  || rm -f $@
+
+$(SOURCEDIR)/$(LIBPCAPARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBPCAPURI)  || rm -f $@
+
+$(SOURCEDIR)/$(TCPDUMPARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(TCPDUMPURI)  || rm -f $@
 
 $(SOURCEDIR)/$(DROPBEARARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(DROPBEARURI)  || rm -f $@
@@ -108,6 +140,15 @@ $(SOURCEDIR)/$(RSYNCARCHIVE):
 $(SOURCEDIR)/$(RUNASARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RUNASURI)     || rm -f $@
 
+$(SOURCEDIR)/$(NANOARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(NANOURI)     || rm -f $@
+
 $(SOURCEDIR)/$(FFMPEGARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(FFMPEGURI)     || rm -f $@
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(FFMPEGURI)    || rm -f $@
+
+$(SOURCEDIR)/$(STRACEARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(STRACEURI)    || rm -f $@
+
+$(SOURCEDIR)/$(LSOFARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LSOFURI)      || rm -f $@
 

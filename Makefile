@@ -2,8 +2,7 @@
 TOOLCHAINDIR = /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin
 PATH  := $(TOOLCHAINDIR):$(PATH)
 TARGET = arm-unknown-linux-uclibcgnueabi
-
-PROCS = 2
+PROCS = 5
 
 BUILDENV :=                 \
 	AR=$(TARGET)-ar         \
@@ -15,36 +14,42 @@ BUILDENV :=                 \
 	RANLIB=$(TARGET)-ranlib \
 	STRIP=$(TARGET)-strip
 
-
 TOPDIR      := $(CURDIR)
 SOURCEDIR   := $(TOPDIR)/src
 PREFIXDIR   := $(TOPDIR)/prefix
 BUILDDIR    := $(TOPDIR)/build
 
+GMLIBDIR    := $(TOPDIR)/tools/gm_lib
+RTSPDDIR    := $(TOPDIR)/tools/rtspd
+GMUTILDIR   := $(TOPDIR)/tools/utils
+PATCHESDIR  := $(TOPDIR)/tools/patches
+
 INSTALLDIR  := $(TOPDIR)/sdcard/firmware/bin
 WEBROOT     := $(TOPDIR)/sdcard/firmware/www
 COMPOSER    := /usr/local/bin/composer
 
-BINS =                                                  \
-		smbpasswd smbstatus smbtree smbclient           \
-		scp dbclient dropbearkey                        \
-		arm-php arm-php-cgi                             \
-		chuangmi_ctrl                                   \
-		ffmpeg ffprobe                                  \
-		runas                                           \
-		rsync                                           \
-		rtspd                                           \
+BINS =                                         \
+		smbpasswd smbstatus smbtree smbclient  \
+		scp dbclient dropbearkey               \
+		arm-php arm-php-cgi                    \
+		chuangmi_ctrl                          \
+		ffmpeg ffprobe                         \
+		lsof                                   \
+		nano                                   \
+		runas                                  \
+		rsync                                  \
+		rtspd                                  \
+		strace                                 \
 		gd2togif gd2topng gdparttopng gdtopng giftogd2 pngtogd pngtogd2
 
 SBINS =          \
 		dropbear \
 		lighttpd \
+		tcpdump  \
 		nmbd     \
 		smbd
 
-GMLIBDIR  := $(TOPDIR)/tools/gm_lib
-RTSPDDIR  := $(TOPDIR)/tools/rtspd
-GMUTILDIR := $(TOPDIR)/tools/utils
+include SOURCES.mk
 
 UTILS :=                                                \
 		tools/audio_livesound                           \
@@ -74,34 +79,34 @@ UTILS :=                                                \
 		tools/liveview_with_pip
 
 
-include SOURCES.mk
+utils: $(UTILS)
 
-.PHONY: all
 
 all:                                     \
-		libs                             \
-		$(BUILDDIR)/dropbear             \
-		$(BUILDDIR)/lighttpd             \
-		$(BUILDDIR)/php                  \
-		$(BUILDDIR)/samba                \
-		$(BUILDDIR)/chuangmi_ctrl        \
-		$(BUILDDIR)/runas                \
-		$(BUILDDIR)/rsync                \
-		$(BUILDDIR)/ffmpeg               \
-		$(BUILDDIR)/rtspd                \
-		sdcard/manufacture.bin           \
-		utils
-
-libs:                                    \
 		$(BUILDDIR)/zlib                 \
 		$(BUILDDIR)/libxml2              \
 		$(BUILDDIR)/libjpeg-turbo        \
 		$(BUILDDIR)/libpng               \
 		$(BUILDDIR)/libgd                \
 		$(BUILDDIR)/pcre                 \
-		$(BUILDDIR)/x264
-
-utils: $(UTILS)
+		$(BUILDDIR)/x264                 \
+		$(BUILDDIR)/ncurses              \
+		$(BUILDDIR)/libpcap              \
+		$(BUILDDIR)/tcpdump              \
+		$(BUILDDIR)/dropbear             \
+		$(BUILDDIR)/lighttpd             \
+		$(BUILDDIR)/nano                 \
+		$(BUILDDIR)/php                  \
+		$(BUILDDIR)/samba                \
+		$(BUILDDIR)/chuangmi_ctrl        \
+		$(BUILDDIR)/runas                \
+		$(BUILDDIR)/rsync                \
+		$(BUILDDIR)/lsof                 \
+		$(BUILDDIR)/strace               \
+		$(BUILDDIR)/ffmpeg               \
+		$(BUILDDIR)/rtspd                \
+		sdcard/manufacture.bin           \
+		utils
 
 
 $(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
@@ -139,7 +144,6 @@ $(BUILDDIR)/libxml2: $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(BUILDDIR)/zlib
 	rm -rf $@-$(LIBXML2VERSION)
 	touch $@
 
-
 $(BUILDDIR)/libjpeg-turbo: $(SOURCEDIR)/$(LIBJPEGARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBJPEGVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBJPEGARCHIVE) -C $(BUILDDIR)
@@ -159,16 +163,16 @@ $(BUILDDIR)/libjpeg-turbo: $(SOURCEDIR)/$(LIBJPEGARCHIVE)
 $(BUILDDIR)/libpng: $(SOURCEDIR)/$(LIBPNGARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPNGVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBPNGARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LIBPNGVERSION)            && \
-		$(BUILDENV)                      \
-		LDFLAGS="-L$(PREFIXDIR)/lib"     \
+	cd $@-$(LIBPNGVERSION)             && \
+		$(BUILDENV)                       \
+		LDFLAGS="-L$(PREFIXDIR)/lib"      \
 		CPPFLAGS="-I$(PREFIXDIR)/include" \
-		./configure                      \
-			--prefix=$(PREFIXDIR)        \
-			--host=$(TARGET)             \
-			--disable-shared             \
-			--enable-static           && \
-		make -j$(PROCS)               && \
+		./configure                       \
+			--prefix=$(PREFIXDIR)         \
+			--host=$(TARGET)              \
+			--disable-shared              \
+			--enable-static            && \
+		make -j$(PROCS)                && \
 		make -j$(PROCS) install
 	rm -rf $@-$(LIBPNGVERSION)
 	touch $@
@@ -230,6 +234,68 @@ $(BUILDDIR)/x264: $(SOURCEDIR)/$(X264ARCHIVE)
 	rm -rf $@-$(X264VERSION)
 	touch $@
 
+
+$(BUILDDIR)/ncurses: $(SOURCEDIR)/$(NCURSESARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(NCURSESVERSION)
+	tar -xzf $(SOURCEDIR)/$(NCURSESARCHIVE) -C $(BUILDDIR)
+	cd $@-$(NCURSESVERSION)                 && \
+	$(BUILDENV)                                \
+	CC='$(TOOLCHAINDIR)/$(TARGET)-gcc -static' \
+	CFLAGS='-fPIC'                             \
+		./configure                            \
+			--host=$(TARGET)                   \
+			--prefix=$(PREFIXDIR)              \
+			--disable-shared                   \
+			--enable-static                    \
+			--with-normal                      \
+			--without-debug                    \
+			--without-ada                      \
+			--with-default-terminfo=/usr/share/terminfo \
+			--with-terminfo-dirs="/etc/terminfo:/lib/terminfo:/usr/share/terminfo:/usr/lib/terminfo" && \
+		make -j$(PROCS)                     && \
+		make -j$(PROCS) install.libs install.includes
+	rm -rf $@-$(NCURSESVERSION)
+	touch $@
+
+
+$(BUILDDIR)/libpcap: $(SOURCEDIR)/$(LIBPCAPARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPCAPVERSION)
+	tar -xzf $(SOURCEDIR)/$(LIBPCAPARCHIVE) -C $(BUILDDIR)
+	cd $@-$(LIBPCAPVERSION)             && \
+	$(BUILDENV)                            \
+		CFLAGS='-I$(PREFIXDIR)'	           \
+		./configure                        \
+			--prefix="$(PREFIXDIR)"        \
+			--disable-canusb               \
+			--host=$(TARGET)               \
+			--with-pcap=linux              \
+			ac_cv_type_u_int64_t=yes    && \
+		make -j$(PROCS)                 && \
+		make -j$(PROCS) install
+	rm -rf $@-$(LIBPCAPVERSION)
+	touch $@
+
+
+$(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(TCPDUMPVERSION)
+	tar -xzf $(SOURCEDIR)/$(TCPDUMPARCHIVE) -C $(BUILDDIR)
+	cd $@-$(TCPDUMPVERSION)                   && \
+	export CROSS_COMPILE="$(TARGET)-"         && \
+	export CFLAGS="-static -L$(PREFIXDIR)/lib -I$(PREFIXDIR)/include -I$(PREFIXDIR)/include/pcap"  && \
+	export CPPFLAGS="${CFLAGS}"               && \
+	export LDFLAGS="${CFLAGS}"                && \
+	$(BUILDENV)                                  \
+		CC="$(TOOLCHAINDIR)/$(TARGET)-gcc"       \
+		LIBS='-lpcap'                            \
+		./configure                              \
+			--without-crypto                     \
+			--host=$(TARGET)                     \
+			--prefix="$(PREFIXDIR)"              \
+			ac_cv_linux_vers=3                && \
+		make -j$(PROCS)                       && \
+		make -j$(PROCS) install
+	rm -rf $@-$(TCPDUMPVERSION)
+	touch $@
 
 $(BUILDDIR)/dropbear: $(SOURCEDIR)/$(DROPBEARARCHIVE) $(BUILDDIR)/zlib
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(DROPBEARVERSION)
@@ -421,18 +487,71 @@ $(BUILDDIR)/runas: $(SOURCEDIR)/$(RUNASARCHIVE)
 	touch $@
 
 
+$(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(NANOVERSION)      && \
+	tar -xzf $(SOURCEDIR)/$(NANOARCHIVE) -C $(BUILDDIR)   && \
+	cd $@-$(NANOVERSION)                                  && \
+	$(BUILDENV)                                              \
+	CFLAGS="-O2 -Wall -static"                               \
+	CPPFLAGS="-P -I$(PREFIXDIR)/include -I $(PREFIXDIR)/include/ncurses -L$(PREFIXDIR)/lib/" \
+	LDFLAGS="-L$(PREFIXDIR)/lib/"                            \
+		./configure                                          \
+			--host=$(TARGET)                                 \
+			--prefix=$(PREFIXDIR)                            \
+			--disable-mouse  \
+			--disable-browser \
+			--disable-nls                                    \
+			--disable-dependency-tracking                    \
+			--enable-static                               && \
+		make -j$(PROCS)                                   && \
+		make -j$(PROCS) install
+	rm -rf $@-$(NANOVERSION)
+	touch $@
+
+
 $(BUILDDIR)/rsync: $(SOURCEDIR)/$(RSYNCARCHIVE)
-	mkdir -p $(BUILDDIR) && rm -rf $@-$(RSYNCVERSION)                                           && \
-	tar -xzf $(SOURCEDIR)/$(RSYNCARCHIVE) -C $(BUILDDIR)                                        && \
-	cd $@-$(RSYNCVERSION)                                                                       && \
-		$(BUILDENV)                                                                                \
-		./configure CFLAGS="-static" EXEEXT="-static"                                              \
-		--host=$(TARGET)                                                                           \
-		--target=$(TARGET)                                                                      && \
-		make -j$(PROCS)                                                                         && \
-	cp rsync $(PREFIXDIR)/bin/rsync                                                             && \
-	rm -rf $(BUILDDIR)/$@-$(RSYNCVERSION)                                                       && \
-	cd $(TOPDIR)                                                                                && \
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(RSYNCVERSION)     && \
+	tar -xzf $(SOURCEDIR)/$(RSYNCARCHIVE) -C $(BUILDDIR)  && \
+	cd $@-$(RSYNCVERSION)                                 && \
+		$(BUILDENV)                                          \
+		./configure CFLAGS="-static" EXEEXT="-static"        \
+		--host=$(TARGET)                                     \
+		--target=$(TARGET)                                && \
+		make -j$(PROCS)                                   && \
+	cp rsync $(PREFIXDIR)/bin/rsync                       && \
+	rm -rf $(BUILDDIR)/$@-$(RSYNCVERSION)                 && \
+	cd $(TOPDIR)                                          && \
+	touch $@
+
+
+$(BUILDDIR)/strace: $(SOURCEDIR)/$(STRACEARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(STRACEVERSION)
+	tar -xf $(SOURCEDIR)/$(STRACEARCHIVE) -C $(BUILDDIR)
+	cd $@-$(STRACEVERSION)                             && \
+		patch -p2 < $(PATCHESDIR)/strace.patch         && \
+		$(BUILDENV)                                       \
+		LDFLAGS="-L$(PREFIXDIR)/lib"                      \
+		CPPFLAGS="-I$(PREFIXDIR)/include"                 \
+		./configure                                       \
+			--prefix=$(PREFIXDIR)                         \
+			--host=$(TARGET)                           && \
+		make -j$(PROCS)                                && \
+		make -j$(PROCS) install
+	rm -rf $@-$(STRACEVERSION)
+	touch $@
+
+
+$(BUILDDIR)/lsof: $(SOURCEDIR)/$(LSOFARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(LSOFVERSION)
+	tar -xzf $(SOURCEDIR)/$(LSOFARCHIVE) -C $(BUILDDIR)
+	cd $@-$(LSOFVERSION)                               && \
+		export LSOF_ARCH="$(TARGET)"                   && \
+		export LSOF_CC="$(TOOLCHAINDIR)/$(TARGET)-gcc" && \
+		$(BUILDENV)                                       \
+		./Configure -n linux                           && \
+		make -j$(PROCS)                                && \
+		cp lsof $(PREFIXDIR)/bin/lsof                  && \
+	rm -rf $@-$(LSOFVERSION)
 	touch $@
 
 
@@ -472,7 +591,7 @@ $(BUILDDIR)/ffmpeg: $(SOURCEDIR)/$(FFMPEGARCHIVE) $(BUILDDIR)/x264 $(BUILDDIR)/z
 			--enable-version3                                 \
 			--enable-zlib                                  && \
 		make -j$(PROCS)                                    && \
-        make -j$(PROCS) install                            && \
+		make -j$(PROCS) install                            && \
 	rm -rf $(BUILDDIR)/$@-$(FFMPEGVERSION)                 && \
 	cd $(TOPDIR)                                           && \
 	touch $@
@@ -493,21 +612,14 @@ $(BUILDDIR)/rtspd:
 		-L$(GMLIBDIR)/lib                               \
 		-lpthread -lm -lrt -lgm -o $(RTSPDDIR)/rtspd && \
 	cp $(RTSPDDIR)/rtspd $(PREFIXDIR)/bin/rtspd      && \
-    touch $@
+	touch $@
 
 
 $(UTILS):
 	$(TARGET)-gcc -Wall -I$(GMLIBDIR)/inc -L$(GMLIBDIR)/lib -lpthread -lgm $(GMUTILDIR)/$(@F).c -o $@
 
 
-.PHONY: website install images uninstall clean
-
-website: all
-	cd $(WEBROOT)                                                                               && \
-	echo '*** Running composer install in $(WEBROOT)'                                           && \
-	$(COMPOSER) install --no-dev                                                                && \
-	echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues'         && \
-	find $(WEBROOT)/vendor -type l -delete
+.PHONY: install website images uninstall clean
 
 install: all
 	mkdir -p $(INSTALLDIR)                                                                      && \
@@ -518,17 +630,29 @@ install: all
 	echo "*** Stripping binaries"                                                               && \
 	$(TARGET)-strip $(INSTALLDIR)/*
 
-images: install website
+
+website: all install
+	echo '*** Running composer install in $(WEBROOT)'                                           && \
+	cd $(WEBROOT)                                                                               && \
+	$(COMPOSER) install --no-dev                                                                && \
+	echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues'         && \
+	find $(WEBROOT)/vendor -type l -delete
+
+
+images: all install website
 	echo "*** Creating archive of sdcard/ to chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz" && \
+	find . -maxdepth 1 -type f -name 'chuangmi-720p-hack.zip' -or -name 'chuangmi-720p-hack.tgz' -delete    && \
 	zip -r --quiet chuangmi-720p-hack.zip README.md sdcard                                      && \
 	tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard                                && \
 	echo "*** chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz created"
+
 
 uninstall:
 	cd $(TOPDIR)/                                                                               && \
 	rm -f chuangmi-720p-hack.tgz chuangmi-720p-hack.zip                                         && \
 	rm -rf $(INSTALLDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                  && \
 	cd $(TOPDIR)/ && find tools -maxdepth 1 -type f -not -name 'README' | xargs rm -f
+
 
 clean:
 	rm -rf $(INSTALLDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                  && \

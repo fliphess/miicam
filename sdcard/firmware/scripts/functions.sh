@@ -48,7 +48,7 @@ wait_for_network_until()
         IP="8.8.8.8"
     fi
 
-    if [ "x${SECONDS}" == "x" ]
+    if [ "x${RETRIES}" == "x" ]
     then
         RETRIES=10
     fi

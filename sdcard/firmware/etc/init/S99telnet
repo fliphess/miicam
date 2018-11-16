@@ -19,10 +19,13 @@ check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
   start)
-	start_daemon
+	    start_daemon
         ;;
   stop)
-	stop_daemon "${PIDFILE}"
+	    stop_daemon
+        ;;
+  status)
+        status_daemon
         ;;
   restart|reload)
         "$0" stop

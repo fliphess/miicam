@@ -43,7 +43,7 @@
 
         <b-modal id="WarningModal" title="Please confirm to continue..." size="lg" v-model="isModalOpen" @ok="submit()">
             <div id="question">
-                Are you sure you want to initiate a ${section}? Press OK to confirm.
+                Are you sure you want to initiate a {{ action }}? Press OK to confirm.
                 <br/>
             </div>
         </b-modal>
@@ -65,7 +65,7 @@
          </div>
          <br/>
 
-         <p>Selected: <b>{{ section }}</b>: {{ desc }}</p>
+         <p>Selected: <b>{{ action }}</b>: {{ desc }}</p>
 
          <pre><code>
              <div class="output" v-for="line in output">{{ line }}</div>
@@ -81,9 +81,9 @@
             show_alert: false,
             alert_message: "",
             output: "",
-            section: "system",
+            action: "system",
             desc: "",
-            sections: {
+            actions: {
                 system: {
                     desc: "Push a button :)",
                     url: "",
@@ -138,9 +138,9 @@
             submit: function() {
                 var url;
 
-                if (this.section == "reboot")
+                if (this.action == "reboot")
                     url = `/api/system/reboot`;
-                else if (this.section == "shutdown")
+                else if (this.action == "shutdown")
                     url = `/api/system/shutdown`;
 
                 if (url) {
@@ -164,12 +164,12 @@
             reset: function() {
                 this.output = [];
             },
-            select: function(section) {
+            select: function(action) {
                 this.reset();
-                this.section = section;
-                this.desc = this.sections[this.section].desc;
+                this.action = action;
+                this.desc = this.actions[this.action].desc;
 
-                var url = this.sections[this.section].url;
+                var url = this.actions[this.action].url;
 
                 if (url) {
                     axios.get(url)
@@ -191,7 +191,7 @@
             },
         },
         mounted () {
-            this.select(this.section);
+            this.select(this.action);
         }
     });
 </script>
