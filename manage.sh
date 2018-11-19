@@ -18,17 +18,17 @@ function usage()
 
     Options:
 
-      --build        - Does a container build and runs make images clean
+      --build        - Runs a container build and then executes make images clean
                        To create a chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz
                        containing the binaries and other contents of the sdcard
 
-      --build-docker - Only builds the container environment
+      --build-docker - Only (re)build the container environment
+
+      --shell        - Opens a shell in the container build environment
 
       --setup-web    - Create required files for running the webui locally
 
       --run-web      - Run the php inbuild web server in www/public
-
-      --shell        - Opens a shell in the container build environment
 
     Download toolchain: https://fliphess.com/toolchain/
     Repo: https://github.com/fliphess/chuangmi-720p-hack
