@@ -82,7 +82,7 @@ UTILS :=                                                \
 utils: $(UTILS)
 
 
-all:                                     \
+all:    $(PREFIXDIR)/bin                 \
 		$(BUILDDIR)/zlib                 \
 		$(BUILDDIR)/libxml2              \
 		$(BUILDDIR)/libjpeg-turbo        \
@@ -108,11 +108,14 @@ all:                                     \
 		sdcard/manufacture.bin           \
 		utils
 
+$(PREFIXDIR)/bin:
+	mkdir -p $(PREFIXDIR)/bin
+
 
 $(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(ZLIBVERSION)
 	tar -xzf $(SOURCEDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
-	cd $@-$(ZLIBVERSION)              && \
+	@cd $@-$(ZLIBVERSION)              && \
 		$(BUILDENV)                      \
 		./configure                      \
 			--prefix=$(PREFIXDIR)        \
@@ -126,7 +129,7 @@ $(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
 $(BUILDDIR)/libxml2: $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(BUILDDIR)/zlib
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBXML2VERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBXML2ARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LIBXML2VERSION)           && \
+	@cd $@-$(LIBXML2VERSION)           && \
 		$(BUILDENV)                      \
 		ARCH=arm                         \
 		Z_CFLAGS="-DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -I$(PREFIXDIR)/include" \
@@ -147,7 +150,7 @@ $(BUILDDIR)/libxml2: $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(BUILDDIR)/zlib
 $(BUILDDIR)/libjpeg-turbo: $(SOURCEDIR)/$(LIBJPEGARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBJPEGVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBJPEGARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LIBJPEGVERSION)           && \
+	@cd $@-$(LIBJPEGVERSION)           && \
 		$(BUILDENV)                      \
 		./configure                      \
 			--prefix=$(PREFIXDIR)        \
@@ -163,7 +166,7 @@ $(BUILDDIR)/libjpeg-turbo: $(SOURCEDIR)/$(LIBJPEGARCHIVE)
 $(BUILDDIR)/libpng: $(SOURCEDIR)/$(LIBPNGARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPNGVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBPNGARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LIBPNGVERSION)             && \
+	@cd $@-$(LIBPNGVERSION)             && \
 		$(BUILDENV)                       \
 		LDFLAGS="-L$(PREFIXDIR)/lib"      \
 		CPPFLAGS="-I$(PREFIXDIR)/include" \
@@ -181,7 +184,7 @@ $(BUILDDIR)/libpng: $(SOURCEDIR)/$(LIBPNGARCHIVE)
 $(BUILDDIR)/libgd: $(SOURCEDIR)/$(LIBGDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libjpeg-turbo $(BUILDDIR)/libpng
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBGDVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBGDARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LIBGDVERSION)             && \
+	@cd $@-$(LIBGDVERSION)             && \
 		$(BUILDENV)                      \
 		ARCH=arm                         \
 		./configure                      \
@@ -204,7 +207,7 @@ $(BUILDDIR)/libgd: $(SOURCEDIR)/$(LIBGDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/lib
 $(BUILDDIR)/pcre: $(SOURCEDIR)/$(PCREARCHIVE) $(BUILDDIR)/zlib
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(PCREVERSION)
 	unzip -q $(SOURCEDIR)/$(PCREARCHIVE) -d $(BUILDDIR)
-	cd $@-$(PCREVERSION)              && \
+	@cd $@-$(PCREVERSION)             && \
 		$(BUILDENV)                      \
 		./configure                      \
 			--host=$(TARGET)             \
@@ -220,7 +223,7 @@ $(BUILDDIR)/pcre: $(SOURCEDIR)/$(PCREARCHIVE) $(BUILDDIR)/zlib
 $(BUILDDIR)/x264: $(SOURCEDIR)/$(X264ARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(X264VERSION)
 	tar -xjf $(SOURCEDIR)/$(X264ARCHIVE) -C $(BUILDDIR)
-	cd $@-$(X264VERSION)                && \
+	@cd $@-$(X264VERSION)               && \
 	$(BUILDENV)                            \
 		./configure                        \
 			--host=$(TARGET)               \
@@ -238,7 +241,7 @@ $(BUILDDIR)/x264: $(SOURCEDIR)/$(X264ARCHIVE)
 $(BUILDDIR)/ncurses: $(SOURCEDIR)/$(NCURSESARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(NCURSESVERSION)
 	tar -xzf $(SOURCEDIR)/$(NCURSESARCHIVE) -C $(BUILDDIR)
-	cd $@-$(NCURSESVERSION)                 && \
+	@cd $@-$(NCURSESVERSION)                 && \
 	$(BUILDENV)                                \
 	CC='$(TOOLCHAINDIR)/$(TARGET)-gcc -static' \
 	CFLAGS='-fPIC'                             \
@@ -261,7 +264,7 @@ $(BUILDDIR)/ncurses: $(SOURCEDIR)/$(NCURSESARCHIVE)
 $(BUILDDIR)/libpcap: $(SOURCEDIR)/$(LIBPCAPARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPCAPVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIBPCAPARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LIBPCAPVERSION)             && \
+	@cd $@-$(LIBPCAPVERSION)             && \
 	$(BUILDENV)                            \
 		CFLAGS='-I$(PREFIXDIR)'	           \
 		./configure                        \
@@ -279,7 +282,7 @@ $(BUILDDIR)/libpcap: $(SOURCEDIR)/$(LIBPCAPARCHIVE)
 $(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(TCPDUMPVERSION)
 	tar -xzf $(SOURCEDIR)/$(TCPDUMPARCHIVE) -C $(BUILDDIR)
-	cd $@-$(TCPDUMPVERSION)                   && \
+	@cd $@-$(TCPDUMPVERSION)                   && \
 	export CROSS_COMPILE="$(TARGET)-"         && \
 	export CFLAGS="-static -L$(PREFIXDIR)/lib -I$(PREFIXDIR)/include -I$(PREFIXDIR)/include/pcap"  && \
 	export CPPFLAGS="${CFLAGS}"               && \
@@ -302,7 +305,7 @@ $(BUILDDIR)/dropbear: $(SOURCEDIR)/$(DROPBEARARCHIVE) $(BUILDDIR)/zlib
 	tar -xjf $(SOURCEDIR)/$(DROPBEARARCHIVE) -C $(BUILDDIR)
 	sed -i 's|\(#define DROPBEAR_PATH_SSH_PROGRAM\).*|\1 "/tmp/sd/ft/dbclient"|' $@-$(DROPBEARVERSION)/options.h
 	sed -i 's|\(#define DEFAULT_PATH\).*|\1 "/bin:/sbin:/usr/bin:/usr/sbin:/tmp/sd/ft:/mnt/data/ft"|' $@-$(DROPBEARVERSION)/options.h
-	cd $@-$(DROPBEARVERSION)          && \
+	@cd $@-$(DROPBEARVERSION)          && \
 		$(BUILDENV)                      \
 		./configure                      \
 			--prefix=$(PREFIXDIR)        \
@@ -319,7 +322,7 @@ $(BUILDDIR)/dropbear: $(SOURCEDIR)/$(DROPBEARARCHIVE) $(BUILDDIR)/zlib
 $(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/pcre
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIGHTTPDVERSION)
 	tar -xzf $(SOURCEDIR)/$(LIGHTTPDARCHIVE) -C $(BUILDDIR)
-	for i in access                     \
+	@for i in access                     \
 		accesslog                       \
 		alias                           \
 		auth                            \
@@ -376,7 +379,7 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(PHPVERSION)
 	tar -xjf $(SOURCEDIR)/$(PHPARCHIVE) -C $(BUILDDIR)
 	sed -i -e '/.*hp_ini_register_extensions.*/d' $@-$(PHPVERSION)/main/main.c
-	cd $@-$(PHPVERSION)              && \
+	@cd $@-$(PHPVERSION)              && \
 		$(BUILDENV)                     \
 		LIBS='-ldl'                     \
 		./configure                     \
@@ -432,7 +435,7 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 $(BUILDDIR)/samba: $(SOURCEDIR)/$(SAMBAARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(SAMBAVERSION)
 	tar -xzf $(SOURCEDIR)/$(SAMBAARCHIVE) -C $(BUILDDIR)
-	cd $@-$(SAMBAVERSION)/source3    && \
+	@cd $@-$(SAMBAVERSION)/source3    && \
 		$(BUILDENV)                     \
 		./autogen.sh                 && \
 		./configure                     \
@@ -465,10 +468,10 @@ $(BUILDDIR)/samba: $(SOURCEDIR)/$(SAMBAARCHIVE)
 	touch $@
 
 
-$(BUILDDIR)/chuangmi_ctrl: $(SOURCEDIR)/$(MIJIACTRLARCHIVE)
-	mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)              && \
-	unzip $(SOURCEDIR)/$(MIJIACTRLARCHIVE) -d $(BUILDDIR)                                       && \
-	cd $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)                                          && \
+$(BUILDDIR)/chuangmi_ctrl: $(PREFIXDIR)/bin $(SOURCEDIR)/$(MIJIACTRLARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)
+	unzip $(SOURCEDIR)/$(MIJIACTRLARCHIVE) -d $(BUILDDIR)
+	@cd $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)                                         && \
 	make                                                                                        && \
 	cp mijia_ctrl $(PREFIXDIR)/bin/chuangmi_ctrl                                                && \
 	rm -rf $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)                                      && \
@@ -476,10 +479,10 @@ $(BUILDDIR)/chuangmi_ctrl: $(SOURCEDIR)/$(MIJIACTRLARCHIVE)
 	touch $@
 
 
-$(BUILDDIR)/runas: $(SOURCEDIR)/$(RUNASARCHIVE)
-	mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/static-sudo-$(RUNASVERSION)                      && \
-	unzip $(SOURCEDIR)/$(RUNASARCHIVE) -d $(BUILDDIR)                                           && \
-	cd $(BUILDDIR)/static-sudo-$(RUNASVERSION)                                                  && \
+$(BUILDDIR)/runas: $(PREFIXDIR)/bin $(SOURCEDIR)/$(RUNASARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/static-sudo-$(RUNASVERSION)
+	unzip $(SOURCEDIR)/$(RUNASARCHIVE) -d $(BUILDDIR)
+	@cd $(BUILDDIR)/static-sudo-$(RUNASVERSION)                                                 && \
 	$(TARGET)-gcc -static -W -Wall -Wextra -Werror -pedantic rpzsudo.c -o runas                 && \
 	cp runas $(PREFIXDIR)/bin/runas                                                             && \
 	rm -rf $(BUILDDIR)/static-sudo-$(RUNASVERSION)                                              && \
@@ -488,9 +491,9 @@ $(BUILDDIR)/runas: $(SOURCEDIR)/$(RUNASARCHIVE)
 
 
 $(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
-	mkdir -p $(BUILDDIR) && rm -rf $@-$(NANOVERSION)      && \
-	tar -xzf $(SOURCEDIR)/$(NANOARCHIVE) -C $(BUILDDIR)   && \
-	cd $@-$(NANOVERSION)                                  && \
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(NANOVERSION)
+	tar -xzf $(SOURCEDIR)/$(NANOARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(NANOVERSION)                                 && \
 	$(BUILDENV)                                              \
 	CFLAGS="-O2 -Wall -static"                               \
 	CPPFLAGS="-P -I$(PREFIXDIR)/include -I $(PREFIXDIR)/include/ncurses -L$(PREFIXDIR)/lib/" \
@@ -498,8 +501,8 @@ $(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
 		./configure                                          \
 			--host=$(TARGET)                                 \
 			--prefix=$(PREFIXDIR)                            \
-			--disable-mouse  \
-			--disable-browser \
+			--disable-mouse                                  \
+			--disable-browser                                \
 			--disable-nls                                    \
 			--disable-dependency-tracking                    \
 			--enable-static                               && \
@@ -509,10 +512,10 @@ $(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
 	touch $@
 
 
-$(BUILDDIR)/rsync: $(SOURCEDIR)/$(RSYNCARCHIVE)
-	mkdir -p $(BUILDDIR) && rm -rf $@-$(RSYNCVERSION)     && \
-	tar -xzf $(SOURCEDIR)/$(RSYNCARCHIVE) -C $(BUILDDIR)  && \
-	cd $@-$(RSYNCVERSION)                                 && \
+$(BUILDDIR)/rsync: $(PREFIXDIR)/bin $(SOURCEDIR)/$(RSYNCARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(RSYNCVERSION)
+	tar -xzf $(SOURCEDIR)/$(RSYNCARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(RSYNCVERSION)                                && \
 		$(BUILDENV)                                          \
 		./configure CFLAGS="-static" EXEEXT="-static"        \
 		--host=$(TARGET)                                     \
@@ -527,7 +530,7 @@ $(BUILDDIR)/rsync: $(SOURCEDIR)/$(RSYNCARCHIVE)
 $(BUILDDIR)/strace: $(SOURCEDIR)/$(STRACEARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(STRACEVERSION)
 	tar -xf $(SOURCEDIR)/$(STRACEARCHIVE) -C $(BUILDDIR)
-	cd $@-$(STRACEVERSION)                             && \
+	@cd $@-$(STRACEVERSION)                            && \
 		patch -p2 < $(PATCHESDIR)/strace.patch         && \
 		$(BUILDENV)                                       \
 		LDFLAGS="-L$(PREFIXDIR)/lib"                      \
@@ -541,10 +544,10 @@ $(BUILDDIR)/strace: $(SOURCEDIR)/$(STRACEARCHIVE)
 	touch $@
 
 
-$(BUILDDIR)/lsof: $(SOURCEDIR)/$(LSOFARCHIVE)
+$(BUILDDIR)/lsof: $(PREFIXDIR)/bin $(SOURCEDIR)/$(LSOFARCHIVE)
 	mkdir -p $(BUILDDIR) && rm -rf $@-$(LSOFVERSION)
 	tar -xzf $(SOURCEDIR)/$(LSOFARCHIVE) -C $(BUILDDIR)
-	cd $@-$(LSOFVERSION)                               && \
+	@cd $@-$(LSOFVERSION)                               && \
 		export LSOF_ARCH="$(TARGET)"                   && \
 		export LSOF_CC="$(TOOLCHAINDIR)/$(TARGET)-gcc" && \
 		$(BUILDENV)                                       \
@@ -556,9 +559,9 @@ $(BUILDDIR)/lsof: $(SOURCEDIR)/$(LSOFARCHIVE)
 
 
 $(BUILDDIR)/ffmpeg: $(SOURCEDIR)/$(FFMPEGARCHIVE) $(BUILDDIR)/x264 $(BUILDDIR)/zlib
-	mkdir -p $(BUILDDIR) && rm -rf $@-$(FFMPEGVERSION)     && \
-	tar -xjf $(SOURCEDIR)/$(FFMPEGARCHIVE) -C $(BUILDDIR)  && \
-	cd $@-$(FFMPEGVERSION)                                 && \
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(FFMPEGVERSION)
+	tar -xjf $(SOURCEDIR)/$(FFMPEGARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(FFMPEGVERSION)                                 && \
 		$(BUILDENV)                                           \
 		./configure                                           \
 			--pkg-config-flags="--static"                     \
@@ -597,12 +600,8 @@ $(BUILDDIR)/ffmpeg: $(SOURCEDIR)/$(FFMPEGARCHIVE) $(BUILDDIR)/x264 $(BUILDDIR)/z
 	touch $@
 
 
-sdcard/manufacture.bin:
-	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
-
-
-$(BUILDDIR)/rtspd:
-	mkdir -p $(BUILDDIR) $(PREFIXDIR)/bin            && \
+$(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
+	mkdir -p $(BUILDDIR)
 	cd $(RTSPDDIR)                                   && \
 	$(TARGET)-gcc                                       \
 		-Wall                                           \
@@ -619,10 +618,14 @@ $(UTILS):
 	$(TARGET)-gcc -Wall -I$(GMLIBDIR)/inc -L$(GMLIBDIR)/lib -lpthread -lgm $(GMUTILDIR)/$(@F).c -o $@
 
 
+sdcard/manufacture.bin:
+	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
+
+
 .PHONY: install website images uninstall clean
 
 install: all
-	mkdir -p $(INSTALLDIR)                                                                      && \
+	@mkdir -p $(INSTALLDIR)                                                                     && \
 	echo "*** Moving binaries to $(INSTALLDIR)"                                                 && \
 	cd $(PREFIXDIR)/bin  && cp $(BINS) $(INSTALLDIR)                                            && \
 	cd $(PREFIXDIR)/sbin && cp $(SBINS) $(INSTALLDIR)                                           && \
@@ -632,7 +635,7 @@ install: all
 
 
 website: all install
-	echo '*** Running composer install in $(WEBROOT)'                                           && \
+	@echo '*** Running composer install in $(WEBROOT)'                                           && \
 	cd $(WEBROOT)                                                                               && \
 	$(COMPOSER) install --no-dev                                                                && \
 	echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues'         && \
@@ -640,10 +643,10 @@ website: all install
 
 
 images: all install website
-	echo "*** Creating archive of sdcard/ to chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz" && \
+	@echo "*** Creating archive of sdcard/ to chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz" && \
 	find . -maxdepth 1 -type f -name 'chuangmi-720p-hack.zip' -or -name 'chuangmi-720p-hack.tgz' -delete    && \
-	zip -r --quiet chuangmi-720p-hack.zip README.md sdcard                                      && \
-	tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard                                && \
+	zip -r --quiet chuangmi-720p-hack.zip README.md sdcard                                       && \
+	tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard                                 && \
 	echo "*** chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz created"
 
 
