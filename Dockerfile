@@ -37,6 +37,7 @@ RUN echo "*** Install required packages" \
  && apt-get -qq update                   \
  && apt-get -qq install -y               \
       autoconf                           \
+      ca-certificates                    \
       bison                              \
       build-essential                    \
       curl                               \
@@ -47,6 +48,7 @@ RUN echo "*** Install required packages" \
       locales                            \
       make                               \
       ncurses-dev                        \
+      openssl                            \
       php-cli                            \
       php-mbstring                       \
       unrar                              \
