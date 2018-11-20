@@ -1,5 +1,5 @@
 
-DOWNLOADCMD := wget -t 2 -T 10 -c -O
+DOWNLOADCMD := wget -t 5 -T 10 -c -O
 
 ZLIBVERSION = 1.2.11
 ZLIBARCHIVE = zlib-$(ZLIBVERSION).tar.gz
