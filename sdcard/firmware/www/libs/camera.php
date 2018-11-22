@@ -57,13 +57,14 @@ class ISP328
     public function Get(string $key) {
         if (!in_array($key, self::$all_isp_keys)) {
             throw new \Exception(
-                sprintf('Invalid input: Key %s not in known keys.', $key)
+                sprintf('Invalid input: Key %s not in known keys.', escapeshellarg($key))
             );
         }
 
         $command = sprintf("echo r %s > /proc/isp328/command", escapeshellarg($key));
 
         exec($command, $output, $return);
+
         if ($return != 0) {
             throw new \Exception(
                 sprintf('Error executing %s: %s', $command, implode(" ", $output))
@@ -84,7 +85,7 @@ class ISP328
 
         if ($current_value == $value) return $value;
 
-        $command = sprintf("echo w %s %s > /proc/isp328/command", escapeshellarg($key), escapeshellarg($value));
+        $command = sprintf("echo w %s %s > /proc/isp328/command 2>&1", escapeshellarg($key), escapeshellarg($value));
 
         exec($command, $output, $return);
         if ($return != 0) {
@@ -259,9 +260,9 @@ function CameraState() {
     $default = 'unknown';
 
     return array(
-        "ir_cut"      => (IR_Cut::IsOn())     ? "on" : "off",
-        "night_mode"  => (NightMode::IsOn())  ? "on" : "off",
-        "flip_mode"   => (FlipMode::IsOn())   ? "on" : "off",
-        "mirror_mode" => (MirrorMode::IsOn()) ? "on" : "off",
+        "ir_cut"      => IR_Cut::IsOn(),
+        "night_mode"  => NightMode::IsOn(),
+        "flip_mode"   => FlipMode::IsOn(),
+        "mirror_mode" => MirrorMode::IsOn(),
     );
 }

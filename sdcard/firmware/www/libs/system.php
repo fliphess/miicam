@@ -1,5 +1,186 @@
 <?php
 
+
+// **************************************************************
+// ** Config Manipulation                                      **
+// **************************************************************
+
+class Configuration
+{
+
+    public function __construct() {}
+
+    public static $config_path  = '/tmp/sd/config.cfg';
+
+    public static $backupdir = '/tmp/sd/config.bak';
+
+    public static $required_config = [
+        "AUTO_NIGHT_MODE",
+        "DISABLE_CLOUD",
+        "DISABLE_HACK",
+        "DISABLE_OTA",
+        "ENABLE_CRON",
+        "ENABLE_FTPD",
+        "ENABLE_HTTPD",
+        "ENABLE_MQTT",
+        "ENABLE_RTSP",
+        "ENABLE_SAMBA",
+        "ENABLE_SSHD",
+        "ENABLE_TELNETD",
+        "HOSTNAME",
+        "MOSQUITTOOPTS",
+        "MOSQUITTOPUBOPTS",
+        "MQTT_HOST",
+        "MQTT_PASS",
+        "MQTT_PORT",
+        "MQTT_STATUSINTERVAL",
+        "MQTT_TOPIC",
+        "MQTT_USER",
+        "NTP_SERVER",
+        "PING_IP",
+        "PING_RETRIES",
+        "PING_WAIT",
+        "PURGE_LOGFILES_AT_BOOT",
+        "ROOT_PASSWORD",
+        "START_RESTARTD",
+        "TIMEZONE",
+        "WAIT_FOR_NETWORK",
+        "WIFI_PASS",
+        "WIFI_SSID",
+    ];
+
+    public function Read() {
+        // * Read the configuration and return as a single-key array
+
+        $output = file_get_contents(self::$config_path);
+        if (!$output) {
+            throw new \Exception(
+                sprintf('Error retrieving configuration content from %s', self::$config_path)
+            );
+        }
+        return array("content" => $output);
+    }
+
+    public function Test() {
+        // * Verify the syntax of the current config file on the command line
+
+        $command = sprintf('/bin/busybox ash -n %s 2>&1', self::$config_path);
+        exec($command, $output, $return);
+
+        if ($return != 0) {
+            return array("success" => false, "message" => $output);
+        } else {
+            return array("success" => true, "message" => $output);
+        }
+    }
+
+    public function Write($content) {
+        // * Save the content to the configuration file
+        self::Verify($content);
+        self::Backup();
+
+        if (!file_put_contents(self::$config_path, $content, LOCK_EX)) {
+            throw new \Exception(
+                sprintf('Failed to write new content to %s configuration content: %s (line: %s)', $line, $lines_count)
+            );
+        }
+        return array("success" => true, "message" => sprintf("Saved to %s", self::$config_path));
+    }
+
+    public function Verify($content) {
+        $lines = explode("\n", $content);
+        $lines_count = 0;
+
+        foreach ($lines as $line) {
+            $lines_count++;
+            if (!preg_match('/^#.+$|^$/', $line) and !preg_match('/^\w+=\"?([a-zA-Z0-9_\-\ \/\$\.]+)?\"?$/', $line)) {
+                throw new \Exception(
+                    sprintf('Invalid input in configuration content: %s (line: %s)', $line, $lines_count)
+                );
+            }
+        }
+        foreach (self::$required_config as $element) {
+            $regex = sprintf('/%s=/', $element);
+            if (!preg_match($regex, $content)) {
+                throw new \Exception(
+                    sprintf('Invalid configuration: %s not found in content!', $element)
+                );
+            }
+        }
+        return true;
+    }
+
+    public function Backup() {
+        // * Backup the current configuration to backupdir
+        $timestamp = strftime("%Y%m%d.%H%M%S");
+
+        if (!is_dir(self::$backupdir))
+            OS::CreateDir(self::$backupdir);
+
+        $filename = sprintf('%s/config_%s', self::$backupdir, $timestamp);
+
+        if (!copy(self::$config_path, $filename)) {
+            throw new \Exception(
+                sprintf('Failed to copy %s to %s', self::$config_path, $filename)
+            );
+        }
+
+        return sprintf('config_%s', $timestamp);
+    }
+
+    public function ListBackups() {
+        // * Return a list of all available backup files in backup dir
+
+        if (!is_dir(self::$backupdir)) {
+            return [];
+        }
+
+        $files = glob(sprintf("%s/config_*", self::$backupdir));
+
+        $filenames = [];
+        foreach ($files as $file) {
+            array_push($filenames, basename($file));
+        }
+        return $filenames;
+    }
+
+    public function BackupRestore($filename) {
+        // * Restore a given backup file as the current config
+        $sourcefile = sprintf('%s/%s', self::$backupdir, $filename);
+
+        if (!is_file($sourcefile)) {
+            throw new \Exception(
+                sprintf('Failed to restore %s to %s: File not found!', $sourcefile, self::$config_path)
+            );
+        }
+
+        self::Backup();
+
+        if (!copy($sourcefile, self::$config_path)) {
+            throw new \Exception(
+                sprintf('Failed to restore %s to %s: Copy Failed', $sourcefile, self::$config_path)
+            );
+        }
+
+        return array("message" => sprintf("Config %s restored to %s", $sourcefile, self::$config_path), "success" => true);
+    }
+
+    public function RemoveBackups() {
+        // * Leave N backups and cleanup the rest
+
+        $command = sprintf("rm -rf %s 2>&1", escapeshellarg(self::$backupdir));
+        exec($command, $output, $return);
+
+        if ($return != 0) {
+            throw new \Exception(
+                sprintf('Error removing directory %s: %s', self::$backupdir, implode(" ", $output))
+            );
+        }
+        return true;
+    }
+}
+
+
 // **************************************************************
 // ** GPIO Functions                                           **
 // **************************************************************

@@ -23,6 +23,7 @@
         <li><a href="/system.html">System</a></li>
         <li><a href="/services.html">Services</a></li>
         <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/config.html">Config Editor</a></li>
         <li><a href="/apidocs.html">API Docs</a></li>
         <li class="right"><a class="active">Services</a></li>
       </ul>
@@ -45,6 +46,8 @@
                      @dismissed="show_output=false">
                      {{ output }}
                  </b-alert>
+
+                <p v-if="services.length == 0">Waiting for incoming data....</p>
 
                 <table style="width:50%" id="table-services">
                     <thead>

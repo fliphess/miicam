@@ -23,6 +23,7 @@
         <li><a href="/system.html">System</a></li>
         <li><a href="/services.html">Services</a></li>
         <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/config.html">Config Editor</a></li>
         <li><a href="/apidocs.html">API Docs</a></li>
         <li class="right"><a class="active">Logviewer</a></li>
       </ul>
@@ -48,9 +49,14 @@
                 </div>
 
                 <p>Now tailing {{ logdesc }}, select a log to view.</p>
-                <pre><code>
-                    <div class="loglines" v-for="line in lines">{{ line }}</div>
-                </code></pre>
+
+                <p v-if="lines.length == 0">Waiting for incoming data....</p>
+
+                <div class="code" v-if="lines.length > 0">
+                    <pre><code>
+                        <div class="loglines" v-for="line in lines">{{ line }}</div>
+                    </code></pre>
+                </div>
             </div>
         </div>
 

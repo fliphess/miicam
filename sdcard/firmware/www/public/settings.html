@@ -1,37 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width" />
-    <title>Settings</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width" />
+      <title>Settings</title>
 
-    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
-    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
-    <link rel="stylesheet" href="/static/css/chuangmi.css">
+      <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+      <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+      <link rel="stylesheet" href="/static/css/chuangmi.css">
 
-    <script src="/static/js/vue.min.js"></script>
-    <script src="/static/js/polyfill.min.js"></script>
-    <script src="/static/js/bootstrap-vue.js"></script>
-
+      <script src="/static/js/vue.min.js"></script>
+      <script src="/static/js/polyfill.min.js"></script>
+      <script src="/static/js/bootstrap-vue.js"></script>
+      <script src="/static/js/axios.min.js"></script>
   </head>
 
   <body>
       <ul class="topnav">
-        <li><a href="/index.html">Home</a></li>
-        <li><a href="/snapshot.html">Snapshot</a></li>
-        <li><a href="/settings.html">Settings</a></li>
-        <li><a href="/system.html">System</a></li>
-        <li><a href="/services.html">Services</a></li>
-        <li><a href="/logviewer.html">Log viewer</a></li>
-        <li><a href="/apidocs.html">API Docs</a></li>
-        <li class="right"><a class="active">Settings</a></li>
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/snapshot.html">Snapshot</a></li>
+          <li><a href="/settings.html">Settings</a></li>
+          <li><a href="/system.html">System</a></li>
+          <li><a href="/services.html">Services</a></li>
+          <li><a href="/logviewer.html">Log viewer</a></li>
+          <li><a href="/config.html">Config Editor</a></li>
+          <li><a href="/apidocs.html">API Docs</a></li>
+          <li class="right"><a class="active">Settings</a></li>
       </ul>
-    <div class="content">
 
-        <div style="padding:0 16px;">
-            <h1>Settings</h1>
-        </div>
+      <div class="content">
+          <div style="padding:0 16px;">
+              <h1>Settings</h1>
 
-    </div>
+              <div id="app">
+
+                  <b-alert variant="danger"
+                       dismissible
+                       :show="error_show"
+                       @dismissed="error_show=false">
+                       {{ error_message }}
+                  </b-alert>
+
+                  <b-alert variant="success"
+                       dismissible
+                       :show="success_show"
+                       @dismissed="success_show=false">
+                       {{ success_message }}
+                  </b-alert>
+
+                  <h2>Leds</h2>
+                  <template v-for="led in leds">
+                      <b-button-group>
+                          <b-button :variant="state[led].variant" v-on:click="toggle_state(led)">{{ humanize(led) }}: <i>({{ state[led].on == true ? 'on' : 'off' }})</i></b-button>
+                      </b-button-group>
+                  </template>
+
+                  <br/>
+                  <br/>
+
+                  <h2>Camera Options</h2>
+                  <template v-for="option in cam_options">
+                      <b-button-group>
+                          <b-button :variant="state[option].variant" v-on:click="toggle_state(option)">{{ humanize(option) }}: <i>({{ state[option].on == true ? 'on' : 'off' }})</i></b-button>
+                      </b-button-group>
+                  </template>
+
+                  <br/>
+                  <br/>
+
+                  <h2>NVRAM Settings</h2>
+                  <p v-if="nvram_settings.length == 0">Retrieving data....</p>
+
+                  <table v-if="nvram_settings.length > 0" style="width:50%" id="table-settings">
+                      <thead>
+                          <tr>
+                              <th @click="sort('key')">Key</th>
+                              <th @click="sort('value')">Value</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr v-for="item in nvram_sorted">
+                              <td>{{ item.key }}</td>
+                              <td>{{ item.value }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+
+                  <br>
+
+                  <p v-if="nvram_settings.length > pageSize">Current Page: {{ currentPage }}</p>
+
+                  <b-button-group>
+                      <b-button @click="get_nvram()">Refresh</b-button>
+                  </b-button-group>
+
+                  <b-button-group v-if="nvram_settings.length > pageSize">
+                      <b-button @click="prevPage">Previous</b-button>
+                      <b-button @click="nextPage">Next</b-button>
+                  </b-button-group>
+
+              </div>
+          </div>
+      </div>
+
+      <script>
+          const app = new Vue({
+              el: '#app',
+              data: {
+                  leds: ['blue_led', 'yellow_led', 'ir_led'],
+                  cam_options: ['ir_cut', 'night_mode', 'flip_mode', 'mirror_mode'],
+                  nvram_settings: [],
+                  state: {
+                      blue_led: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/led/blue_led/set/on`,
+                          url_off: `/api/led/blue_led/set/off`,
+                      },
+                      yellow_led: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/led/yellow_led/set/on`,
+                          url_off: `/api/led/yellow_led/set/off`,
+                      },
+                      ir_led: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/led/ir_led/set/on`,
+                          url_off: `/api/led/ir_led/set/off`,
+                      },
+                      ir_cut: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/camera/ir_cut/set/on`,
+                          url_off: `/api/camera/ir_cut/set/off`,
+                      },
+                      night_mode: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/camera/night_mode/set/on`,
+                          url_off: `/api/camera/night_mode/set/off`,
+                      },
+                      flip_mode: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/camera/flip_mode/set/on`,
+                          url_off: `/api/camera/flip_mode/set/off`,
+                      },
+                      mirror_mode: {
+                          on: "unknown",
+                          variant: "secondary",
+                          url_on: `/api/camera/mirror_mode/set/on`,
+                          url_off: `/api/camera/mirror_mode/set/off`,
+                      },
+                  },
+                  error_show: false,
+                  error_message: null,
+                  success_show: false,
+                  success_message: null,
+
+                  currentSort: "key",
+                  currentSortDir: "asc",
+                  pageSize: 6,
+                  currentPage: 1,
+              },
+              mounted: function() {
+                  this.get_state(`/api/led/state`);
+                  this.get_state(`/api/camera/state`);
+                  this.get_nvram();
+              },
+              methods: {
+                  humanize: function humanize(str) {
+                      var frags = str.split('_');
+                      for (i=0; i<frags.length; i++) {
+                          frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+                      }
+                      return frags.join(' ');
+                  },
+                  get_state: function(url) {
+                      axios.get(url)
+                      .then(response => {
+                          for (var key in response.data) {
+                              this.set_state(key, response.data[key]);
+                          }
+                      })
+                      .catch(error => {
+                          this.error_show = true;
+                          this.error_message = error.response.data.message;
+                      });
+                  },
+                  set_state: function(option, state) {
+                      this.state[option].on = state;
+                      this.state[option].variant = (state == true) ? "primary" : "secondary";
+                  },
+                  toggle_state: function(option) {
+                      var state = this.state[option].on;
+                      var url   = (state == true) ? this.state[option].url_off : this.state[option].url_on;
+
+                      if (state == "unknown") {
+                           this.error_show = true;
+                           this.error_message = "Please wait till the current state is retrieved from the camera or refresh the page.";
+                           return;
+                      }
+
+                      axios.get(url)
+                      .then(response => {
+                          if (response.data.success) {
+                              this.set_state(option, !state);
+                              this.success_show = true;
+                              this.success_message = this.humanize(option) + " was turned off";
+                          } else {
+                              this.error_show = true;
+                              this.error_message = "Turn on " + this.humanize(option) + " Failed"
+                          }
+                      })
+                      .catch(error => {
+                          this.error_show = true;
+                          this.error_message = error.response.data.message;
+                      });
+                  },
+                  get_nvram: function() {
+                      this.nvram_settings = [];
+
+                      axios.get(`/api/nvram/state`)
+                      .then(response => {
+                          if (response.data.success != false) {
+                              var settings = [];
+                              for (var key in response.data) {
+                                   settings.push({"key": key, "value": response.data[key]});
+                              }
+                              this.nvram_settings = settings;
+                          } else {
+                              this.error_show = true;
+                              this.error_message = "An error appeared while retrieving nvram settings from /api/nvram/state";
+                          }
+                      })
+                      .catch(error => {
+                          this.error_show = true;
+                          this.error_message = error.response.data.message;
+                      });
+                  },
+                  nvram_select: function(item) {
+                      this.current_nvram = item;
+                  },
+                  sort: function(s) {
+                      if (s === this.currentSort)
+                          this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc';
+                      this.currentSort = s;
+                  },
+                  nextPage: function() {
+                      if ((this.currentPage * this.pageSize) < this.nvram_settings.length) this.currentPage++;
+                  },
+                  prevPage: function() {
+                      if (this.currentPage > 1) this.currentPage--;
+                  },
+              },
+              computed: {
+                  nvram_sorted: function() {
+                      return this.nvram_settings.sort((a,b) => {
+                          let modifier = 1;
+                          if(this.currentSortDir === 'desc') modifier = -1;
+                          if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
+                          if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+                          return 0;
+                      }).filter((row, index) => {
+                          let start = (this.currentPage-1)*this.pageSize;
+                          let end = this.currentPage*this.pageSize;
+                          if(index >= start && index < end) return true;
+                      });
+                  }
+              }
+          });
+      </script>
   </body>
 </html>

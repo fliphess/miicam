@@ -1,4 +1,11 @@
-body {margin: 0;}
+
+html, body{
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	position: relative;
+}
 
 /*
  * responsive topnav
@@ -43,7 +50,7 @@ table {
 
 th, td {
   text-align: left;
-  padding: 16px;
+  padding: 10px;
   border-bottom: 1px solid #EFEFEF;
 }
 
@@ -145,3 +152,4 @@ pre code {
   display: block;
   padding: 10px;
 }
+

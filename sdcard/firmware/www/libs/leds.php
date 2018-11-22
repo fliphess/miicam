@@ -4,6 +4,7 @@
 // ** led functions                                            **
 // **************************************************************
 
+
 class LED
 {
     private static $leds = [
@@ -37,7 +38,7 @@ class LED
     }
 
     public static function Ctl(string $arguments) {
-        $command = sprintf("%s %s", self::$chuangmi_ctrl, $arguments);
+        $command = sprintf("%s %s 2>&1", self::$chuangmi_ctrl, $arguments);
         exec($command, $output, $return);
 
         if ($return != 0) {

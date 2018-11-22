@@ -18,16 +18,16 @@ class Snapshot
         return sprintf('/tmp/sd/RECORDED_IMAGES/%s', strftime("%Y/%m/%d"));
     }
 
-    // * Determine file destination and create directory structure
     protected function __PrepareFile() {
+        // * Determine file destination and create directory structure
         $directory = self::__GetDir();
         OS::CreateDir($directory);
 
         return $directory . "/" . strftime("%H%M%S.jpg");
     }
 
-    // * Take a picture and save it to a file
     protected function __TakePicture($filename) {
+        // * Take a picture and save it to a file
         $command = sprintf(self::$command_string, self::$ffmpeg, $filename);
         exec($command, $output, $return);
 
@@ -39,8 +39,8 @@ class Snapshot
         return $output;
     }
 
-    // * Copy the current (last) snapshot to our images directory
     public function SaveCurrent() {
+        // * Copy the current (last) snapshot to our images directory
         $filename = self::__PrepareFile();
 
         if (!copy(self::$snapshot_destination, $filename)) {
@@ -53,8 +53,8 @@ class Snapshot
         return false;
     }
 
-    // * Save an image to our image directory
     public function SaveNew() {
+        // * Save an image to our image directory
         if ((!getenv('ENABLE_RTSP')) && (!Services::IsRunning('rtspd'))) {
             throw new \Exception(
                 "Can't create snapshots when RTSP is not running!"

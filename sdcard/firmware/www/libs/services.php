@@ -15,8 +15,8 @@ class Services
         "crond"           => true,
         "dropbear"        => true,
         "ftpd"            => true,
-        "klogd"           => false,  // Kernel logging can't be stopped
-        "lighttpd"        => false,  // Let's not stop the webserver
+        "klogd"           => false,  // Kernel logging can't be stopped for debugging purposes
+        "lighttpd"        => false,  // Let's not stop the webserver and paint ourselves in the corner
         "messagebus"      => false,  // Used by isp328
         "mqtt-control"    => true,
         "mqtt-interval"   => true,
@@ -24,7 +24,7 @@ class Services
         "restartd"        => true,
         "rtsp"            => true,
         "samba"           => true,
-        "syslogd"         => false,  // Syslogging can't be stopped for now
+        "syslogd"         => false,  // Syslogging can't be stopped for now for debugging reasons
         "telnet"          => true,
         "udhcpc"          => false,
         "watchdog"        => false,

@@ -41,7 +41,7 @@ $app->get('/ping', function ($request, $response) {
 // ** Snapshot                                                 **
 // **************************************************************
 
-$app->get('/snapshot/create', function ($request,$response) {
+$app->get('/snapshot/create', function ($request, $response) {
     $output = Snapshot::Create();
     if ($output) {
         $data = array(
@@ -91,13 +91,13 @@ $app->get('/snapshot/save/current', function ($request, $response) {
 // ** WIFI                                                     **
 // **************************************************************
 
-$app->get('/wifi', function ($request,$response) {
+$app->get('/wifi', function ($request, $response) {
     $wifistate = WIFI::DataDict();
     $data = ($wifistate) ? $wifistate : array("success" => false, "output" => "Failed to parse iwconfig output");
     return $response->withJson($data);
 })->setName('/wifi');
 
-$app->get('/wifi/ifconfig', function ($request,$response) {
+$app->get('/wifi/ifconfig', function ($request, $response) {
     $state = WIFI::IfConfig();
     $data = ($state) ? $state : array("success" => false, "output" => "Failed to parse ifconfig output");
     return $response->withJson($data);
@@ -111,7 +111,7 @@ $app->get('/wifi/ifconfig', function ($request,$response) {
 
 $app->group('/led', function () use ($app) {
 
-    $app->get('/state', function ($request,$response) {
+    $app->get('/state', function ($request, $response) {
         $ledstate = LED::LedState();
         $data = ($ledstate) ? $ledstate : array("success" => false);
         return $response->withJson($data);
@@ -120,15 +120,16 @@ $app->group('/led', function () use ($app) {
     // *********************************
     // ** Blue LED                    **
     // *********************************
-    $app->get('/blue', function ($request, $response) {
+
+    $app->get('/blue_led', function ($request, $response) {
         $data = array(
             "led"   => "blue_led",
             "state" => (Blue_Led::IsOn()) ? "on" : "off",
         );
         return $response->withJson($data);
-    })->setName('/led/blue');
+    })->setName('/led/blue_led');
 
-    $app->get('/blue/set/on', function ($request, $response) {
+    $app->get('/blue_led/set/on', function ($request, $response) {
         Blue_Led::TurnOn();
 
         $data    = array(
@@ -137,9 +138,9 @@ $app->group('/led', function () use ($app) {
             "success" => (Blue_Led::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/blue/set/on');
+    })->setName('/led/blue_led/on');
 
-    $app->get('/blue/set/blink', function ($request, $response) {
+    $app->get('/blue_led/set/blink', function ($request, $response) {
        Blue_Led::TurnBlink();
 
         $data = array(
@@ -148,9 +149,9 @@ $app->group('/led', function () use ($app) {
             "success" => (Blue_Led::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/blue/set/blink');
+    })->setName('/led/blue_led/blink');
 
-    $app->get('/blue/set/off', function ($request, $response) {
+    $app->get('/blue_led/set/off', function ($request, $response) {
         Blue_Led::TurnOff();
 
         $data = array(
@@ -159,20 +160,22 @@ $app->group('/led', function () use ($app) {
             "success" => (Blue_Led::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/blue/set/off');
+    })->setName('/led/blue_led/off');
+
 
     // *********************************
     // ** Yellow LED                  **
     // *********************************
-    $app->get('/yellow', function ($request, $response) {
+
+    $app->get('/yellow_led', function ($request, $response) {
         $data = array(
             "led"   => "yellow_led",
             "state" => (Yellow_Led::IsOn()) ? "on" : "off",
         );
         return $response->withJson($data);
-    })->setName('/led/yellow');
+    })->setName('/led/yellow_led');
 
-    $app->get('/yellow/set/on', function ($request, $response) {
+    $app->get('/yellow_led/set/on', function ($request, $response) {
         Yellow_Led::TurnOn();
         $data = array(
             "led"     => "yellow_led",
@@ -180,9 +183,9 @@ $app->group('/led', function () use ($app) {
             "success" => (Yellow_Led::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/yellow/set/on');
+    })->setName('/led/yellow_led/on');
 
-    $app->get('/yellow/set/blink', function ($request, $response) {
+    $app->get('/yellow_led/set/blink', function ($request, $response) {
         Yellow_Led::TurnBlink();
         $data    = array(
             "led"     => "yellow_led",
@@ -190,9 +193,9 @@ $app->group('/led', function () use ($app) {
             "success" => (Yellow_Led::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/yellow/set/blink');
+    })->setName('/led/yellow_led/blink');
 
-    $app->get('/yellow/set/off', function ($request, $response) {
+    $app->get('/yellow_led/set/off', function ($request, $response) {
         Yellow_Led::TurnOff();
         $data    = array(
             "led"     => "yellow_led",
@@ -200,20 +203,22 @@ $app->group('/led', function () use ($app) {
             "success" => (Yellow_Led::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/yellow/set/off');
+    })->setName('/led/yellow_led/off');
+
 
     // *********************************
     // ** IR LED                      **
     // *********************************
-    $app->get('/ir', function ($request, $response) {
+
+    $app->get('/ir_led', function ($request, $response) {
         $data = array(
             "led" => "ir_led",
             "state" => (IR_Led::IsOn()) ? "on" : "off",
         );
         return $response->withJson($data);
-    })->setName('/led/ir');
+    })->setName('/led/ir_led');
 
-    $app->get('/ir/set/on', function ($request, $response) {
+    $app->get('/ir_led/set/on', function ($request, $response) {
         IR_Led::TurnOn();
 
         $data = array(
@@ -222,9 +227,9 @@ $app->group('/led', function () use ($app) {
             "success" => (IR_Led::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/ir/set/on');
+    })->setName('/led/ir_led/on');
 
-    $app->get('/ir/set/off', function ($request, $response) {
+    $app->get('/ir_led/set/off', function ($request, $response) {
         IR_Led::TurnOff();
 
         $data = array(
@@ -233,7 +238,8 @@ $app->group('/led', function () use ($app) {
             "success" => (IR_Led::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/led/ir/set/off');
+    })->setName('/led/ir_led/off');
+
 });
 
 
@@ -244,7 +250,7 @@ $app->group('/led', function () use ($app) {
 
 $app->group('/camera', function () use ($app) {
 
-    $app->get('/state', function ($request,$response) {
+    $app->get('/state', function ($request, $response) {
         $camerastate = CameraState();
         $data = ($camerastate) ? $camerastate : array("success" => false);
         return $response->withJson($data);
@@ -285,7 +291,7 @@ $app->group('/camera', function () use ($app) {
             "success" => $success,
         );
         return $response->withJson($data);
-    })->setName('/camera/isp328/set');
+    })->setName('/camera/isp328');
 
     // *********************************
     // ** IR Cut                      **
@@ -307,7 +313,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (IR_Cut::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/ir_cut/set/on');
+    })->setName('/camera/ir_cut/on');
 
     $app->get('/ir_cut/set/off', function ($request, $response, $args) {
         IR_Cut::TurnOff();
@@ -317,7 +323,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (IR_Cut::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/ir_cut/set/off');
+    })->setName('/camera/ir_cut/off');
 
     // *********************************
     // ** Night Mode                  **
@@ -339,7 +345,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (NightMode::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/night_mode/set/on');
+    })->setName('/camera/night_mode/on');
 
     $app->get('/night_mode/set/off', function ($request, $response, $args) {
         NightMode::TurnOff();
@@ -349,7 +355,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (NightMode::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/night_mode/set/off');
+    })->setName('/camera/night_mode/off');
 
     // *********************************
     // ** Flip Mode                   **
@@ -370,7 +376,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (FlipMode::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/flip_mode/set/on');
+    })->setName('/camera/flip_mode/on');
 
     $app->get('/flip_mode/set/off', function ($request, $response, $args) {
         FlipMode::TurnOff();
@@ -380,7 +386,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (FlipMode::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/flip_mode/set/off');
+    })->setName('/camera/flip_mode/off');
 
     // *********************************
     // ** Mirror Mode                 **
@@ -401,7 +407,7 @@ $app->group('/camera', function () use ($app) {
             "success" => (MirrorMode::IsOn()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/mirror_mode/set/on');
+    })->setName('/camera/mirror_mode/on');
 
     $app->get('/mirror_mode/set/off', function ($request, $response, $args) {
         MirrorMode::TurnOff();
@@ -411,9 +417,58 @@ $app->group('/camera', function () use ($app) {
             "success" => (MirrorMode::IsOff()) ? true : false,
         );
         return $response->withJson($data);
-    })->setName('/camera/mirror_mode/set/off');
+    })->setName('/camera/mirror_mode/off');
 });
 
+
+// **************************************************************
+// ** Config                                                   **
+// **************************************************************
+
+$app->get('/config/read', function ($request, $response) {
+    $config = Configuration::Read();
+    $data   = ($config) ? $config : array("success" => false);
+    return $response->withJson($data);
+})->setName('/config/read');
+
+$app->get('/config/write', function ($request, $response) {
+    return $response->withJson(array("success" => false, "message" => "Use a POST request to update"));
+})->setName('/config/write/get');
+
+$app->post('/config/write', function ($request, $response) {
+    $post = $request->getParsedBody();
+    $data = Configuration::Write($post['content']);
+    return $response->withJson($data);
+})->setName('/config/write');
+
+$app->get('/config/test', function ($request, $response) {
+    $data = Configuration::Test();
+    return $response->withJson($data);
+})->setName('/config/test');
+
+$app->get('/config/backup/create', function ($request, $response) {
+    $backup = Configuration::Backup();
+    $data  = ($backup) ? array("message" => $backup, "success" => true) : array("success" => false);
+    return $response->withJson($data);
+})->setName('/config/backup/create');
+
+$app->get('/config/backup/list', function ($request, $response) {
+    $data = Configuration::ListBackups();
+    return $response->withJson($data);
+})->setName('/config/backup/list');
+
+$app->get('/config/backup/remove', function ($request, $response) {
+    $success = Configuration::RemoveBackups();
+    $data    = array("success" => true, "message" => "Backups deleted");
+    return $response->withJson($data);
+})->setName('/config/backup/remove');
+
+$app->get('/config/restore/{filename}', function ($request, $response, $args) {
+    $filename = $args['filename'];
+    $restore  = Configuration::BackupRestore($filename);
+    $data     = ($restore) ? $restore : array("success" => false);
+    return $response->withJson($data);
+})->setName('/config/backup/restore');
 
 
 // **************************************************************
@@ -422,11 +477,11 @@ $app->group('/camera', function () use ($app) {
 
 $app->group('/nvram', function () use ($app) {
 
-    $app->get('/state', function ($request,$response) {
+    $app->get('/state', function ($request, $response) {
         $nvram = NVRAM::Show();
         $data  = ($nvram) ? $nvram : array("success" => false);
         return $response->withJson($data);
-    })->setName('/nram');
+    })->setName('/nvram');
 
     $app->get('/get/{key}', function ($request, $response, $args) {
         $key = $args['key'];

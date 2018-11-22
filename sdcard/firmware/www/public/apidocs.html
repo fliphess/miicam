@@ -23,6 +23,7 @@
         <li><a href="/system.html">System</a></li>
         <li><a href="/services.html">Services</a></li>
         <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/config.html">Config Editor</a></li>
         <li><a href="/apidocs.html">API Docs</a></li>
         <li class="right"><a class="active">API Docs</a></li>
       </ul>
@@ -39,6 +40,7 @@
                          <b-button v-on:click="select('camera')">Camera</b-button>
                          <b-button v-on:click="select('leds')">LEDS</b-button>
                          <b-button v-on:click="select('system')">System</b-button>
+                         <b-button v-on:click="select('config')">Config</b-button>
                          <b-button v-on:click="select('isp328')">ISP 328</b-button>
                          <b-button v-on:click="select('services')">Services</b-button>
                          <b-button v-on:click="select('nvram')">NVRam</b-button>
@@ -70,6 +72,18 @@
                     title: "",
                     endpoints: [],
                     sections: {
+                        config: {
+                            title: "Configuration file",
+                            endpoints: [
+                               { method: 'GET',  uri: '/api/config/read',               desc: 'Retrieve the content of the current configuration file'},
+                               { method: 'POST', uri: '/api/config/write',              desc: 'Write the current configuration file use (content=<filedata>)'},
+                               { method: 'GET',  uri: '/api/config/test',               desc: 'Verify the syntax of the current configuration file using ash -n'},
+                               { method: 'GET',  uri: '/api/config/backup/create',      desc: 'Backup the current configuration file'},
+                               { method: 'GET',  uri: '/api/config/backup/list',        desc: 'List all available configuration backups'},
+                               { method: 'GET',  uri: '/api/config/backup/remove',      desc: 'Remove all configuration backups'},
+                               { method: 'GET',  uri: '/api/config/restore/{filename}', desc: 'Restore an earlier created backup as the current configuration file'},
+                            ]
+                        },
                         snapshot: {
                             title: "Snapshot Control",
                             endpoints: [
@@ -99,41 +113,40 @@
                         leds: {
                             title: "LED Control",
                             endpoints: [
-                               { method: 'GET', uri: '/api/led/state',            desc: 'Returns the current state of the leds' },
-                               { method: 'GET', uri: '/api/led/blue',             desc: 'Returns the state of the blue led.' },
-                               { method: 'GET', uri: '/api/led/blue/set/on',      desc: 'Turn the blue led on.' },
-                               { method: 'GET', uri: '/api/led/blue/set/off',     desc: 'Turn the blue led off' },
-                               { method: 'GET', uri: '/api/led/blue/set/blink',   desc: 'Turn the blue led to blinking.' },
-                               { method: 'GET', uri: '/api/led/yellow',           desc: 'Returns the state of the yellow led.' },
-                               { method: 'GET', uri: '/api/led/yellow/set/on',    desc: 'Turn the yellow led on' },
-                               { method: 'GET', uri: '/api/led/yellow/set/off',   desc: 'Turn the yellow led off' },
-                               { method: 'GET', uri: '/api/led/yellow/set/blink', desc: 'Turn the yellow led to blinking.' },
-                               { method: 'GET', uri: '/api/led/ir',               desc: 'Returns the state of the infra red leds.' },
-                               { method: 'GET', uri: '/api/led/ir/set/on',        desc: 'Turn on the infra red leds.' },
-                               { method: 'GET', uri: '/api/led/ir/set/off',       desc: 'Turn off the infra red leds.' },
+                               { method: 'GET', uri: '/api/led/state',                  desc: 'Returns the current state of the leds' },
+                               { method: 'GET', uri: '/api/led/blue_led',               desc: 'Returns the state of the blue led.' },
+                               { method: 'GET', uri: '/api/led/blue_led/set/on',        desc: 'Turn the blue led on.' },
+                               { method: 'GET', uri: '/api/led/blue_led/set/off',       desc: 'Turn the blue led off' },
+                               { method: 'GET', uri: '/api/led/blue_led/set/blink',     desc: 'Turn the blue led to blinking.' },
+                               { method: 'GET', uri: '/api/led/yellow_led',             desc: 'Returns the state of the yellow led.' },
+                               { method: 'GET', uri: '/api/led/yellow_led/set/on',      desc: 'Turn the yellow led on' },
+                               { method: 'GET', uri: '/api/led/yellow_led/set/off',    desc: 'Turn the yellow led off' },
+                               { method: 'GET', uri: '/api/led/yellow_led/set/blink',   desc: 'Turn the yellow led to blinking.' },
+                               { method: 'GET', uri: '/api/led/ir_led',                 desc: 'Returns the state of the infra red leds.' },
+                               { method: 'GET', uri: '/api/led/ir_led/set/on',          desc: 'Turn on the infra red leds.' },
+                               { method: 'GET', uri: '/api/led/ir_led/set/off',         desc: 'Turn off the infra red leds.' },
                             ],
                         },
                         system: {
                             title: "System Endpoints",
                             endpoints: [
-                                { method: 'GET', uri: '/api/ping',             desc: 'Testing endpoint to verify if the api is responsive.' },
-                                { method: 'GET', uri: '/api/wifi',             desc: 'Returns a json with the current wifi iwconfig state.' },
-                                { method: 'GET', uri: '/api/wifi/ifconfig',    desc: 'Returns a json with the current wifi ifconfig state.' },
-                                { method: 'GET', uri: '/api/system/proclist',  desc: 'Returns the processlist of the camera.' },
-                                { method: 'GET', uri: '/api/system/dmesg',     desc: 'Returns the dmesg output of the camera.' },
-                                { method: 'GET', uri: '/api/system/diskusage', desc: 'Returns the output of df -h.' },
-                                { method: 'GET', uri: '/api/system/uptime',    desc: 'Returns the uptime and load of the camera.' },
-                                { method: 'GET', uri: '/api/system/meminfo',   desc: 'Returns the content of /proc/meminfo' },
-                                { method: 'GET', uri: '/api/system/memfree',   desc: 'Returns the systems memory usage.' },
-                                { method: 'GET', uri: '/api/system/cpuinfo',   desc: 'Returns the content of /proc/cpuinfo.' },
-                                { method: 'GET', uri: '/api/system/reboot',    desc: 'Initiates a reboot of the camera.' },
-                                { method: 'GET', uri: '/api/system/shutdown',  desc: 'Initiates a shutdown of the camera.' },
+                                { method: 'GET', uri: '/api/ping',                      desc: 'Testing endpoint to verify if the api is responsive.' },
+                                { method: 'GET', uri: '/api/wifi',                      desc: 'Returns a json with the current wifi iwconfig state.' },
+                                { method: 'GET', uri: '/api/wifi/ifconfig',             desc: 'Returns a json with the current wifi ifconfig state.' },
+                                { method: 'GET', uri: '/api/system/proclist',           desc: 'Returns the processlist of the camera.' },
+                                { method: 'GET', uri: '/api/system/dmesg',              desc: 'Returns the dmesg output of the camera.' },
+                                { method: 'GET', uri: '/api/system/diskusage',          desc: 'Returns the output of df -h.' },
+                                { method: 'GET', uri: '/api/system/uptime',             desc: 'Returns the uptime and load of the camera.' },
+                                { method: 'GET', uri: '/api/system/meminfo',            desc: 'Returns the content of /proc/meminfo' },
+                                { method: 'GET', uri: '/api/system/memfree',            desc: 'Returns the systems memory usage.' },
+                                { method: 'GET', uri: '/api/system/cpuinfo',            desc: 'Returns the content of /proc/cpuinfo.' },
+                                { method: 'GET', uri: '/api/system/reboot',             desc: 'Initiates a reboot of the camera.' },
+                                { method: 'GET', uri: '/api/system/shutdown',           desc: 'Initiates a shutdown of the camera.' },
                             ]
                         },
                         isp328: {
                             title: "ISP 328 Endpoints",
                             endpoints: [
-                                { method: 'GET', uri: '/api/camera/state',                    desc: 'Returns a json of the current camera settings state.' },
                                 { method: 'GET', uri: '/api/camera/isp328',                   desc: 'Returns a list with all available isp328 camera parameters.' },
                                 { method: 'GET', uri: '/api/camera/isp328/get/{key}',         desc: 'Returns the value for a specific isp328 parameter.' },
                                 { method: 'GET', uri: '/api/camera/isp328/set/{key}/{value}', desc: 'Sets the value for a isp328 parameter (Use with care!)' },
