@@ -90,6 +90,10 @@
                     </b-form-textarea>
                 </div>
 
+                <div v-if="content == ''">
+                    <p>Retrieving configuration file...</p>
+                </div>
+
                 <br/>
 
                 <b-button-group>

@@ -11,7 +11,7 @@ LIBXML2URI = http://xmlsoft.org/sources/$(LIBXML2ARCHIVE)
 
 LIBJPEGVERSION = 1.5.2
 LIBJPEGARCHIVE = libjpeg-turbo-$(LIBJPEGVERSION).tar.gz
-LIBJPEGURI = https://prdownloads.sourceforge.net/libjpeg-turbo/$(LIBJPEGARCHIVE)
+LIBJPEGURI = http://prdownloads.sourceforge.net/libjpeg-turbo/$(LIBJPEGARCHIVE)
 
 LIBPNGVERSION = 1.6.35
 LIBPNGARCHIVE = libpng-$(LIBPNGVERSION).tar.gz

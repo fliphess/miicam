@@ -108,7 +108,7 @@ class Configuration
 
         $command = sprintf('/bin/busybox ash -n %s 2>&1', self::$config_path);
         exec($command, $output, $return);
-        return array("success" => ($return == 0) ? true : false, "message" => implode(" ", $output));
+        return array("success" => ($return == 0) ? true : false, "message" => ($output) ? implode(" ", $output) : "No syntax errors detected in configuration file");
     }
 
     public function ListBackups() {
