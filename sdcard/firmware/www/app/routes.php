@@ -426,8 +426,9 @@ $app->group('/camera', function () use ($app) {
 // **************************************************************
 
 $app->get('/config/read', function ($request, $response) {
-    $config = Configuration::Read();
-    $data   = ($config) ? $config : array("success" => false);
+    $content = Configuration::Read();
+    $success =  ($content) ? true : false;
+    $data    = array("success" => $success, "content" => $content, "message" => "Succesfully read config file");
     return $response->withJson($data);
 })->setName('/config/read');
 
@@ -436,8 +437,11 @@ $app->get('/config/write', function ($request, $response) {
 })->setName('/config/write/get');
 
 $app->post('/config/write', function ($request, $response) {
-    $post = $request->getParsedBody();
-    $data = Configuration::Write($post['content']);
+    $post    = $request->getParsedBody();
+    $content = $post['content'];
+    $success = Configuration::Write($content);
+    $data    = array("success" => $success, "message" => "Config written succesfully");
+
     return $response->withJson($data);
 })->setName('/config/write');
 
@@ -446,16 +450,16 @@ $app->get('/config/test', function ($request, $response) {
     return $response->withJson($data);
 })->setName('/config/test');
 
-$app->get('/config/backup/create', function ($request, $response) {
-    $backup = Configuration::Backup();
-    $data  = ($backup) ? array("message" => $backup, "success" => true) : array("success" => false);
-    return $response->withJson($data);
-})->setName('/config/backup/create');
-
 $app->get('/config/backup/list', function ($request, $response) {
     $data = Configuration::ListBackups();
     return $response->withJson($data);
 })->setName('/config/backup/list');
+
+$app->get('/config/backup/create', function ($request, $response) {
+    $filename = Configuration::Backup();
+    $data  = ($filename) ? array("message" => sprintf("New backup created: %s", $filename), "success" => true) : array("success" => false, "message" => "Backup creation failed");
+    return $response->withJson($data);
+})->setName('/config/backup/create');
 
 $app->get('/config/backup/remove', function ($request, $response) {
     $success = Configuration::RemoveBackups();
@@ -465,8 +469,8 @@ $app->get('/config/backup/remove', function ($request, $response) {
 
 $app->get('/config/restore/{filename}', function ($request, $response, $args) {
     $filename = $args['filename'];
-    $restore  = Configuration::BackupRestore($filename);
-    $data     = ($restore) ? $restore : array("success" => false);
+    $message  = Configuration::BackupRestore($filename);
+    $data     = array("message" => $message, "success" => true);
     return $response->withJson($data);
 })->setName('/config/backup/restore');
 

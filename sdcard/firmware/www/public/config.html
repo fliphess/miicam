@@ -72,7 +72,8 @@
                     <b-button variant="secondary" v-on:click="backup_config">Backup Current Config</b-button>
                     <b-button variant="secondary" v-b-modal="'RemoveModal'">Remove Backup Configs</b-button>
                     <b-dropdown variant="secondary" text="Restore Config Backup" >
-                        <b-dropdown-item v-on:click="select_backup_file(backup)" v-b-modal="'RestoreModal'" v-for="backup in backup_list" :value="backup">{{ backup }}</b-dropdown-item>
+                        <b-dropdown-item v-on:click="select_backup_file(backup)" v-b-modal="'RestoreModal'" v-if="backup_list.length > 0" v-for="backup in backup_list" :value="backup">{{ backup }}</b-dropdown-item>
+                        <b-dropdown-item v-if="backup_list.length == 0">No backups present. Create one first.</b-dropdown-item>
                     </b-dropdown>
                 </b-button-group>
 
@@ -88,6 +89,7 @@
                         spellcheck="false">
                     </b-form-textarea>
                 </div>
+
                 <br/>
 
                 <b-button-group>
@@ -139,39 +141,40 @@
                             this.error_message = error.response.data.message;
                         });
                     },
-                    get: function(url, error_message, success_message) {
+                    get: function(url) {
                         axios.get(url)
                         .then(response => {
-                            if (response.data.success != false) {
+                            if (response.data.success == true) {
                                 this.success_show = true;
                                 this.error_show = false;
-                                this.success_message = success_message + response.data.message;
+                                this.success_message = response.data.message;
                             } else {
                                 this.success_show = false;
                                 this.error_show = true;
-                                this.error_message = error_message + response.data.message;
+                                this.error_message = response.data.message;
                             }
                         })
                         .catch(error => {
                             this.success_show = false;
                             this.error_show = true;
-                            this.error_message = error_message + error.response.data.message;
+                            this.error_message = error.response.data.message;
                         });
                     },
                     test_config: function() {
-                        this.get(`/api/config/test`, "Config test FAIL: ", "Config test OK: ");
+                        this.get(`/api/config/test`);
                     },
                     backup_config: function() {
-                        this.get(`/api/config/backup/create`, "Failed to create backup: ", "New backup created: ");
+                        this.get(`/api/config/backup/create`);
+                        this.get_backups();
                     },
                     restore_config: function() {
-                        var url = `/api/config/restore/${this.selected_backup_file}`;
-                        this.get(url, "Failed to restore config from backup: ", "Config restored from backup: ");
+                        this.get(`/api/config/restore/${this.selected_backup_file}`);
                         this.get_config();
                         this.get_backups();
                     },
                     remove_backups: function() {
-                        this.get(`/api/config/backup/remove`, "Removing backups failed: ", "Removing backups succeeded: ");
+                        this.get(`/api/config/backup/remove`);
+                        this.get_backups();
                     },
                     select_backup_file: function(backup_file) {
                         this.selected_backup_file = backup_file;

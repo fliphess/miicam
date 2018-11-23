@@ -52,30 +52,20 @@ class Configuration
     public function Read() {
         // * Read the configuration and return as a single-key array
 
-        $output = file_get_contents(self::$config_path);
-        if (!$output) {
+        $content = file_get_contents(self::$config_path);
+
+        if (!$content) {
             throw new \Exception(
-                sprintf('Error retrieving configuration content from %s', self::$config_path)
+                sprintf('Error reading configuration file %s', self::$config_path)
             );
         }
-        return array("content" => $output);
-    }
 
-    public function Test() {
-        // * Verify the syntax of the current config file on the command line
-
-        $command = sprintf('/bin/busybox ash -n %s 2>&1', self::$config_path);
-        exec($command, $output, $return);
-
-        if ($return != 0) {
-            return array("success" => false, "message" => $output);
-        } else {
-            return array("success" => true, "message" => $output);
-        }
+        return $content;
     }
 
     public function Write($content) {
         // * Save the content to the configuration file
+
         self::Verify($content);
         self::Backup();
 
@@ -84,7 +74,8 @@ class Configuration
                 sprintf('Failed to write new content to %s configuration content: %s (line: %s)', $line, $lines_count)
             );
         }
-        return array("success" => true, "message" => sprintf("Saved to %s", self::$config_path));
+
+        return true;
     }
 
     public function Verify($content) {
@@ -99,6 +90,7 @@ class Configuration
                 );
             }
         }
+
         foreach (self::$required_config as $element) {
             $regex = sprintf('/%s=/', $element);
             if (!preg_match($regex, $content)) {
@@ -107,12 +99,37 @@ class Configuration
                 );
             }
         }
+
         return true;
+    }
+
+    public function Test() {
+        // * Verify the syntax of the current config file on the command line
+
+        $command = sprintf('/bin/busybox ash -n %s 2>&1', self::$config_path);
+        exec($command, $output, $return);
+        return array("success" => ($return == 0) ? true : false, "message" => implode(" ", $output));
+    }
+
+    public function ListBackups() {
+        // * Return a list of all available backup files in backup dir
+
+        if (!is_dir(self::$backupdir)) {
+            return [];
+        }
+
+        $files = glob(sprintf("%s/config_*", self::$backupdir));
+
+        $file_list = [];
+        foreach ($files as $file) {
+            array_push($file_list, basename($file));
+        }
+        return $file_list;
     }
 
     public function Backup() {
         // * Backup the current configuration to backupdir
-        $timestamp = strftime("%Y%m%d.%H%M%S");
+        $timestamp = strftime("%Y%m%d_%H%M%S");
 
         if (!is_dir(self::$backupdir))
             OS::CreateDir(self::$backupdir);
@@ -128,20 +145,18 @@ class Configuration
         return sprintf('config_%s', $timestamp);
     }
 
-    public function ListBackups() {
-        // * Return a list of all available backup files in backup dir
+    public function RemoveBackups() {
+        // * Leave N backups and cleanup the rest
 
-        if (!is_dir(self::$backupdir)) {
-            return [];
+        $command = sprintf("rm -rf %s 2>&1", escapeshellarg(self::$backupdir));
+        exec($command, $output, $return);
+
+        if ($return != 0) {
+            throw new \Exception(
+                sprintf('Error removing directory %s: %s', self::$backupdir, implode(" ", $output))
+            );
         }
-
-        $files = glob(sprintf("%s/config_*", self::$backupdir));
-
-        $filenames = [];
-        foreach ($files as $file) {
-            array_push($filenames, basename($file));
-        }
-        return $filenames;
+        return true;
     }
 
     public function BackupRestore($filename) {
@@ -162,21 +177,7 @@ class Configuration
             );
         }
 
-        return array("message" => sprintf("Config %s restored to %s", $sourcefile, self::$config_path), "success" => true);
-    }
-
-    public function RemoveBackups() {
-        // * Leave N backups and cleanup the rest
-
-        $command = sprintf("rm -rf %s 2>&1", escapeshellarg(self::$backupdir));
-        exec($command, $output, $return);
-
-        if ($return != 0) {
-            throw new \Exception(
-                sprintf('Error removing directory %s: %s', self::$backupdir, implode(" ", $output))
-            );
-        }
-        return true;
+        return sprintf("Config %s restored to %s", $sourcefile, self::$config_path);
     }
 }
 
