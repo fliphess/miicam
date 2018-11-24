@@ -25,7 +25,7 @@
         <li><a href="/logviewer.html">Log viewer</a></li>
         <li><a href="/config.html">Config Editor</a></li>
         <li><a href="/apidocs.html">API Docs</a></li>
-        <li class="right"><a class="active">Logviewer</a></li>
+        <li class="right"><a class="active">Config Editor</a></li>
       </ul>
     <div class="content">
         <div style="padding:0 16px;">
@@ -133,6 +133,7 @@
                                 this.error_show = false;
                                 this.success_message = response.data.message;
                                 this.get_config();
+                                this.get_backups();
                             } else {
                                 this.success_show = false;
                                 this.error_show = true;
