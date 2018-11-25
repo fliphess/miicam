@@ -23,10 +23,8 @@
 #include <net/if.h>
 #include <dirent.h>
 
-
 #include "librtsp.h"
 #include "gmlib.h"
-
 
 #define DVR_ENC_EBST_ENABLE      0x55887799
 #define DVR_ENC_EBST_DISABLE     0
@@ -160,16 +158,12 @@ typedef struct st_av {
 
 pthread_t enqueue_thread_id   = 0;
 pthread_t encode_thread_id    = 0;
-
 unsigned int sys_tick         = 0;
 struct timeval sys_sec        = {-1, -1};
 int sys_port                  = 554;
 char *ipptr                   = NULL;
-
 static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
-static int rtspd_set_1ch      = 0;
-static int rtspd_set_enc_type = 0;
 static int rtspd_avail_ch     = 0;
 
 
@@ -177,10 +171,24 @@ pthread_mutex_t stream_queue_mutex;
 av_t enc[CAP_CH_NUM];
 gm_system_t gm_system;
 
+
 void *groupfd;                    // * Return of gm_new_groupfd()
 void *bindfd;                     // * Return of gm_bind()
 void *capture_object;
 void *encode_object;
+
+void *sub_enc_object;             // * Create encoder object (scaler)
+void *sub_bindfd;                 // * Create encoder object (scaler) bind
+
+
+struct CommandLineArguments {
+    int framerate;
+    int height;
+    int width;
+    int bitrate;
+    int bitrateMode;
+    int encoderType;
+} cliArgs;
 
 
 static char *rtsp_enc_type_str[] = {
@@ -202,7 +210,6 @@ static char getch(void)
     tv.tv_sec = 10;
     tv.tv_usec = 0;
     n = select(1, &rfds, NULL, NULL, &tv);
-
     if (n > 0) {
         n = read(0, &ch, 1);
         if (n == 1)
@@ -274,6 +281,7 @@ static int open_live_streaming(int ch_num, int sub_num)
         fprintf(stderr, "open_live_streaming: ch_num=%d, sub_num=%d setup error\n", ch_num, sub_num);
 
     strcpy(pb->name, livename);
+
     return 0;
 }
 
@@ -306,16 +314,17 @@ static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len
 
     if ( ret < 0 ) {
         gettimeofday(&curr_tval, NULL );
+
         if ( ret == ERR_FULL) {
             pb->congest = 1;
             if ( TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000 )
                 fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d full\n", ch_num, sub_num);
         }
         else if ((ret != ERR_NOTINIT)&& (ret != ERR_MUTEX) && (ret != ERR_NOTRUN)) {
-
             if (TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000)
                 fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d error %d\n", ch_num, sub_num, ret);
         }
+
         if ( TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000) {
             fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d error %d\n", ch_num, sub_num, ret);
             gettimeofday(&err_print_tval, NULL );
@@ -342,9 +351,10 @@ static int close_live_streaming(int ch_num, int sub_num)
     CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num);
     b = &enc[ch_num].bs[sub_num];
     pb = &enc[ch_num].priv_bs[sub_num];
-    if (pb->sr >= 0) {
 
+    if (pb->sr >= 0) {
         ret = stream_dereg(pb->sr, 1);
+
         if (ret < 0)
             goto err_exit;
 
@@ -356,8 +366,10 @@ static int close_live_streaming(int ch_num, int sub_num)
 err_exit:
     if (ret < 0)
         fprintf(stderr, "%s: stream_dereg(%d) err %d\n", __func__, pb->sr, ret);
+
     return ret;
 }
+
 
 int open_bs(int ch_num, int sub_num)
 {
@@ -381,6 +393,7 @@ int open_bs(int ch_num, int sub_num)
         default:
             break;
     }
+
     return 0;
 }
 
@@ -395,12 +408,14 @@ int close_bs(int ch_num, int sub_num)
 
     e->bs[sub_num].video.enabled = DVR_ENC_EBST_DISABLE;
     e->bs[sub_num].enabled = DVR_ENC_EBST_DISABLE;
+
     for (sub = 0; sub < RTSP_NUM_PER_CAP; sub++) {
         if (e->bs[sub].video.enabled == DVR_ENC_EBST_ENABLE) {
             is_close_channel = 0;
             break;
         }
     }
+
     if (is_close_channel == 1)
         enc[ch_num].enabled = DVR_ENC_EBST_DISABLE;
 
@@ -422,6 +437,7 @@ static int bs_check_event(void)
             }
         }
     }
+
     return ret;
 }
 
@@ -439,6 +455,7 @@ void bs_new_event(void)
 
     for (ch_num = 0; ch_num < CAP_CH_NUM; ch_num++) {
         pthread_mutex_lock(&enc[ch_num].ubs_mutex);
+
         for (sub_num = 0; sub_num < RTSP_NUM_PER_CAP; sub_num++) {
             b = &enc[ch_num].bs[sub_num];
             pb = &enc[ch_num].priv_bs[sub_num];
@@ -516,14 +533,17 @@ int set_poll_event(void)
 
     for (ch_num = 0; ch_num < CAP_CH_NUM; ch_num++) {
         e = &enc[ch_num];
+
         if (e->enabled != DVR_ENC_EBST_ENABLE)
             continue;
+
         for (sub_num = 0; sub_num < RTSP_NUM_PER_CAP; sub_num++) {
             b = &e->bs[sub_num];
             if (b->video.enabled == DVR_ENC_EBST_ENABLE)
                 ret = 0;
         }
     }
+
     return ret;
 }
 
@@ -536,7 +556,6 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
     gm_mjpege_attr_t *mjpege_attr;
 
     switch (enc->enc_type) {
-
         case ENC_TYPE_H264:
             h264e_attr  = &enc->codec.h264e_attr;
             w           = h264e_attr->dim.width;
@@ -555,6 +574,7 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
             h           = mjpege_attr->dim.height;
             break;
     }
+
     if (enc_type)
         *enc_type = enc->enc_type;
 
@@ -569,7 +589,6 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
 #define PRINT_INTERVAL_MS    5000
 static unsigned int frame_counts[CAP_CH_NUM][RTSP_NUM_PER_CAP] = {{0}};
 static unsigned int rec_bs_len[CAP_CH_NUM][RTSP_NUM_PER_CAP]   = {{0}};
-
 static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeval *cur_timeval)
 {
     int enc_type, w, h;
@@ -598,6 +617,7 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
     } else {
         diff_ms = (cur_timeval->tv_usec - last_timeval.tv_usec) / 1000;
     }
+
     total_ms += diff_ms;
 
     // * Show statistic
@@ -611,7 +631,7 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                 gm_enc = &enc_param[pb->video.cap_ch][pb->video.cap_path].enc[pb->video.rec_track];
                 get_enc_res(gm_enc, &enc_type, &w, &h);
                 sprintf(res_str, "%dx%d", w, h);
-                printf("/live/ch%02d_%d: cap%d_%d %9s %s %d.%02dfps %dkbps\n",
+                printf("/live/ch%02d_%d: cap%d_%d %9s %s %d.%02d fps %d kbps\n",
                         i,
                         j,
                         pb->video.cap_ch,
@@ -625,9 +645,9 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                 rec_bs_len[i][j] = 0;
             }
         }
-        printf("\n");
         total_ms = 0;
     }
+
     last_timeval.tv_sec = cur_timeval->tv_sec;
     last_timeval.tv_usec = cur_timeval->tv_usec;
 }
@@ -656,9 +676,11 @@ static int frm_cb(int type, int qno, gm_ss_entity *entity)
 {
     priv_avbs_t *pb;
     int ch_num, sub_num;
+
     for (ch_num = 0; ch_num < CAP_CH_NUM; ch_num++) {
         for (sub_num = 0; sub_num < RTSP_NUM_PER_CAP; sub_num++) {
             pb = &enc[ch_num].priv_bs[sub_num];
+
             if (pb->video.offs == (int)(entity->data) && pb->video.len == entity->size && pb->video.qno==qno) {
                 pthread_mutex_lock(&pb->video.priv_vbs_mutex);
                 pb->video.offs = 0;
@@ -667,6 +689,7 @@ static int frm_cb(int type, int qno, gm_ss_entity *entity)
             }
         }
     }
+
     return 0;
 }
 
@@ -679,14 +702,17 @@ priv_avbs_t *find_file_sr(char *name, int srno)
     for (ch_num = 0; ch_num < CAP_CH_NUM; ch_num++) {
         for (sub_num = 0; sub_num < RTSP_NUM_PER_CAP; sub_num++) {
             pb = &enc[ch_num].priv_bs[sub_num];
+
             if ((pb->sr == srno) && (pb->name) && (strcmp(pb->name, name) == 0)) {
                 hit = 1;
                 break;
             }
         }
+
         if (hit)
             break;
     }
+
     return (hit ? pb : NULL);
 }
 
@@ -700,37 +726,48 @@ static int cmd_cb(char *name, int sno, int cmd, void *p)
         case GM_STREAM_CMD_OPTION:
             ret = 0;
             break;
+
         case GM_STREAM_CMD_DESCRIBE:
             ret = 0;
             break;
+
         case GM_STREAM_CMD_OPEN:
             printf("%s:%d <GM_STREAM_CMD_OPEN>\n", __FUNCTION__, __LINE__);
             ERR_GOTO(-10, cmd_cb_err);
             break;
+
         case GM_STREAM_CMD_SETUP:
             ret = 0;
             break;
+
         case GM_STREAM_CMD_PLAY:
             if ( strncmp(name, "live/", 5) == 0 ) {
+
                 if ((pb = find_file_sr(name, sno)) == NULL)
                     ERR_GOTO(-1, cmd_cb_err);
+
                 if (pb->video.qno >= 0)
                     pb->play = 1;
             }
             ret = 0;
             break;
+
         case GM_STREAM_CMD_PAUSE:
             printf("%s:%d <GM_STREAM_CMD_PAUSE>\n", __FUNCTION__, __LINE__);
             ret = 0;
             break;
+
         case GM_STREAM_CMD_TEARDOWN:
             if ( strncmp(name, "live/", 5) == 0 ) {
+
                 if ((pb = find_file_sr(name, sno)) == NULL)
                     ERR_GOTO(-1, cmd_cb_err);
+
                 pb->play = 0;
             }
             ret = 0;
             break;
+
         default:
             fprintf(stderr, "%s: not support cmd %d\n", __func__, cmd);
             break;
@@ -740,6 +777,7 @@ cmd_cb_err:
     if ( ret < 0 ) {
         fprintf(stderr, "%s: cmd %d error %d\n", __func__, cmd, ret);
     }
+
     return ret;
 }
 
@@ -749,15 +787,16 @@ void *enqueue_thread(void *ptr)
     while (rtspd_sysinit) {
         if (rtspd_set_event)
             bs_new_event();
+
         if (set_poll_event() < 0) {
             sleep(1);
             continue;
         }
         usleep(1000);
     }
-
     env_release_resources();
     pthread_exit(NULL);
+
     return NULL;
 }
 
@@ -828,6 +867,7 @@ int env_init(void)
     gm_update_bs_info();
 
     srand((unsigned int)time(NULL));
+
     if ((ret = stream_server_init(ipptr, (int) sys_port, 0, 1444, 256, SR_MAX, VQ_MAX, VQ_LEN, AQ_MAX, AQ_LEN, frm_cb, cmd_cb)) < 0)
         fprintf(stderr, "stream_server_init, ret %d\n", ret);
 
@@ -849,6 +889,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
     DECLARE_ATTR(mjpege_attr, gm_mjpege_attr_t);
 
     param = &enc_param[cap_ch][cap_path];
+
     if (param->cap.obj == NULL) {
         param->cap.obj = gm_new_obj(GM_CAP_OBJECT);            // * New capture object
         cap_attr.cap_vch = cap_ch;
@@ -871,6 +912,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
 
     param->enc[rec_track].obj = gm_new_obj(GM_ENCODER_OBJECT); // * New encoder object
     param->enc[rec_track].enc_type = enc_type;
+
     switch (enc_type) {
         case ENC_TYPE_H264:
             h264e_attr.dim.width             = width;
@@ -888,6 +930,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
             gm_set_attr(param->enc[rec_track].obj, &h264e_attr);
             memcpy(&param->enc[rec_track].codec.h264e_attr, &h264e_attr, sizeof(gm_h264e_attr_t));
             break;
+
         case ENC_TYPE_MPEG4:
             mpeg4e_attr.dim.width            = width;
             mpeg4e_attr.dim.height           = height;
@@ -899,6 +942,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
             gm_set_attr(param->enc[rec_track].obj, &mpeg4e_attr);
             memcpy(&param->enc[rec_track].codec.mpeg4e_attr, &mpeg4e_attr, sizeof(gm_mpeg4e_attr_t));
             break;
+
         case ENC_TYPE_MJPEG:
             mjpege_attr.dim.width            = width;
             mjpege_attr.dim.height           = height;
@@ -907,6 +951,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
             gm_set_attr(param->enc[rec_track].obj, &mjpege_attr);
             memcpy(&param->enc[rec_track].codec.mjpege_attr, &mjpege_attr, sizeof(gm_mjpege_attr_t));
             break;
+
         default:
             printf("Not support %s\n", rtsp_enc_type_str[enc_type]);
             break;
@@ -914,6 +959,17 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
 
     // * Bind channel recording
     param->bindfd[rec_track] = gm_bind(enc_groupfd, param->cap.obj, param->enc[rec_track].obj);
+
+    // * Requires Scaler Encoder (only for H264)
+    if (enc_type == ENC_TYPE_H264 && (width < 1280 || height < 720)) {
+        h264e_attr.ratectl.bitrate      = bitrate;
+        h264e_attr.frame_info.framerate = framerate;
+        h264e_attr.dim.width            = width;
+        h264e_attr.dim.height           = height;
+        gm_set_attr(sub_enc_object, &h264e_attr);
+        sub_bindfd                      = gm_bind(enc_groupfd, param->cap.obj, sub_enc_object);
+    }
+
     rtspd_avail_ch++;
 }
 
@@ -964,6 +1020,7 @@ static int gm_get_max_bandwidth(char *list)
         str += 3;
         sscanf(str,"%03d",&tmp);
         str = strtok(NULL,token);
+
         if (ch == 0 || tmp == 0)
              continue;
 
@@ -983,7 +1040,7 @@ static int gm_get_max_bandwidth(char *list)
 }
 
 
-int gm_get_bandwidth_info(void) // 0:2m,1:8m
+int gm_get_bandwidth_info(void)
 {
     FILE *fp;
     char buffer[2048];
@@ -1031,15 +1088,15 @@ void gm_graph_init(void)
     gm_init();
     gm_get_sysinfo(&gm_system);
 
-    if (gm_system.cap[0].framerate)
-        poll_wait_time = 1000000 / (gm_system.cap[0].framerate + 2);
+    if (cliArgs.framerate>0)
+        poll_wait_time = 1000000 / (cliArgs.framerate + 2);
     else
         poll_wait_time = 15000;
 
-    cap_fps = gm_system.cap[0].framerate;
-    cap_h = gm_system.cap[0].dim.height;
-    cap_w = gm_system.cap[0].dim.width;
-    cap_bandwidth = cap_fps * cap_h * cap_w;
+    cap_fps        = cliArgs.framerate;
+    cap_h          = cliArgs.height;
+    cap_w          = cliArgs.width;
+    cap_bandwidth  = cap_fps * cap_h * cap_w;
     cap_resolution = cap_h * cap_w;
 
     memset(enc_param, 0, sizeof(enc_param));
@@ -1047,29 +1104,8 @@ void gm_graph_init(void)
     chipid = gm_get_chipinfo();
     chipid = (chipid >> 16) & 0x0000ffff;
 
-    if (gm_get_bandwidth_info() == 1)
-        rtspd_set_1ch = 1;
-
     rtspd_avail_ch = 0;
-
-    if (rtspd_set_1ch == 1 && rtspd_set_enc_type == 0) {
-        // * Single channel, h264 case
-        gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 8192, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-
-    } else if (rtspd_set_1ch == 1 && rtspd_set_enc_type == 1) {
-        // * Single channel, mpeg4 case, mpeg4 max_fps=10 bs=2048
-        gm_enc_init(0, 3, 0, ENC_TYPE_MPEG4, GM_CBR, 10, 2048, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-
-    } else if (rtspd_set_1ch == 1 && rtspd_set_enc_type == 2) {
-        // * Single channel, MJPEG case
-        gm_enc_init(0, 3, 0, ENC_TYPE_MJPEG, GM_CBR, cap_fps, 8192, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-
-    } else {
-        // * Multi channel H264
-        gm_enc_init(0, 0, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 256, 320, 240);
-        gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 4096, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-    }
-
+    gm_enc_init(0, 0, 0, cliArgs.encoderType, cliArgs.bitrateMode, cliArgs.framerate, cliArgs.bitrate, cliArgs.width, cliArgs.height);
     gm_apply(enc_groupfd); // * Activate settings
 }
 
@@ -1094,14 +1130,17 @@ void gm_graph_release(void)
     for (cap_ch = 0; cap_ch < CAP_CH_NUM; cap_ch++) {
         for (cap_path = 0; cap_path < CAP_PATH_NUM; cap_path++) {
             param = &enc_param[cap_ch][cap_path];
+
             for (rec_track = 0; rec_track < ENC_TRACK_NUM; rec_track++) {
                 if (param->enc[rec_track].obj)
                     gm_delete_obj(param->enc[rec_track].obj);
             }
+
             if (param->cap.obj)
                 gm_delete_obj(param->cap.obj);
         }
     }
+
     gm_delete_groupfd(enc_groupfd);
     gm_release();
 }
@@ -1127,6 +1166,7 @@ void *encode_thread(void *ptr)
         for (cap_path = 0; cap_path < CAP_PATH_NUM; cap_path++) {
             param = &enc_param[cap_ch][cap_path];
             for (rec_track = 0; rec_track < ENC_TRACK_NUM; rec_track++) {
+
                 if (param->bindfd[rec_track]) {
                     poll_fds[cap_ch][ch].bindfd = param->bindfd[rec_track];
                     poll_fds[cap_ch][ch].event = GM_POLL_READ;
@@ -1180,7 +1220,7 @@ void *encode_thread(void *ptr)
         ret = gm_poll(&poll_fds[0][0], CAP_CH_NUM * RTSP_NUM_PER_CAP, 2000);
 
         if (ret == GM_TIMEOUT) {
-            printf("Poll timeout!!");
+            printf("Poll timeout!!\n");
             continue;
         }
 
@@ -1214,6 +1254,7 @@ void *encode_thread(void *ptr)
                 // * Turn receiving MV data off
                 bs[i][j].bs.mv_buf = 0;
                 bs[i][j].bs.mv_buf_len = 0;
+
                 if (pb->play == 0)
                     first_play[i][j] = -1;
             }
@@ -1297,14 +1338,11 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
 
     while(1) {
         ret = gm_poll(&poll_fds, 1, 2000);
-
         if ( ret == GM_TIMEOUT ) {
-            printf("Poll timeout!!");
+            printf("Poll timeout!!\n");
             continue;
         }
-
         memset(&bs, 0, sizeof(bs));
-
         if ( poll_fds.revent.event != GM_POLL_READ )
             continue;
 
@@ -1328,13 +1366,12 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
         ret = gm_recv_multi_bitstreams(&bs, 1); // -1:fail 0:scuess
         if ( ret < 0 )
             printf("Error to receive bitstream.\n");
-
         else if ( (bs.retval < 0) && bs.bindfd )
             printf("CH0 Error to receive bitstream. ret=%d\n", bs.retval);
 
         else if ( ret == 0 && bs.retval == GM_SUCCESS ) {
             if (bs.bs.keyframe == 1 ) {
-                switch (rtspd_set_enc_type) {
+                switch (cliArgs.encoderType) {
                     case 0:
                         stream_sdp_parameter_encoder("H264", (unsigned char *) bs.bs.bs_buf, bs.bs.bs_len, pb->video.sdpstr, SDPSTR_MAX);
                     case 1:
@@ -1417,7 +1454,6 @@ int is_bs_all_disable(void)
                 return 0;
         }
     }
-
     return 1;
 }
 
@@ -1439,7 +1475,6 @@ char *get_local_ip(void)
     strncpy(ifr.ifr_name, "wlan0", IFNAMSIZ-1);
     ioctl(fd, SIOCGIFADDR, &ifr);
     close(fd);
-
     return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 }
 
@@ -1452,15 +1487,14 @@ int main(int argc, char *argv[])
 
     printf("  Usage:\n");
     printf("  Multiple streams:\n");
-    printf("    #./rtspd\n");
-    printf("  Max single h264 stream:\n");
-    printf("    #./rtspd -s\n");
-    printf("  Max single mpeg4 stream:\n");
-    printf("    #./rtspd -m\n");
-    printf("  Max single mjpeg stream:\n");
-    printf("    #./rtspd -j\n");
+    printf("      ./rtspd -bBITRATE -fFRAMERATE -wWIDTH -hHEIGHT -mBITRADEMODE[1-4]\n");
 
-    rtspd_set_1ch = 0;
+    cliArgs.bitrate     = 8192;
+    cliArgs.framerate   = gm_system.cap[0].framerate;
+    cliArgs.width       = gm_system.cap[0].dim.width;
+    cliArgs.height      = gm_system.cap[0].dim.height;
+    cliArgs.bitrateMode = GM_CBR;
+    cliArgs.encoderType = ENC_TYPE_H264;
 
     if (argc > 1) {
         for (i = 1; i < argc; i++) {
@@ -1469,17 +1503,26 @@ int main(int argc, char *argv[])
                 return 1;
             } else {
                 switch (argv[i][1]) {
-                    case 's':
-                        rtspd_set_1ch = 1;
-                        rtspd_set_enc_type = 0;
+                    case 'b':
+                        cliArgs.bitrate     = atoi(&argv[i][2]);
+                        break;
+                    case 'f':
+                        cliArgs.framerate   = atoi(&argv[i][2]);
+                        break;
+                    case 'w':
+                        cliArgs.width       = atoi(&argv[i][2]);
+                        break;
+                    case 'h':
+                        cliArgs.height      = atoi(&argv[i][2]);
                         break;
                     case 'm':
-                        rtspd_set_1ch = 1;
-                        rtspd_set_enc_type = 1;
+                        cliArgs.bitrateMode = atoi(&argv[i][2]);
                         break;
                     case 'j':
-                        rtspd_set_1ch = 1;
-                        rtspd_set_enc_type = 2;
+                        cliArgs.encoderType = ENC_TYPE_MJPEG;
+                        break;
+                    case '4':
+                        cliArgs.encoderType = ENC_TYPE_MPEG4;
                         break;
                     default:
                         printf("argv error:%s\n", argv[i]);
@@ -1489,7 +1532,35 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (cliArgs.bitrate > 8192) {
+        printf("ERROR: Use a maximum bitrate of 8192\n");
+        return 1;
+    }
+
+    if (cliArgs.framerate > 15) {
+        printf("ERROR: A framerate higher than 15 fps is not supported.\n");
+        return 1;
+    }
+
+    if ((cliArgs.width > 1280) || (cliArgs.height > 720)) {
+        printf("ERROR: A height bigger than 720p or a width larger than 1280p is not supported.\n");
+        return 1;
+    }
+
+    if ((cliArgs.bitrateMode < 1) || (cliArgs.bitrateMode > 4)) {
+        printf("ERROR: Bitrate mode should be in between 1 and 4\n");
+        return 1;
+    }
+
     gm_graph_init();
+
+    printf("Config Loaded (H264)\n");
+    printf("* bitrate:     %d\n", cliArgs.bitrate);
+    printf("* framerate:   %d\n", cliArgs.framerate);
+    printf("* width:       %d\n", cliArgs.width);
+    printf("* height:      %d\n", cliArgs.height);
+    printf("* bitrateMode: %d\n", cliArgs.bitrateMode);
+    printf("* Encoder:     %s\n", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
 
     for (cap_ch = 0; cap_ch < CAP_CH_NUM; cap_ch++) {
         for (cap_path = 0; cap_path < CAP_PATH_NUM; cap_path++) {
