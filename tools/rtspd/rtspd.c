@@ -1061,39 +1061,13 @@ void gm_graph_init(void)
         gm_enc_init(0, 3, 0, ENC_TYPE_MPEG4, GM_CBR, 10, 2048, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
 
     } else if (rtspd_set_1ch == 1 && rtspd_set_enc_type == 2) {
-        // * Single channel, mjpeg case
+        // * Single channel, MJPEG case
         gm_enc_init(0, 3, 0, ENC_TYPE_MJPEG, GM_CBR, cap_fps, 8192, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
 
     } else {
-        // * Multi-channel only supported by h264
-        if (cap_resolution > (1920*1088)) {
-            gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 8192, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-
-        } else if (cap_bandwidth > (1920*1088*30)) {
-            gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 8192, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-
-        } else {
-            if ((chipid == 0x8136) || (chipid == 0x8135)) {
-                gm_enc_init(0, 0, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 256, 320, 240);
-                gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 4096, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
-
-            } else if (chipid == 0x8137) {
-                gm_enc_init(0, 0, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 128, 320, 240);
-                gm_enc_init(0, 0, 1, ENC_TYPE_H264, GM_CBR, cap_fps, 512, 640, 480);
-                gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 4096, gm_system.cap[0].dim.width,gm_system.cap[0].dim.height);
-
-            } else if (chipid == 0x8138) {
-                gm_enc_init(0, 0, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 128, 320, 240);
-                gm_enc_init(0, 0, 1, ENC_TYPE_H264, GM_CBR, cap_fps, 2048, 1280, 720);
-                gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 4096, gm_system.cap[0].dim.width,gm_system.cap[0].dim.height);
-
-            } else {
-                gm_enc_init(0, 0, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 128, 320, 240);
-                gm_enc_init(0, 0, 1, ENC_TYPE_H264, GM_CBR, cap_fps, 2048, 1280, 720);
-                gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 4096, gm_system.cap[0].dim.width,gm_system.cap[0].dim.height);
-
-            }
-        }
+        // * Multi channel H264
+        gm_enc_init(0, 0, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 256, 320, 240);
+        gm_enc_init(0, 3, 0, ENC_TYPE_H264, GM_CBR, cap_fps, 4096, gm_system.cap[0].dim.width, gm_system.cap[0].dim.height);
     }
 
     gm_apply(enc_groupfd); // * Activate settings
@@ -1404,7 +1378,7 @@ static int rtspd_start(int port)
 
     rtspd_sysinit = 1;
 
-    // * Record Thread
+    // * Encode Thread
     if (encode_thread_id == (pthread_t)NULL) {
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -1412,6 +1386,7 @@ static int rtspd_start(int port)
         pthread_attr_destroy(&attr);
     }
 
+    // * Enqueue Thread
     if (enqueue_thread_id == (pthread_t)NULL) {
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
@@ -1439,7 +1414,7 @@ int is_bs_all_disable(void)
         e = &enc[ch_num];
         for(sub_num=0; sub_num < RTSP_NUM_PER_CAP; sub_num++) {
             if (e->bs[sub_num].enabled == DVR_ENC_EBST_ENABLE)
-                return 0;  /* already enabled */
+                return 0;
         }
     }
 
