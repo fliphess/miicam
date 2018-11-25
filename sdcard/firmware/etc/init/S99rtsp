@@ -11,10 +11,16 @@ else
   exit 1
 fi
 
+[ -z "$RTSP_FRAMERATE" ]    && RTSP_FRAMERATE=15
+[ -z "$RTSP_WIDTH" ]        && RTSP_WIDTH=1280
+[ -z "$RTSP_HEIGHT" ]       && RTSP_HEIGHT=720
+[ -z "$RTSP_BITRATE" ]      && RTSP_BITRATE=8192
+[ -z "$RTSP_BITRATE_MODE" ] && RTSP_BITRATE_MODE=1
+
 NAME="rtspd"
 DESC="RTSP server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
-DAEMON_OPTS="-s"
+DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
 
