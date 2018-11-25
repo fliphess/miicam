@@ -106,7 +106,7 @@ class Configuration
     public function Test() {
         // * Verify the syntax of the current config file on the command line
 
-        $command = sprintf('/bin/busybox ash -n %s 2>&1', self::$config_path);
+        $command = sprintf('/bin/busybox ash -n %s 2>&1 && echo "Syntax OK"', self::$config_path);
         exec($command, $output, $return);
         return array("success" => ($return == 0) ? true : false, "message" => ($output) ? implode(" ", $output) : "No syntax errors detected in configuration file");
     }
@@ -346,11 +346,11 @@ class OS
     }
 
     public static function Reboot() {
-        return self::RunCommand("/sbin/reboot -d 5 2>&1");
+        return self::RunCommand("/sbin/reboot -d 5 2>&1 && echo 'Scheduled REBOOT'");
     }
 
     public static function Shutdown() {
-        return self::RunCommand("/sbin/poweroff -d 5 2>&1");
+        return self::RunCommand("/sbin/poweroff -d 5 2>&1 && echo 'Scheduled SHUTDOWN'");
     }
 
     public static function Uptime() {
