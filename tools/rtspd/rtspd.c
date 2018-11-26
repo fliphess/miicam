@@ -166,7 +166,6 @@ static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
 static int rtspd_avail_ch     = 0;
 
-
 pthread_mutex_t stream_queue_mutex;
 av_t enc[CAP_CH_NUM];
 gm_system_t gm_system;
@@ -284,7 +283,6 @@ static int open_live_streaming(int ch_num, int sub_num)
 
     return 0;
 }
-
 
 #define TIMEVAL_DIFF(start, end) (((end.tv_sec)-(start.tv_sec))*1000000+((end.tv_usec)-(start.tv_usec)))
 static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len, unsigned int tv_ms)
@@ -1578,6 +1576,7 @@ int main(int argc, char *argv[])
             printf("    rtsp://%s/live/ch%02d_%d\n", get_local_ip(), i, j);
         }
     }
+
     printf("Press 'q' to exit.\n");
 
     while(1) {
