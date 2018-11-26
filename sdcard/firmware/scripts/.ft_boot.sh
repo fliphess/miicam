@@ -94,7 +94,7 @@ then
 fi
 
 ##################################################################################
-## Mount /root from sd card                                                     ##
+## Make /root writablle                                                         ##
 ##################################################################################
 
 echo "*** Mounting /root from sd card"
@@ -135,6 +135,12 @@ fi
 if [ -n "${TIMEZONE}" ]
 then
     echo "*** Configure time zone... "
+
+    if [ -f "/usr/share/zoneinfo/uclibc/$TIMEZONE" ]
+    then
+        cp -f /usr/share/zoneinfo/uclibc/$TIMEZONE /etc/localtime
+    fi
+
     rm /tmp/etc/TZ
     echo "${TIMEZONE}" > /tmp/etc/TZ
     export TZ="${TIMEZONE}"
