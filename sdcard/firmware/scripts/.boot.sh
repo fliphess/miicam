@@ -23,23 +23,12 @@ LOGFILE="${LOGDIR}/ft_boot.log"
 echo "*** Executing /mnt/data/test/boot.sh... "
 
 ##################################################################################
-## Put our bins into PATH                                                       ##
-##################################################################################
-
-if [ -d "${SD_MOUNTDIR}/firmware/bin" ] && ! mountpoint -q /tmp/sd/ft
-then
-    echo "*** Mounting ${SD_MOUNTDIR}/firmware/bin on /tmp/sd/ft... "
-    mount --rbind "${SD_MOUNTDIR}/firmware/bin" /tmp/sd/ft
-fi
-
-
-##################################################################################
 ## Configure NVRAM                                                              ##
 ##################################################################################
 
 echo "*** Configuring NVRAM"
 for setting in blue_led yellow_led ir_led ir_cut ; do
-    nvram set "${i}"=off
+    nvram set "${i}=off"
 done
 
 nvram commit
@@ -181,7 +170,7 @@ fi
 ## MQTT                           ##
 ####################################
 
-if [ "${ENABLE_MQTT}" -eq 1 ] && [ -x /usr/bin/mosquitto_pub ] && [ -x /usr/bin/mosquitto_sub ]
+if [ "${ENABLE_MQTT}" -eq 1 ]
 then
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-interval start
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-control start
