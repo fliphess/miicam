@@ -212,6 +212,15 @@ else
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99restartd stop
 fi
 
+####################################
+## Mirrored mode                  ##
+####################################
+
+if [ "$MIRRORED" -eq 1 ]
+then
+    flip on
+    mirror on
+fi
 
 ##################################################################################
 ## Cleanup                                                                      ##
