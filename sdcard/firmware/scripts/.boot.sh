@@ -213,10 +213,10 @@ else
 fi
 
 ####################################
-## Mirrored mode                  ##
+## Ceiling camera mode            ##
 ####################################
 
-if [ "$MIRRORED" -eq 1 ]
+if [ "$CEILING_MODE" -eq 1 ]
 then
     flip on
     mirror on
