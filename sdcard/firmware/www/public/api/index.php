@@ -1,5 +1,7 @@
 <?php
 
+ini_set('memory_limit','15M');
+
 require '../../vendor/autoload.php';
 require '../../libs/autoload.php';
 
