@@ -194,7 +194,7 @@ yellow_led off
 ## RestartD                       ##
 ####################################
 
-if [ "$START_RESTARTD" -eq 1 ]
+if [ "$ENABLE_RESTARTD" -eq 1 ]
 then
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99restartd restart
 else
