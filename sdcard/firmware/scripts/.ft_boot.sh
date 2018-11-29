@@ -63,6 +63,7 @@ Chuangmi 720P hack configuration:
   ENABLE_HTTPD   = ${ENABLE_HTTPD}
   ENABLE_FTPD    = ${ENABLE_FTPD}
   ENABLE_SAMBA   = ${ENABLE_SAMBA}
+  ENABLE_LOGGING = ${ENABLE_LOGGING}
   ENABLE_RTSP    = ${ENABLE_RTSP}
 
 EOF
@@ -72,9 +73,14 @@ EOF
 ## Syslog                                                                       ##
 ##################################################################################
 
+echo "*** Enabling logging"
 
-sh "${SD_MOUNTDIR}/firmware/etc/init/S01logging" restart
-
+if [ "$ENABLE_LOGGING" -eq 1 ]
+then
+    sh "${SD_MOUNTDIR}/firmware/etc/init/S01logging" restart
+else
+    sh "${SD_MOUNTDIR}/firmware/etc/init/S01logging" stop
+fi
 
 ##################################################################################
 ## Make /etc writeable                                                          ##
