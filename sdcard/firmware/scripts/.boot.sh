@@ -212,6 +212,15 @@ else
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99restartd stop
 fi
 
+####################################
+## Ceiling camera mode            ##
+####################################
+
+if [ "$CEILING_MODE" -eq 1 ]
+then
+    flip on
+    mirror on
+fi
 
 ##################################################################################
 ## Cleanup                                                                      ##
