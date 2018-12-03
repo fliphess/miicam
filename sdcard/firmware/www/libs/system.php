@@ -23,6 +23,7 @@ class Configuration
         "ENABLE_FTPD",
         "ENABLE_HTTPD",
         "ENABLE_MQTT",
+        "ENABLE_RESTARTD",
         "ENABLE_RTSP",
         "ENABLE_SAMBA",
         "ENABLE_SSHD",
@@ -42,7 +43,6 @@ class Configuration
         "PING_WAIT",
         "PURGE_LOGFILES_AT_BOOT",
         "ROOT_PASSWORD",
-        "START_RESTARTD",
         "TIMEZONE",
         "WAIT_FOR_NETWORK",
         "WIFI_PASS",
@@ -395,7 +395,7 @@ class OS
     }
 
     public static function FreeMemory() {
-        return self::RunCommand('echo x > /proc/frammap/free_pages 2>&1');
+        return self::RunCommand('echo 1 > /proc/frammap/free_pages 2>&1 && echo OK');
     }
 
     public function CreateDir($path) {
