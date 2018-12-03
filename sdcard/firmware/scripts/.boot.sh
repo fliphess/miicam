@@ -19,8 +19,18 @@ LOGFILE="${LOGDIR}/ft_boot.log"
 
 (
 
-
 echo "*** Executing /mnt/data/test/boot.sh... "
+
+##################################################################################
+## Put our bins into PATH                                                       ##
+##################################################################################
+
+if [ -d "${SD_MOUNTDIR}/firmware/bin" ] && ! mountpoint -q /tmp/sd/ft
+then
+    echo "*** Mounting ${SD_MOUNTDIR}/firmware/bin on /tmp/sd/ft... "
+    mount --rbind "${SD_MOUNTDIR}/firmware/bin" /tmp/sd/ft
+fi
+
 
 ##################################################################################
 ## Configure NVRAM                                                              ##
