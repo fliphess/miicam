@@ -206,6 +206,7 @@ static char getch(void)
 
     FD_ZERO(&rfds);
     FD_SET(0, &rfds);
+
     tv.tv_sec = 10;
     tv.tv_usec = 0;
     n = select(1, &rfds, NULL, NULL, &tv);
@@ -221,7 +222,7 @@ static char getch(void)
 
 static int do_queue_alloc(int type)
 {
-    int    rc;
+    int rc;
     do {
         rc = stream_queue_alloc(type);
     } while MUTEX_FAILED(rc);
@@ -232,7 +233,7 @@ static int do_queue_alloc(int type)
 
 static unsigned int get_tick_gm(unsigned int tv_ms)
 {
-    sys_tick=tv_ms*(RTP_HZ/1000);
+    sys_tick = tv_ms*(RTP_HZ/1000);
     return sys_tick;
 }
 
@@ -283,6 +284,7 @@ static int open_live_streaming(int ch_num, int sub_num)
 
     return 0;
 }
+
 
 #define TIMEVAL_DIFF(start, end) (((end.tv_sec)-(start.tv_sec))*1000000+((end.tv_usec)-(start.tv_usec)))
 static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len, unsigned int tv_ms)
@@ -951,7 +953,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
             break;
 
         default:
-            printf("Not support %s\n", rtsp_enc_type_str[enc_type]);
+            printf("Encoder type not supported: %s\n", rtsp_enc_type_str[enc_type]);
             break;
     }
 
@@ -1266,7 +1268,7 @@ void *encode_thread(void *ptr)
 
         if ( (ret = gm_recv_multi_bitstreams(&bs[0][0],CAP_CH_NUM * RTSP_NUM_PER_CAP)) < 0 ) {
             // <=-1:fail, 0:success
-            printf("Error to receive bitstream. ret(%d)\n", ret);
+            printf("Error: failed to receive bitstream. ret(%d)\n", ret);
             continue;
         }
 
@@ -1407,7 +1409,7 @@ static int rtspd_start(int port)
         return ret;
 
     if (pthread_mutex_init(&stream_queue_mutex, NULL)) {
-        perror("rtspd_start: mutex init failed:");
+        perror("Error: rtspd_start: mutex init failed:");
         exit(-1);
     }
 
@@ -1477,27 +1479,43 @@ char *get_local_ip(void)
 }
 
 
+static void print_usage()
+{
+    printf("Usage:\n");
+    printf("  ./rtspd [-bfwhm] [-j|-4]\n");
+    printf(
+        "\nAvailable options:\n"
+        "-b [1-8192]    - Set the bitrate      (default: 8192)\n"
+        "-f [1-15]      - Set the framerate    (default: 15)\n"
+        "-w [1-1280]    - Set the image width  (default: 1280 pixels)\n"
+        "-h [1-720]     - Set the image height (default: 720 pixels)\n"
+        "-m [1-4]       - Set the bitrate mode (default: 1, CBR)\n"
+        "-j (optional)  - Use MJPEG encoding   (default: off)\n"
+        "-4 (optional)  - Use MPEG4 encoding   (default: off)\n\n"
+        );
+
+	exit(EXIT_FAILURE);
+}
+
+
 int main(int argc, char *argv[])
 {
     int i,j;
     char key;
     int cap_ch, cap_path, rec_track;
 
-    printf("  Usage:\n");
-    printf("  Multiple streams:\n");
-    printf("      ./rtspd -bBITRATE -fFRAMERATE -wWIDTH -hHEIGHT -mBITRADEMODE[1-4]\n");
-
     cliArgs.bitrate     = 8192;
-    cliArgs.framerate   = gm_system.cap[0].framerate;
-    cliArgs.width       = gm_system.cap[0].dim.width;
-    cliArgs.height      = gm_system.cap[0].dim.height;
+    cliArgs.framerate   = 15;
+    cliArgs.width       = 1280;
+    cliArgs.height      = 720;
     cliArgs.bitrateMode = GM_CBR;
     cliArgs.encoderType = ENC_TYPE_H264;
 
     if (argc > 1) {
         for (i = 1; i < argc; i++) {
             if (argv[i][0] != '-' ) {
-                printf("argv error\n");
+                printf("Invalid input: %s!\n", argv[i]);
+                print_usage();
                 return 1;
             } else {
                 switch (argv[i][1]) {
@@ -1523,25 +1541,31 @@ int main(int argc, char *argv[])
                         cliArgs.encoderType = ENC_TYPE_MPEG4;
                         break;
                     default:
-                        printf("argv error:%s\n", argv[i]);
+                        printf("Unknown argument: %s\n", argv[i]);
+                        print_usage();
                         return 1;
                 }
             }
         }
     }
 
-    if (cliArgs.bitrate > 8192) {
-        printf("ERROR: Use a maximum bitrate of 8192\n");
+    if ((cliArgs.bitrate < 1) || (cliArgs.bitrate > 8192)) {
+        printf("ERROR: Use a maximum bitrate of 8192 and a minimum of 1\n");
         return 1;
     }
 
-    if (cliArgs.framerate > 15) {
-        printf("ERROR: A framerate higher than 15 fps is not supported.\n");
+    if ((cliArgs.framerate < 1) || (cliArgs.framerate > 15)) {
+        printf("ERROR: A framerate below 1 or higher than 15 fps is not supported.\n");
         return 1;
     }
 
-    if ((cliArgs.width > 1280) || (cliArgs.height > 720)) {
-        printf("ERROR: A height bigger than 720p or a width larger than 1280p is not supported.\n");
+    if ((cliArgs.height < 1) || (cliArgs.height > 720)) {
+        printf("ERROR: A height bigger than 720p or below 1 is not supported.\n");
+        return 1;
+    }
+
+    if ((cliArgs.width < 1) || (cliArgs.width > 1280)) {
+        printf("ERROR: A width wider than 720p is not supported.\n");
         return 1;
     }
 
@@ -1550,15 +1574,21 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    printf("\n"
+        "*******************************************\n"
+        "** Starting the RTSP Daemon              **\n"
+        "*******************************************\n"
+    );
+
     gm_graph_init();
 
-    printf("Config Loaded (H264)\n");
-    printf("* bitrate:     %d\n", cliArgs.bitrate);
-    printf("* framerate:   %d\n", cliArgs.framerate);
-    printf("* width:       %d\n", cliArgs.width);
-    printf("* height:      %d\n", cliArgs.height);
-    printf("* bitrateMode: %d\n", cliArgs.bitrateMode);
-    printf("* Encoder:     %s\n", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
+    printf("\nConfig Loaded:\n");
+    printf("  * bitrate:     %d\n", cliArgs.bitrate);
+    printf("  * framerate:   %d\n", cliArgs.framerate);
+    printf("  * width:       %d\n", cliArgs.width);
+    printf("  * height:      %d\n", cliArgs.height);
+    printf("  * bitrateMode: %d\n", cliArgs.bitrateMode);
+    printf("  * Encoder:     %s\n\n", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
 
     for (cap_ch = 0; cap_ch < CAP_CH_NUM; cap_ch++) {
         for (cap_path = 0; cap_path < CAP_PATH_NUM; cap_path++) {
@@ -1570,14 +1600,12 @@ int main(int argc, char *argv[])
 
     rtspd_start(554);
 
-    printf("Connect command:\n");
+    printf("\nConnect command:\n");
     for (i = 0; i < CAP_CH_NUM; i++) {
         for (j = 0; j < rtspd_avail_ch; j++) {
-            printf("    rtsp://%s/live/ch%02d_%d\n", get_local_ip(), i, j);
+            printf("  * rtsp://%s/live/ch%02d_%d\n", get_local_ip(), i, j);
         }
     }
-
-    printf("Press 'q' to exit.\n");
 
     while(1) {
         key = getch();
