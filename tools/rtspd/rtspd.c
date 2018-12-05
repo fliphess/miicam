@@ -226,21 +226,24 @@ void take_snapshot(void)
     static int filecount = 0;
     int snapshot_len = 0;
     FILE *snapshot_fd = NULL;
-    char filename[40];
+    char filename[80];
+
+    gm_enc_t *param;
     snapshot_t snapshot;
 
-    snapshot.bindfd = &enc_param[0][0];
-    snapshot.image_quality = 30;  // The value of image quality from 1(worst) ~ 100(best)
+    param = &enc_param[0][0];
+    snapshot.bindfd = param->bindfd[0];
+    snapshot.image_quality = 100;  // The value of image quality from 1(worst) ~ 100(best)
     snapshot.bs_buf = snapshot_buf;
     snapshot.bs_buf_len = MAX_SNAPSHOT_LEN;
-    snapshot.bs_width = 176;
-    snapshot.bs_height = 144;
+    snapshot.bs_width = 1280;
+    snapshot.bs_height = 720;
 
-    snapshot_len = gm_request_snapshot(&snapshot, 1500); // Timeout value 500ms
+    snapshot_len = gm_request_snapshot(&snapshot, 500); // Timeout value 500ms
 
     if (snapshot_len > 0) {
-        sprintf(filename, "snapshot_%d.jpg", filecount++);
-        printf("Get %s size %dbytes\n", filename, snapshot_len);
+        sprintf(filename, "/tmp/sd/RECORDED_IMAGES/snapshot_%d.jpg", filecount++);
+        printf("Image %s size %d bytes\n", filename, snapshot_len);
 
         snapshot_fd = fopen(filename, "wb");
         if (snapshot_fd == NULL) {
