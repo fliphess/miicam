@@ -1,5 +1,4 @@
-/**
- * @file rtspd.c
+/* @file rtspd.c
  *  Simple RTSP server demo
  * Copyright (C) 2013 GM Corp. (http://www.grain-media.com)
  *
@@ -12,6 +11,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <signal.h>
 #include <time.h>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -55,6 +55,8 @@
 #define NONE_BS_EVENT            0
 #define START_BS_EVENT           1
 #define STOP_BS_EVENT            2
+
+#define MAX_SNAPSHOT_LEN  (128*1024)
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -165,11 +167,11 @@ char *ipptr                   = NULL;
 static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
 static int rtspd_avail_ch     = 0;
+char *snapshot_buf            = 0;
 
 pthread_mutex_t stream_queue_mutex;
 av_t enc[CAP_CH_NUM];
 gm_system_t gm_system;
-
 
 void *groupfd;                    // * Return of gm_new_groupfd()
 void *bindfd;                     // * Return of gm_bind()
@@ -219,6 +221,39 @@ static char getch(void)
     return -1;
 }
 
+void take_snapshot(void)
+{
+    static int filecount = 0;
+    int snapshot_len = 0;
+    FILE *snapshot_fd = NULL;
+    char filename[40];
+    snapshot_t snapshot;
+
+    snapshot.bindfd = &enc_param[0][0];
+    snapshot.image_quality = 30;  // The value of image quality from 1(worst) ~ 100(best)
+    snapshot.bs_buf = snapshot_buf;
+    snapshot.bs_buf_len = MAX_SNAPSHOT_LEN;
+    snapshot.bs_width = 176;
+    snapshot.bs_height = 144;
+
+    snapshot_len = gm_request_snapshot(&snapshot, 1500); // Timeout value 500ms
+
+    if (snapshot_len > 0) {
+        sprintf(filename, "snapshot_%d.jpg", filecount++);
+        printf("Get %s size %dbytes\n", filename, snapshot_len);
+
+        snapshot_fd = fopen(filename, "wb");
+        if (snapshot_fd == NULL) {
+            printf("Error: Failed to open file %s\n", filename);
+            exit(EXIT_FAILURE);
+        }
+
+        fwrite(snapshot_buf, 1, snapshot_len, snapshot_fd);
+        fclose(snapshot_fd);
+    } else {
+        printf("Error: Failed to retrieve snapshot data\n");
+    }
+}
 
 static int do_queue_alloc(int type)
 {
@@ -586,7 +621,7 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
 }
 
 
-#define PRINT_INTERVAL_MS    5000
+#define PRINT_INTERVAL_MS 5000
 static unsigned int frame_counts[CAP_CH_NUM][RTSP_NUM_PER_CAP] = {{0}};
 static unsigned int rec_bs_len[CAP_CH_NUM][RTSP_NUM_PER_CAP]   = {{0}};
 static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeval *cur_timeval)
@@ -1504,6 +1539,13 @@ int main(int argc, char *argv[])
     char key;
     int cap_ch, cap_path, rec_track;
 
+    snapshot_buf = (char *)malloc(MAX_SNAPSHOT_LEN);
+
+    if (snapshot_buf == NULL) {
+        perror("Error allocating snapshot memory buffer\n");
+        exit(1);
+    }
+
     cliArgs.bitrate     = 8192;
     cliArgs.framerate   = 15;
     cliArgs.width       = 1280;
@@ -1609,8 +1651,14 @@ int main(int argc, char *argv[])
 
     while(1) {
         key = getch();
-        if (key == 'q' || key == 'Q')
+
+        if (key == 's') {
+            printf("Creating a snapshot of the current data stream\n");
+            take_snapshot();
+        }
+        else if (key == 'q' || key == 'Q')
             break;
+
         sleep(1);
     }
 
