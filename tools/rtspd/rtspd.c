@@ -56,7 +56,9 @@
 #define START_BS_EVENT           1
 #define STOP_BS_EVENT            2
 
-#define MAX_SNAPSHOT_LEN  (128*1024)
+#define MAX_SNAPSHOT_LEN  (256*1024)
+
+// #define MAX_SNAPSHOT_LEN  (128*1024)
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -233,11 +235,11 @@ void take_snapshot(void)
 
     param = &enc_param[0][0];
     snapshot.bindfd = param->bindfd[0];
-    snapshot.image_quality = 100;  // The value of image quality from 1(worst) ~ 100(best)
+    snapshot.image_quality = 100;                        // The value of image quality from 1(worst) ~ 100(best)
     snapshot.bs_buf = snapshot_buf;
     snapshot.bs_buf_len = MAX_SNAPSHOT_LEN;
-    snapshot.bs_width = 1280;
-    snapshot.bs_height = 720;
+    snapshot.bs_width = 320;
+    snapshot.bs_height = 240;
 
     snapshot_len = gm_request_snapshot(&snapshot, 500); // Timeout value 500ms
 
@@ -253,9 +255,16 @@ void take_snapshot(void)
 
         fwrite(snapshot_buf, 1, snapshot_len, snapshot_fd);
         fclose(snapshot_fd);
-    } else {
-        printf("Error: Failed to retrieve snapshot data\n");
     }
+	else {
+        if (snapshot_len == -1) {
+            printf("Error: Failed to retrieve snapshot data\n");
+        } else if (snapshot_len == -2) {
+            printf("Error: Buffer too small to store snapshot data\n");
+        } else if (snapshot_len == -4) {
+            printf("Error: Timeout while waiting for snapshot data\n");
+        }
+	}
 }
 
 static int do_queue_alloc(int type)
