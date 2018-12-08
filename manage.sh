@@ -78,7 +78,7 @@ function build()
 {
     log "Building firmware image"
 
-    run 'make images clean && mv /build/chuangmi-720p-hack.zip /build/chuangmi-720p-hack.tgz /result/'
+    run 'make images clean && mv /env/chuangmi-720p-hack.zip /env/chuangmi-720p-hack.tgz /result/'
 
     return $?
 }

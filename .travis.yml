@@ -11,7 +11,7 @@ before_install:
   - docker build --cache-from quay.io/fliphess/chuangmi-720p-hack -t fliphess/chuangmi-720p-hack .
 
 script:
-  - docker run -i -v "$(pwd):/result" --detach=false --tty=true fliphess/chuangmi-720p-hack /bin/bash -c 'make PROCS=2 images clean && mv /build/chuangmi-720p-hack.zip /build/chuangmi-720p-hack.tgz /result/'
+  - docker run -i -v "$(pwd):/result" --detach=false --tty=true fliphess/chuangmi-720p-hack /bin/bash -c 'make PROCS=2 images clean && mv /env/chuangmi-720p-hack.zip /env/chuangmi-720p-hack.tgz /result/'
 
 notifications:
   email: false

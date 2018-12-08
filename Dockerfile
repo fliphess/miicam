@@ -18,7 +18,7 @@ ENV NM="${TARGET}-nm"
 ENV RANLIB="${TARGET}-ranlib"
 ENV STRIP="${TARGET}-strip"
 
-ENV TOPDIR="/build"
+ENV TOPDIR="/env"
 ENV SOURCEDIR="${TOPDIR}/src"
 ENV PREFIXDIR="${TOPDIR}/prefix"
 ENV BUILDDIR="${TOPDIR}/build"
@@ -91,12 +91,12 @@ RUN echo "*** Unpacking Toolchain"       \
 ## Get repo                                       ##
 ####################################################
 
-COPY . /build
+COPY . /env
 
 
 ####################################################
-## Setting workdir to /build                      ##
+## Setting workdir to /env                        ##
 ####################################################
 
-WORKDIR /build
+WORKDIR /env
 
