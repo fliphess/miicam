@@ -23,6 +23,7 @@ class Configuration
         "ENABLE_FTPD",
         "ENABLE_HTTPD",
         "ENABLE_MQTT",
+        "ENABLE_RESTARTD",
         "ENABLE_RTSP",
         "ENABLE_SAMBA",
         "ENABLE_SSHD",
@@ -42,7 +43,6 @@ class Configuration
         "PING_WAIT",
         "PURGE_LOGFILES_AT_BOOT",
         "ROOT_PASSWORD",
-        "START_RESTARTD",
         "TIMEZONE",
         "WAIT_FOR_NETWORK",
         "WIFI_PASS",
@@ -106,7 +106,7 @@ class Configuration
     public function Test() {
         // * Verify the syntax of the current config file on the command line
 
-        $command = sprintf('/bin/busybox ash -n %s 2>&1', self::$config_path);
+        $command = sprintf('/bin/busybox ash -n %s 2>&1 && echo "Syntax OK"', self::$config_path);
         exec($command, $output, $return);
         return array("success" => ($return == 0) ? true : false, "message" => ($output) ? implode(" ", $output) : "No syntax errors detected in configuration file");
     }
@@ -346,11 +346,11 @@ class OS
     }
 
     public static function Reboot() {
-        return self::RunCommand("/sbin/reboot -d 5 2>&1");
+        return self::RunCommand("/sbin/reboot -d 5 2>&1 && echo 'Scheduled REBOOT'");
     }
 
     public static function Shutdown() {
-        return self::RunCommand("/sbin/poweroff -d 5 2>&1");
+        return self::RunCommand("/sbin/poweroff -d 5 2>&1 && echo 'Scheduled SHUTDOWN'");
     }
 
     public static function Uptime() {
@@ -395,7 +395,7 @@ class OS
     }
 
     public static function FreeMemory() {
-        return self::RunCommand('echo x > /proc/frammap/free_pages 2>&1');
+        return self::RunCommand('echo 1 > /proc/frammap/free_pages 2>&1 && echo OK');
     }
 
     public function CreateDir($path) {

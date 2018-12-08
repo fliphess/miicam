@@ -39,7 +39,7 @@ $app->add(function (Request $request, Response $response, callable $next) {
     $uri = $request->getUri();
 
     $logline = array(
-        "remote_ip" => $_SERVER['REMOTE_ADDR'],
+        "remote_ip" => getenv('REMOTE_ADDR'),
         "method"    => $request->getMethod(),
         "status"    => $response->getStatusCode(),
         "reason"    => $response->getReasonPhrase(),
