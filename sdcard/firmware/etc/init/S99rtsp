@@ -15,7 +15,7 @@ fi
 [ -z "$RTSP_WIDTH" ]        && RTSP_WIDTH=1280
 [ -z "$RTSP_HEIGHT" ]       && RTSP_HEIGHT=720
 [ -z "$RTSP_BITRATE" ]      && RTSP_BITRATE=8192
-[ -z "$RTSP_BITRATE_MODE" ] && RTSP_BITRATE_MODE=1
+[ -z "$RTSP_BITRATE_MODE" ] && RTSP_BITRATE_MODE=4
 
 NAME="rtspd"
 DESC="RTSP server"
