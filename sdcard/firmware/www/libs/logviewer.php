@@ -13,6 +13,12 @@ class LogTailer
 
     static function Get($log, $seek) {
 
+        if (!getenv('ENABLE_LOGGING') == 1) {
+            throw new \Exception(
+                'Logging is disabled in config.cfg. Set ENABLE_LOGGING to 1'
+            );
+        }
+
         if (!array_key_exists($log, self::$file_mapping)) {
             throw new \Exception(
                 sprintf('Log type not known: %s', $log)
