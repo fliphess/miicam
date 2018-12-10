@@ -1876,23 +1876,41 @@ int main(int argc, char *argv[])
         }
     }
 
+    int snap = 0;
+    int quit = 0;
+
     while(1) {
-        key = getch();
-
-        if ((key == 's') || (access("/dev/shm/snapshot", F_OK ) != -1 )) {
-            unlink("/dev/shm/snapshot");
-
+        if (snap == 1) {
+            snap = 0;
             printf("Creating a snapshot of the current data stream\n");
             take_snapshot();
         }
+
+        if (access("/dev/shm/snapshot", F_OK ) != -1 ) {
+            unlink("/dev/shm/snapshot");
+            snap = 1;
+        }
+
+        if (access("/dev/shm/rtsp_quit", F_OK ) != -1 ) {
+            unlink("/dev/shm/rtsp_quit");
+            quit = 1;
+        }
+
+        key = getch();
+
+        if (key == 's') {
+            snap = 1;
+        }
         else if (key == 'q' || key == 'Q')
+            quit = 1;
+
+        if (quit == 1)
             break;
 
         sleep(1);
     }
 
     rtspd_stop();
-
     gm_delete_groupfd(groupfd);
     gm_graph_release();
     gm_release();
