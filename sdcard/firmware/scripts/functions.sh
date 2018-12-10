@@ -830,6 +830,50 @@ get_sharpness()
 }
 
 ##################################################################################
+## MQTT Functions                                                               ##
+##################################################################################
+
+mqtt_send()
+{
+    TOPIC="$1"; shift
+    MESSAGE="$*"
+
+    OPTIONS="-i ${HOSTNAME}.mqtt_send -h ${MQTT_HOST} -p ${MQTT_PORT}"
+
+    ## If username and password are set: Add them to options
+    if [ "x${MQTT_USER}" != "x" ] && [ "x${MQTT_PASS}" != "x" ]
+    then
+        OPTIONS="${OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS}"
+    fi
+
+    OPTIONS="${OPTIONS} ${MOSQUITTOPUBOPTS} ${MOSQUITTOOPTS}"
+
+    mosquitto_pub ${OPTIONS} -t "${TOPIC}" -m "${MESSAGE}"
+}
+
+
+mqtt_subscribe()
+{
+    TOPIC="$1"
+    ID="$2"
+
+    ## Set the host and port in options
+    OPTIONS="-i ${HOSTNAME}.subscribe.${ID} -h $MQTT_HOST -p $MQTT_PORT"
+
+    ## If username and password are set: Add them to options
+    if [ "x${MQTT_USER}" != "x" ] && [ "x${MQTT_PASS}" != "x" ]
+    then
+        OPTIONS="${OPTIONS} -u ${MQTT_USER} -P ${MQTT_PASS}"
+    fi
+
+    ## Add generic moquitto options from config.cfg to string
+    OPTIONS="${OPTIONS} ${MOSQUITTOOPTS} -v"
+
+    /usr/bin/mosquitto_sub ${OPTIONS} -t "${TOPIC}"
+}
+
+
+##################################################################################
 ##  Status tools                                                                ##
 ##################################################################################
 
