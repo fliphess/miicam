@@ -25,6 +25,7 @@
 
 #include "librtsp.h"
 #include "gmlib.h"
+#include "algorithm/capture_motion_detection.c"
 
 #define DVR_ENC_EBST_ENABLE      0x55887799
 #define DVR_ENC_EBST_DISABLE     0
@@ -56,9 +57,8 @@
 #define START_BS_EVENT           1
 #define STOP_BS_EVENT            2
 
-#define MAX_SNAPSHOT_LEN  (256*1024)
-
-// #define MAX_SNAPSHOT_LEN  (128*1024)
+#define MAX_SNAPSHOT_LEN         (256 * 1024)
+#define MD_DATA_LEN              (720 * 576 / 4)
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -69,6 +69,9 @@
         }    \
     } while(0)    \
 
+
+struct mdt_alg_t mdt_alg = {mb_cell_en: NULL};
+struct mdt_result_t mdt_result[ENC_TRACK_NUM];
 
 typedef struct {
     void *obj;
@@ -162,10 +165,13 @@ typedef struct st_av {
 
 pthread_t enqueue_thread_id   = 0;
 pthread_t encode_thread_id    = 0;
+pthread_t motion_thread_id    = 0;
+
 unsigned int sys_tick         = 0;
 struct timeval sys_sec        = {-1, -1};
 int sys_port                  = 554;
 char *ipptr                   = NULL;
+
 static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
 static int rtspd_avail_ch     = 0;
@@ -179,7 +185,6 @@ void *groupfd;                    // * Return of gm_new_groupfd()
 void *bindfd;                     // * Return of gm_bind()
 void *capture_object;
 void *encode_object;
-
 void *sub_enc_object;             // * Create encoder object (scaler)
 void *sub_bindfd;                 // * Create encoder object (scaler) bind
 
@@ -222,6 +227,88 @@ static char getch(void)
     }
     return -1;
 }
+
+
+static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
+{
+    int ret = 0;
+    gm_cap_motion_t cap_motion;
+
+    cap_motion.id = id; //alpha
+    cap_motion.value = value;
+
+    ret = gm_set_cap_motion(cap_vch, &cap_motion);
+    if (ret < 0) {
+        printf("MD_Test: gm_set_cap_motion error!\n");
+        return -1;
+    }
+    return 0;
+}
+
+
+static int set_interesting_area(int ch)
+{
+    int ret = 0;
+    int mb_w_num, mb_h_num;
+    int h, w;
+    gm_enc_t *param;
+
+    mdt_alg.u_width       = gm_system.cap[ch].dim.width;
+    mdt_alg.u_height      = gm_system.cap[ch].dim.height;
+    mdt_alg.u_mb_width    = 32;
+    mdt_alg.u_mb_height   = 32;
+    mdt_alg.training_time = 15;
+    mdt_alg.frame_count   = 0;
+    mdt_alg.sensitive_th  = 80;
+    mdt_alg.alarm_th      = 17;  // mb_h_num * mb_w_num * (5/100)
+
+    mb_w_num              = (mdt_alg.u_width + (mdt_alg.u_mb_width - 1)) / mdt_alg.u_mb_width;
+    mb_h_num              = (mdt_alg.u_height + (mdt_alg.u_mb_height - 1)) / mdt_alg.u_mb_height;
+    mdt_alg.mb_w_num      = mb_w_num;
+    mdt_alg.mb_h_num      = mb_h_num;
+
+    mdt_alg.mb_cell_en = (unsigned char *)malloc(sizeof(unsigned char) * mb_w_num * mb_h_num);
+    if (mdt_alg.mb_cell_en == NULL) {
+        printf("Error to allocate mb_cell_en\n");
+        ret = -1;
+        goto err_ext;
+    }
+
+    memset(mdt_alg.mb_cell_en, 0, (sizeof(unsigned char) * mb_w_num * mb_h_num));
+
+    // * Set Area
+    for (h = 0; h < mb_h_num; h++) {
+        for (w = 0; w < mb_w_num; w++) {
+            mdt_alg.mb_cell_en[(h * mb_w_num + w)] = 1;
+        }
+    }
+
+    set_cap_motion(ch, 0, 32);      // * Alpha
+    set_cap_motion(ch, 1, 7371);    // * TBG
+    set_cap_motion(ch, 2, 7);       // * Init val
+    set_cap_motion(ch, 3, 9);       // * TB
+    set_cap_motion(ch, 4, 11);      // * Sigma
+    set_cap_motion(ch, 5, 15);      // * Prune
+    set_cap_motion(ch, 7, 0x9ffb0); // * Alpha accuracy
+    set_cap_motion(ch, 8, 9);       // * TG
+    set_cap_motion(ch, 10, 0x7fe0); // * One min alpha
+
+    param = &enc_param[0][0];
+    ret = motion_detection_update(param->bindfd[0], &mdt_alg);
+
+    if (ret != 0) {
+        printf("Error to execute motion_detection_update at CH(%d)\n", ch);
+        ret = -1;
+        goto err_ext;
+    }
+
+err_ext:
+    if (mdt_alg.mb_cell_en)
+        free(mdt_alg.mb_cell_en);
+
+    return ret;
+}
+
 
 void take_snapshot(void)
 {
@@ -364,10 +451,12 @@ static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len
 
         if ( ret == ERR_FULL) {
             pb->congest = 1;
+
             if ( TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000 )
                 fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d full\n", ch_num, sub_num);
         }
         else if ((ret != ERR_NOTINIT)&& (ret != ERR_MUTEX) && (ret != ERR_NOTRUN)) {
+
             if (TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000)
                 fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d error %d\n", ch_num, sub_num, ret);
         }
@@ -636,6 +725,7 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
 #define PRINT_INTERVAL_MS 5000
 static unsigned int frame_counts[CAP_CH_NUM][RTSP_NUM_PER_CAP] = {{0}};
 static unsigned int rec_bs_len[CAP_CH_NUM][RTSP_NUM_PER_CAP]   = {{0}};
+
 static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeval *cur_timeval)
 {
     int enc_type, w, h;
@@ -702,7 +792,6 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
 
 #define POLL_WAIT_TIME 15000
 static unsigned int poll_wait_time = 0;
-
 
 static void env_release_resources(void)
 {
@@ -806,10 +895,8 @@ static int cmd_cb(char *name, int sno, int cmd, void *p)
 
         case GM_STREAM_CMD_TEARDOWN:
             if ( strncmp(name, "live/", 5) == 0 ) {
-
                 if ((pb = find_file_sr(name, sno)) == NULL)
                     ERR_GOTO(-1, cmd_cb_err);
-
                 pb->play = 0;
             }
             ret = 0;
@@ -824,8 +911,104 @@ cmd_cb_err:
     if ( ret < 0 ) {
         fprintf(stderr, "%s: cmd %d error %d\n", __func__, cmd, ret);
     }
-
     return ret;
+}
+
+
+static void *motion_thread(void *arg)
+{
+    int ch;
+    int ret;
+
+    gm_enc_t *param;
+    param = &enc_param[0][0];
+
+    gm_multi_cap_md_t *cap_md = NULL;
+    cap_md = (gm_multi_cap_md_t *) malloc(sizeof(gm_multi_cap_md_t) * 1);
+    if (cap_md == NULL) {
+        printf("Error to allocate capture motion info!\n");
+        goto thread_exit;
+    }
+
+    memset((void *) cap_md, 0, (sizeof(gm_multi_cap_md_t) * 1));
+
+    cap_md[0].bindfd = param->bindfd[0];
+    cap_md[0].cap_md_info.md_buf_len = CAP_MOTION_SIZE;
+    cap_md[0].cap_md_info.md_buf = (char *) malloc(CAP_MOTION_SIZE);
+
+    if (cap_md[0].cap_md_info.md_buf == NULL) {
+        printf("Error to allocate capture motion buffer!\n");
+        goto thread_exit;
+    }
+
+    while (rtspd_sysinit) {
+        ret = gm_recv_multi_cap_md(cap_md, 1);
+
+        if (ret < 0) { //-1:error,0:sucess
+            printf("Error parameter to get motion data\n");
+            continue;
+        }
+
+        ret = motion_detection_handling(cap_md, &mdt_result[0], 1);
+        if (ret < 0) { //-1:error,0:sucess
+            printf("Error to do motion_detection_handling\n");
+            goto thread_exit;
+        }
+
+        for (ch = 0; ch < 1; ch++) {
+
+            if (mdt_result[ch].result == MOTION_DETECTED)
+                printf("[---Area Has Motion Detected---] at CH(%d)\n", ch);
+
+            else if (mdt_result[ch].result == NO_MOTION) {
+                // TODO - Add motion off if time is expired and no motion detected
+            }
+
+            else if (mdt_result[ch].result == MOTION_IS_TRAINING)
+                printf("[---Motion Is training---] at CH(%d)\n", ch);
+
+            else if (mdt_result[ch].result == MOTION_PARSING_ERROR) {
+                printf("[---Paring data error---] at CH(%d)\n", ch);
+            }
+
+            else if (mdt_result[ch].result == MOTION_INIT_ERROR) {
+                printf("[---Motion init error---] at CH(%d)\n", ch);
+            }
+
+            else if (mdt_result[ch].result == MOTION_ALGO_ERROR) {
+                printf("[---Motion Algorithm Error---] at CH(%d)\n", ch);
+            }
+
+            else if (mdt_result[ch].result == MOTION_DATA_ERROR) {
+                printf("[---Motion data error---] at CH(%d)\n", ch);
+            }
+
+            else {
+                printf("[---Motion Message not Defined Error---] at CH(%d)\n", ch);
+            }
+        }
+
+        usleep(200000);   //two second period to detect motion
+    }
+
+thread_exit:
+
+    if (cap_md) {
+        for (ch = 0 ; ch < 1; ch++) {
+            if (cap_md[ch].cap_md_info.md_buf)
+                free(cap_md[ch].cap_md_info.md_buf);
+        }
+    }
+
+    if (cap_md)
+        free(cap_md);
+
+    motion_detection_end();
+
+    pthread_exit(NULL);
+    motion_thread_id = (pthread_t)NULL;
+
+    return 0;
 }
 
 
@@ -943,12 +1126,12 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
 
         // * GM813x capture path 0(liveview), 1(substream), 2(substream), 3(mainstream)
         cap_attr.path = cap_path;
-        cap_attr.enable_mv_data = 0;
+        cap_attr.enable_mv_data = 1;
         gm_set_attr(param->cap.obj, &cap_attr);                // * Set capture attribute
 
         // * Enable 3dnr if resolution > capture dim / 2
-        if ((width >= (gm_system.cap[0].dim.width / 2)) &&
-            (height >= (gm_system.cap[0].dim.height / 2))) {
+        if ((width >= (gm_system.cap[cap_ch].dim.width / 2)) &&
+            (height >= (gm_system.cap[cap_ch].dim.height / 2))) {
             dnr_attr.enabled = 1;
             gm_set_attr(param->cap.obj, &dnr_attr);
         }
@@ -1006,6 +1189,17 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
 
     // * Bind channel recording
     param->bindfd[rec_track] = gm_bind(enc_groupfd, param->cap.obj, param->enc[rec_track].obj);
+
+    // * Enable motion detection
+    motion_detection_init();
+
+    // * Set area for motion detection
+    int ret = 0;
+    ret = set_interesting_area(rec_track);
+
+    if (ret != 0) {
+        perror("Error running set_interesting_area!\n");
+    }
 
     // * Requires Scaler Encoder (only for H264)
     if (enc_type == ENC_TYPE_H264 && (width < 1280 || height < 720)) {
@@ -1389,7 +1583,9 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
             printf("Poll timeout!!\n");
             continue;
         }
+
         memset(&bs, 0, sizeof(bs));
+
         if ( poll_fds.revent.event != GM_POLL_READ )
             continue;
 
@@ -1411,6 +1607,7 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
         bs.bs.mv_buf_len = 0;
 
         ret = gm_recv_multi_bitstreams(&bs, 1); // -1:fail 0:scuess
+
         if ( ret < 0 )
             printf("Error to receive bitstream.\n");
         else if ( (bs.retval < 0) && bs.bindfd )
@@ -1470,6 +1667,14 @@ static int rtspd_start(int port)
         pthread_attr_destroy(&attr);
     }
 
+    // * Motion Thread
+    if (motion_thread_id == (pthread_t)NULL) {
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        ret = pthread_create(&motion_thread_id, &attr, &motion_thread, NULL);
+        pthread_attr_destroy(&attr);
+    }
+
     // * Enqueue Thread
     if (enqueue_thread_id == (pthread_t)NULL) {
         pthread_attr_init(&attr);
@@ -1480,8 +1685,10 @@ static int rtspd_start(int port)
 
     for (ch_num = 0; ch_num < CAP_CH_NUM; ch_num++) {
         pthread_mutex_lock(&enc[ch_num].ubs_mutex);
+
         for (stream = 0; stream < RTSP_NUM_PER_CAP; stream++)
             env_set_bs_new_event(ch_num, stream, START_BS_EVENT);
+
         pthread_mutex_unlock(&enc[ch_num].ubs_mutex);
     }
 
@@ -1508,6 +1715,7 @@ int is_bs_all_disable(void)
 static void rtspd_stop()
 {
     pthread_mutex_destroy(&stream_queue_mutex);
+    motion_detection_end();
     rtspd_sysinit = 0;
 }
 
@@ -1652,6 +1860,13 @@ int main(int argc, char *argv[])
         }
     }
 
+    // * Setup Auth
+    const char* password;
+    password = getenv("ROOT_PASSWORD");
+    if (password != NULL) {
+
+    }
+
     rtspd_start(554);
 
     printf("\nConnect command:\n");
@@ -1664,7 +1879,9 @@ int main(int argc, char *argv[])
     while(1) {
         key = getch();
 
-        if (key == 's') {
+        if ((key == 's') || (access("/dev/shm/snapshot", F_OK ) != -1 )) {
+            unlink("/dev/shm/snapshot");
+
             printf("Creating a snapshot of the current data stream\n");
             take_snapshot();
         }
@@ -1675,7 +1892,10 @@ int main(int argc, char *argv[])
     }
 
     rtspd_stop();
+
+    gm_delete_groupfd(groupfd);
     gm_graph_release();
+    gm_release();
 
     return 0;
 }
