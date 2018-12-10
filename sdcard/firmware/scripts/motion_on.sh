@@ -14,13 +14,17 @@ else
     exit 1
 fi
 
-## Bail out if MQTT is disabled in config.cfg
-if [ "$ENABLE_MQTT" -ne 1 ]
+## Turn IR Led on
+if [ "$MOTION_LIGHT_ALERT" -eq 1 ]
 then
-    echo "MQTT Support is disabled in the configuration."
-    exit 0
+    ir_led on
 fi
 
-echo "$( date ) - Motion ON" | tee -a "$LOGDIR/motion.log"
-mqtt_send "${MOTION_TOPIC}" "ON"
+## Message MQTT
+if [ "$ENABLE_MQTT" -eq 1 ]
+then
+    mqtt_send "${MOTION_TOPIC}" "$MOTION_MQTT_ON"
+fi
+
+echo "$( date ) - Motion: $MOTION_MQTT_ON" | tee -a "$LOGDIR/motion.log"
 
