@@ -45,6 +45,7 @@
                      <b-button v-on:click="select('bootlog')">Select Bootlog</b-button>
                      <b-button v-on:click="select('webapp')">Select Webapp Logs</b-button>
                      <b-button v-on:click="select('lighttpd')">Select Webserver Log</b-button>
+                     <b-button v-on:click="select('motion')">Select Motion Log</b-button>
                      </b-button-group>
                 </div>
 
@@ -76,6 +77,7 @@
                         webapp:   { desc: "the webapp's request logging" },
                         bootlog:  { desc: "the camera's bootup log file" },
                         lighttpd: { desc: "the webserver's error log"    },
+                        motion:   { desc: "the motion detection log"     },
                     },
                 },
                 mounted () {

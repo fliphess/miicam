@@ -98,6 +98,7 @@ function setup_web() {
     echo webserver >> /tmp/sd/log/lighttpd.log
     echo webapp >>  /tmp/sd/log/webapp.log
     echo bootlog >> /tmp/sd/log/ft_boot.log
+    echo motion >> /tmp/sd/log/motion.log
     echo " [OK]"
 }
 
