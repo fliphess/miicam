@@ -5,3 +5,4 @@ alias vim=vi
 alias view=less
 alias curl='curl --cacert /tmp/sd/firmware/lib/cacert.pem'
 alias w='who'
+alias crontab='crontab -c /var/run/cron'
