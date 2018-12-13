@@ -6,6 +6,7 @@
  * $Date: 2014/12/30 05:37:57 $
  *
  */
+
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,6 +60,10 @@
 
 #define MAX_SNAPSHOT_LEN         (256 * 1024)
 #define MD_DATA_LEN              (720 * 576 / 4)
+
+#define MOTION_ON_SCRIPT         "/tmp/sd/firmware/scripts/motion_on.sh"
+#define MOTION_OFF_SCRIPT        "/tmp/sd/firmware/scripts/motion_off.sh"
+
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -154,6 +159,7 @@ typedef struct st_priv_bs {
 typedef struct st_av {
     // * Public data
     avbs_t bs[RTSP_NUM_PER_CAP];  // * VIDEO, 0: main-bitstream, 1: sub1-bitstream, 2:sub2-bitstream
+
     // * Update data
     pthread_mutex_t ubs_mutex;
 
@@ -208,6 +214,8 @@ static char *rtsp_enc_type_str[] = {
     "MJPEG"
 };
 
+char *rtsp_password;
+char *rtsp_username;
 
 void log_message(char *message){
     char timestring[20];
@@ -413,7 +421,10 @@ static int open_live_streaming(int ch_num, int sub_num)
     if (pb->sr < 0)
         fprintf(stderr, "open_live_streaming: ch_num=%d, sub_num=%d setup error\n", ch_num, sub_num);
 
-    // TODO: Set stream_authorization(pb->sr, "username\0", "password\0");
+    // * Enable authentication for the stream if the username and password are set
+    if (rtsp_username != NULL && rtsp_password != NULL) {
+        stream_authorization(pb->sr, rtsp_username, rtsp_password);
+    }
 
     strcpy(pb->name, livename);
 
@@ -1004,7 +1015,7 @@ static void *motion_thread(void *arg)
                 if (motion_detected == 0) {
                     motion_detected = 1;
                     log_message("Motion ON - executing motion on script");
-                    system("/tmp/sd/firmware/scripts/motion_on.sh");
+                    system(MOTION_ON_SCRIPT);
                 }
             }
 
@@ -1013,9 +1024,10 @@ static void *motion_thread(void *arg)
                 if (motion_detected == 1) {
                     motion_detected = 0;
                     log_message("Motion OFF - executing motion off script");
-                    system("/tmp/sd/firmware/scripts/motion_off.sh");
+                    system(MOTION_OFF_SCRIPT);
                 }
             }
+
             else {
                 log_message("Error: Undefined Motion Event");
             }
@@ -1890,6 +1902,16 @@ int main(int argc, char *argv[])
         "*******************************************\n"
     );
 
+    rtsp_password = getenv("RTSP_PASS");
+    rtsp_username = getenv("RTSP_USER");
+
+    if (rtsp_password != NULL && rtsp_username != NULL) {
+        printf("Stream credentials will be set to:\n");
+        printf("  * username:    %s\n", rtsp_username);
+        printf("  * password:    %s\n\n", rtsp_password);
+    }
+
+    // * Initializing gmlib
     gm_graph_init();
 
     printf("\nConfig Loaded:\n");
@@ -1908,21 +1930,16 @@ int main(int argc, char *argv[])
         }
     }
 
-    rtspd_start(554);
-
-    // * Ignore all other signals
-    signal(SIGCHLD, SIG_IGN);
-    signal(SIGTSTP, SIG_IGN);
-    signal(SIGTTOU, SIG_IGN);
-    signal(SIGTTIN, SIG_IGN);
-
-    // * Use our handler for the signals that we "like"
+    // * Use our handler for the signals so we can do some cleanup at quit
     signal(SIGINT,  signal_handler);
     signal(SIGHUP,  signal_handler);
     signal(SIGTERM, signal_handler);
 
+    // * Start the rtsp threads
+    rtspd_start(554);
+
     while(1) {
-        usleep(1000);
+        usleep(10000);
     }
 
     return 0;
