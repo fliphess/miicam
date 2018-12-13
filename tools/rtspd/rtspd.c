@@ -1684,7 +1684,7 @@ static int rtspd_start(int port)
         return ret;
 
     if (pthread_mutex_init(&stream_queue_mutex, NULL)) {
-        perror("Error: rtspd_start: mutex init failed")
+        perror("Error: rtspd_start: mutex init failed");
         exit(-1);
     }
 
