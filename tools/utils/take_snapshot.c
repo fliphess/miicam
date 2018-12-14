@@ -1,7 +1,3 @@
-/**
- * Create a snapshot
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
