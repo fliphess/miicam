@@ -38,11 +38,14 @@ This hack includes:
 * SSH server - _Enabled by default._
 * FTP server - _Disabled by default._
 * Samba Server - _Disabled by default._
-* Syslog to memory card - _Enabled by default and not to be disabled currently._
+* Syslog to SD card - _Enabled by default and not to be disabled currently._
 * Configure Timezone and use ntpclient to set date and time over Internet
 * Confgurable cronjobs
 * MQTT status updates
 * MQTT Control
+* Configuration using a basic web interface
+* Reintroduction of motion detection without the need for cloud
+* User authentication on RTSP daemon
 
 
 Planned futures:
@@ -51,12 +54,9 @@ Planned futures:
 * Web based Image and Video viewer
 * Build a newer `tf_recovery.img` and u-boot using the toolchain
 * Capture video on motion and on command
-* Configuration over web server
 * Replace Chinese voice files with English and more important: allow playback of those voices
-* Reintroduction of motion detection without the need for cloud by extending the current rtspd code
 * Auto update mechanism for firmware
 * MQTT updates and control
-* User authentication on RTSP daemon
 * SSL for webserver and rtspd
 * Remote syslogging
 * Audio with RTSP stream
@@ -64,32 +64,34 @@ Planned futures:
 
 ## Installation on the Chuangmi 720P camera
 
-The memory card must stay in the camera!
+The SD card must stay in the camera!
 If you remove it, the camera will start without using the hack.
 
-
-### Prepare the memory card
-
-You can use the self compiled image from the cloned repository or download a precompiled release.
-Format a micro SD card in fat32 (vfat) format and copy the content of the **sdcard/** folder at the root of your memory card.
+You can use the pre-compiled firmware that is build with each release or build the firmware yourself using docker or a linux machine.
 
 
-### Configure the Chuangmi camera on the memory card
+### Prepare the SD card
 
-To configure the wifi network to use, edit the file **config.cfg**.
-To configure the services which should run on the camera, open the file **config.cfg** and set the values.
+Format a micro SD card in fat32 (vfat) format and copy the content of the **sdcard/** folder in the root of your SD card.
 
-If you configured the wifi already using the mii app, the settings in `config.cfg` are not required, but still recommended.
-If your nvram somehow gets corrupted, the settings in `config.cfg` can be used to reset the wifi.
+
+### Configure the Chuangmi camera on the SD card
+
+To configure a wifi network to connect to, edit the file **config.cfg**.
+
+If you configured the wifi prior to this hack using the miihome app, the settings are stored in nvram, and not required to set in `config.cfg`.
 
 
 ## Start the camera
 
 * If plugged, unplug the Chuangmi camera
-* Insert the memory card in the Chuangmi camera
+* Insert the SD card in the Chuangmi camera
 * Plug the Chuangmi camera
 
-The camera will start. The led will indicate the current status:
+If all is well, the camera will start.
+
+The led will indicate the current status:
+
 * yellow: camera startup
 * blue blinking: network configuration in progress (connec to wifi, set up the IP address)
 * blue: network configuration is OK. Camera is ready to use.
@@ -99,20 +101,19 @@ You can test is your camera is up and running this hack with your browser on url
 
 ## Resetting the firmware if the hack is not working
 
-If the hack is not working, result [the wiki for all known issues and workarounds](https://github.com/fliphess/chuangmi-720p-hack/wiki/Troubleshooting)
+If the hack is not working, there is a big chance your firmware has been upgraded using the miihome app.
+In newer firmware upgrades the boot from sdcard mechanism is blocked.
+
+Have a look in the wiki on [how to downgrade your firmware](https://github.com/fliphess/chuangmi-720p-hack/wiki/Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working) using the `tf_recovery.img` recovery image.
 
 
-## Use the camera
+## Using the camera
 
 Using the web interface and over MQTT many settings and services can be enabled and disabled.
 
 Have a look at the api docs in the web interface for a list of all available http calls you can use to control the camera.
 
-The MQTT page on the wiki will soon reflect all available options for controlling and monitoring the camera using MQTT.
-
-## Services
-
-Have a look at the [wiki services page](https://github.com/fliphess/chuangmi-720p-hack/wiki/Configuring-Services) for all available additional services this firmware offers.
+For controlling the camera over MQTT, have a look at the [MQTT wiki page](https://github.com/fliphess/chuangmi-720p-hack/wiki/Configuring-MQTT)
 
 
 ## Security considerations
