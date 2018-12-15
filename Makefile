@@ -34,7 +34,6 @@ BINS =                                     \
 	smbpasswd smbstatus smbtree smbclient  \
 	scp dbclient dropbearkey               \
 	arm-php arm-php-cgi                    \
-	chuangmi_ctrl                          \
 	ffmpeg ffprobe                         \
 	lsof                                   \
 	nano                                   \
@@ -81,6 +80,7 @@ SAMPLES :=                                          \
 
 
 UTILS :=                                            \
+	tools/chuangmi_ctrl                             \
 	tools/take_snapshot
 
 
@@ -106,7 +106,6 @@ all:                                 \
 	$(BUILDDIR)/nano                 \
 	$(BUILDDIR)/php                  \
 	$(BUILDDIR)/samba                \
-	$(BUILDDIR)/chuangmi_ctrl        \
 	$(BUILDDIR)/runas                \
 	$(BUILDDIR)/rsync                \
 	$(BUILDDIR)/lsof                 \
@@ -477,16 +476,6 @@ $(BUILDDIR)/samba: $(SOURCEDIR)/$(SAMBAARCHIVE)
 		make -j$(PROCS) installservers                   && \
 		make -j$(PROCS) installbin
 	@rm -rf $@-$(SAMBAVERSION)
-	@touch $@
-
-
-$(BUILDDIR)/chuangmi_ctrl: $(PREFIXDIR)/bin $(SOURCEDIR)/$(MIJIACTRLARCHIVE)
-	@mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)
-	@unzip $(SOURCEDIR)/$(MIJIACTRLARCHIVE) -d $(BUILDDIR)
-	@cd $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)    && \
-	make                                                   && \
-	cp mijia_ctrl $(PREFIXDIR)/bin/chuangmi_ctrl
-	@rm -rf $(BUILDDIR)/mijia-720p-ctrl-$(MIJIACTRLVERSION)
 	@touch $@
 
 
