@@ -5,23 +5,23 @@ ZLIBVERSION = 1.2.11
 ZLIBARCHIVE = zlib-$(ZLIBVERSION).tar.gz
 ZLIBURI = https://www.zlib.net/$(ZLIBARCHIVE)
 
-LIBXML2VERSION = 2.9.7
+LIBXML2VERSION = 2.9.8
 LIBXML2ARCHIVE = libxml2-$(LIBXML2VERSION).tar.gz
 LIBXML2URI = http://xmlsoft.org/sources/$(LIBXML2ARCHIVE)
 
-LIBJPEGVERSION = 1.5.2
+LIBJPEGVERSION = 1.5.3
 LIBJPEGARCHIVE = libjpeg-turbo-$(LIBJPEGVERSION).tar.gz
 LIBJPEGURI = http://prdownloads.sourceforge.net/libjpeg-turbo/$(LIBJPEGARCHIVE)
 
-LIBPNGVERSION = 1.6.35
+LIBPNGVERSION = 1.6.36
 LIBPNGARCHIVE = libpng-$(LIBPNGVERSION).tar.gz
 LIBPNGURI = https://prdownloads.sourceforge.net/libpng/$(LIBPNGARCHIVE)
 
-LIBGDVERSION = 2.2.4
+LIBGDVERSION = 2.2.5
 LIBGDARCHIVE = libgd-$(LIBGDVERSION).tar.gz
 LIBGDURI = https://github.com/libgd/libgd/releases/download/gd-$(LIBGDVERSION)/$(LIBGDARCHIVE)
 
-PCREVERSION = 8.41
+PCREVERSION = 8.42
 PCREARCHIVE = pcre-$(PCREVERSION).zip
 PCREURI = https://ftp.pcre.org/pub/pcre/$(PCREARCHIVE)
 
@@ -29,23 +29,23 @@ NCURSESVERSION = 6.1
 NCURSESARCHIVE = ncurses-$(NCURSESVERSION).tar.gz
 NCURSESURI = https://ftp.gnu.org/pub/gnu/ncurses/$(NCURSESARCHIVE)
 
-LIBPCAPVERSION = 1.7.3
+LIBPCAPVERSION = 1.9.0
 LIBPCAPARCHIVE = libpcap-$(LIBPCAPVERSION).tar.gz
 LIBPCAPURI = http://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
 
-TCPDUMPVERSION = 4.7.4
+TCPDUMPVERSION = 4.9.2
 TCPDUMPARCHIVE = tcpdump-$(TCPDUMPVERSION).tar.gz
 TCPDUMPURI = http://www.tcpdump.org/release/$(TCPDUMPARCHIVE)
 
-DROPBEARVERSION = 2017.75
+DROPBEARVERSION = 2018.76
 DROPBEARARCHIVE = dropbear-$(DROPBEARVERSION).tar.bz2
 DROPBEARURI = https://matt.ucc.asn.au/dropbear/releases/$(DROPBEARARCHIVE)
 
-LIGHTTPDVERSION = 1.4.49
+LIGHTTPDVERSION = 1.4.52
 LIGHTTPDARCHIVE = lighttpd-$(LIGHTTPDVERSION).tar.gz
 LIGHTTPDURI = https://download.lighttpd.net/lighttpd/releases-1.4.x/$(LIGHTTPDARCHIVE)
 
-PHPVERSION = 7.2.0
+PHPVERSION = 7.2.12
 PHPARCHIVE = php-$(PHPVERSION).tar.bz2
 PHPURI = http://php.net/get/$(PHPARCHIVE)/from/this/mirror
 
