@@ -7,18 +7,21 @@
  *
  */
 
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <ctype.h>
 #include <string.h>
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
+#include <libgen.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <net/if.h>
@@ -205,6 +208,9 @@ struct CommandLineArguments {
     int bitrate;
     int bitrateMode;
     int encoderType;
+    int snapshot;
+    int record;
+    int motion;
 } cliArgs;
 
 
@@ -214,8 +220,10 @@ static char *rtsp_enc_type_str[] = {
     "MJPEG"
 };
 
-char *rtsp_password;
-char *rtsp_username;
+char *rtsp_password = NULL;
+char *rtsp_username = NULL;
+static int rtsp_use_auth = 0;
+
 
 void log_message(char *message){
     char timestring[20];
@@ -317,12 +325,41 @@ err_ext:
 }
 
 
+static void create_directory(const char *dir)
+{
+    char tmp[256];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp),"%s",dir);
+    len = strlen(tmp);
+
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+
+    for(p = tmp + 1; *p; p++) {
+        if(*p == '/') {
+           *p = 0;
+           mkdir(tmp, S_IRWXU);
+           *p = '/';
+        }
+    }
+    mkdir(tmp, S_IRWXU);
+}
+
+
 void take_snapshot(void)
 {
-    static int filecount = 0;
+    struct tm *sTm;
+    time_t now = time(0);
+    sTm = gmtime(&now);
+
+    char dirstring[40];
+    char filestring[40];
+    char full_file_path[80];
+
     int snapshot_len = 0;
     FILE *snapshot_fd = NULL;
-    char filename[80];
 
     gm_enc_t *param;
     snapshot_t snapshot;
@@ -338,12 +375,21 @@ void take_snapshot(void)
     snapshot_len = gm_request_snapshot(&snapshot, 500); // Timeout value 500ms
 
     if (snapshot_len > 0) {
-        sprintf(filename, "/tmp/sd/RECORDED_IMAGES/snapshot_%d.jpg", filecount++);
-        printf("Image %s size %d bytes\n", filename, snapshot_len);
+        strftime(dirstring, sizeof(dirstring), "/tmp/sd/RECORDED_IMAGES/%Y/%m/%d", sTm);
 
-        snapshot_fd = fopen(filename, "wb");
+        struct stat st = {0};
+        if (stat(dirstring, &st) != 0) {
+            create_directory(dirstring);
+        }
+
+        strftime(filestring, sizeof(filestring), "snapshot_%H%M%S.jpg", sTm);
+        sprintf(full_file_path, "%s/%s", dirstring, filestring);
+
+        printf("Image %s size %d bytes\n", full_file_path, snapshot_len);
+
+        snapshot_fd = fopen(full_file_path, "wb");
         if (snapshot_fd == NULL) {
-            fprintf(stderr, "Error: Failed to open file %s\n", filename);
+            fprintf(stderr, "Error: Failed to open file %s\n", full_file_path);
             exit(EXIT_FAILURE);
         }
 
@@ -422,7 +468,7 @@ static int open_live_streaming(int ch_num, int sub_num)
         fprintf(stderr, "open_live_streaming: ch_num=%d, sub_num=%d setup error\n", ch_num, sub_num);
 
     // * Enable authentication for the stream if the username and password are set
-    if (rtsp_username != NULL && rtsp_password != NULL) {
+    if (rtsp_use_auth == 1) {
         stream_authorization(pb->sr, rtsp_username, rtsp_password);
     }
 
@@ -1014,6 +1060,10 @@ static void *motion_thread(void *arg)
             else if (mdt_result[ch].result == MOTION_DETECTED) {
                 if (motion_detected == 0) {
                     motion_detected = 1;
+
+                    if (cliArgs.snapshot == 1)
+                        snapshot_create = 1;
+
                     log_message("Motion ON - executing motion on script");
                     system(MOTION_ON_SCRIPT);
                 }
@@ -1233,18 +1283,22 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
     // * Bind channel recording
     param->bindfd[rec_track] = gm_bind(enc_groupfd, param->cap.obj, param->enc[rec_track].obj);
 
-    // * Enable motion detection
-    motion_detection_init();
+    // * Set motion detection
+    if (cliArgs.motion == 1) {
 
-    // * Set area for motion detection
-    int ret = 0;
-    ret = set_interesting_area(rec_track);
+        // * Enable motion detection
+        motion_detection_init();
 
-    if (ret != 0) {
-        perror("Error: Failed running set_interesting_area!\n");
+        // * Set area for motion detection
+        int ret = 0;
+        ret = set_interesting_area(rec_track);
+
+        if (ret != 0) {
+            perror("Error: Failed running set_interesting_area!\n");
+        }
     }
 
-    // * Requires Scaler Encoder (only for H264)
+    // * Enable Scaler Encoder if downscaling is required (only for H264)
     if (enc_type == ENC_TYPE_H264 && (width < 1280 || height < 720)) {
         h264e_attr.ratectl.bitrate      = bitrate;
         h264e_attr.frame_info.framerate = framerate;
@@ -1372,7 +1426,7 @@ void gm_graph_init(void)
     gm_init();
     gm_get_sysinfo(&gm_system);
 
-    if (cliArgs.framerate>0)
+    if (cliArgs.framerate > 0)
         poll_wait_time = 1000000 / (cliArgs.framerate + 2);
     else
         poll_wait_time = 15000;
@@ -1551,7 +1605,7 @@ void *encode_thread(void *ptr)
             break;
 
         if ( (ret = gm_recv_multi_bitstreams(&bs[0][0],CAP_CH_NUM * RTSP_NUM_PER_CAP)) < 0 ) {
-            // <= -1: fail, 0:success
+            // <= -1: fail, 0: success
             log_message("Error: Failed to receive bitstream (gm_recv_multi_bitstreams).");
             continue;
         }
@@ -1563,9 +1617,13 @@ void *encode_thread(void *ptr)
 
                 pb = &enc[i].priv_bs[j];
                 avbs = &enc[i].bs[j];
+
                 if ((bs[i][j].retval < 0) && bs[i][j].bindfd)
                     log_message("Error: Failed to receive bitstream.");
                 else if (bs[i][j].retval == GM_SUCCESS) {
+                    //
+                    // * TODO - Write to file if motion if set to 1
+                    //
                     if (avbs->video.enc_type != ENC_TYPE_MJPEG) {
                         if ((pb->play == 1) && (bs[i][j].bs.keyframe ==1))
                             first_play[i][j] = 1;
@@ -1649,7 +1707,7 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
         bs.bs.mv_buf = 0;
         bs.bs.mv_buf_len = 0;
 
-        ret = gm_recv_multi_bitstreams(&bs, 1); // -1:fail 0:scuess
+        ret = gm_recv_multi_bitstreams(&bs, 1);     // * -1: Fail 0: Success
 
         if ( ret < 0 )
             log_message("Error: Failed to receive bitstream (gm_recv_multi_bitstreams).");
@@ -1669,7 +1727,7 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
                 break;
             }
             else {
-                if (++cnt>100) {
+                if (++cnt > 100) {
                     log_message("Error: Timeout reached while waiting for keyframe");
                     break;
                 }
@@ -1719,11 +1777,13 @@ static int rtspd_start(int port)
     }
 
     // * Motion Thread
-    if (motion_thread_id == (pthread_t)NULL) {
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        ret = pthread_create(&motion_thread_id, &attr, &motion_thread, NULL);
-        pthread_attr_destroy(&attr);
+    if (cliArgs.motion == 1) {
+        if (motion_thread_id == (pthread_t)NULL) {
+            pthread_attr_init(&attr);
+            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+            ret = pthread_create(&motion_thread_id, &attr, &motion_thread, NULL);
+            pthread_attr_destroy(&attr);
+        }
     }
 
     // * Enqueue Thread
@@ -1766,8 +1826,11 @@ int is_bs_all_disable(void)
 static void rtspd_stop()
 {
     pthread_mutex_destroy(&stream_queue_mutex);
-    motion_detection_end();
     rtspd_sysinit = 0;
+
+    if (cliArgs.motion == 1) {
+        motion_detection_end();
+    }
 }
 
 
@@ -1791,13 +1854,17 @@ static void print_usage()
     fprintf(stderr, " ./rtspd [-bfwhm] [-j|-4]\n");
     fprintf(stderr,
         "\nAvailable options:\n"
-        "-b [1-8192]    - Set the bitrate      (default: 8192)\n"
-        "-f [1-15]      - Set the framerate    (default: 15)\n"
-        "-w [1-1280]    - Set the image width  (default: 1280 pixels)\n"
-        "-h [1-720]     - Set the image height (default: 720 pixels)\n"
-        "-m [1-4]       - Set the bitrate mode (default: 1, CBR)\n"
-        "-j (optional)  - Use MJPEG encoding   (default: off)\n"
-        "-4 (optional)  - Use MPEG4 encoding   (default: off)\n\n"
+        "-b [1-8192]    - Set the bitrate         (default: 8192)\n"
+        "-f [1-15]      - Set the framerate       (default: 15)\n"
+        "-w [1-1280]    - Set the image width     (default: 1280 pixels)\n"
+        "-h [1-720]     - Set the image height    (default: 720 pixels)\n"
+        "-m [1-4]       - Set the bitrate mode    (default: 1, CBR)\n"
+        "-j (optional)  - Use MJPEG encoding      (default: off)\n"
+        "-4 (optional)  - Use MPEG4 encoding      (default: off)\n\n"
+
+        "-d (optional)  - Enable motion detection (default: off)\n"
+        "-s (optional)  - Take a snapshot when motion detected (default: off)\n"
+        "-r (optional)  - Record a 10 second clip on motion    (default: off)\n"
         );
 
 	exit(EXIT_FAILURE);
@@ -1833,6 +1900,10 @@ int main(int argc, char *argv[])
     cliArgs.bitrateMode = GM_EVBR;
     cliArgs.encoderType = ENC_TYPE_H264;
 
+    cliArgs.snapshot    = 0;
+    cliArgs.record      = 0;
+    cliArgs.motion      = 0;
+
     if (argc > 1) {
         for (i = 1; i < argc; i++) {
             if (argv[i][0] != '-' ) {
@@ -1841,6 +1912,15 @@ int main(int argc, char *argv[])
                 return 1;
             } else {
                 switch (argv[i][1]) {
+                    case 'd':
+                        cliArgs.motion      = 1;    // * Enable motion detection
+                        break;
+                    case 's':
+                        cliArgs.snapshot    = 1;    // * Enable snapshot when motion detected
+                        break;
+                    case 'r':
+                        cliArgs.record      = 1;    // * Enable record stream when motion detected
+                        break;
                     case 'b':
                         cliArgs.bitrate     = atoi(&argv[i][2]);
                         break;
@@ -1869,6 +1949,11 @@ int main(int argc, char *argv[])
                 }
             }
         }
+    }
+
+    if ((cliArgs.motion != 1) && (cliArgs.snapshot == 1 || cliArgs.record == 1)) {
+        fprintf(stderr, "ERROR: -d is required when using -s or -r\n");
+        return 1;
     }
 
     if ((cliArgs.bitrate < 1) || (cliArgs.bitrate > 8192)) {
@@ -1905,7 +1990,9 @@ int main(int argc, char *argv[])
     rtsp_password = getenv("RTSP_PASS");
     rtsp_username = getenv("RTSP_USER");
 
-    if (rtsp_password != NULL && rtsp_username != NULL) {
+    if (rtsp_username != NULL && strcmp(rtsp_username, "") != 0 && rtsp_password != NULL && strcmp(rtsp_password, "") != 0) {
+        rtsp_use_auth = 1;
+
         printf("Stream credentials will be set to:\n");
         printf("  * username:    %s\n", rtsp_username);
         printf("  * password:    %s\n\n", rtsp_password);
