@@ -20,9 +20,26 @@ fi
 NAME="rtspd"
 DESC="RTSP server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
-DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE $RTSP_EXTRA_ARGS"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
+
+DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE $RTSP_EXTRA_ARGS"
+
+## Enable motion detection
+if [ "$MOTION_DETECTION" -eq 1 ] ; then
+    DAEMON_OPTS="${DAEMON_OPTS} -d"
+fi
+
+## Enable take snapshot on motion
+if [ "$MOTION_TAKE_SNAPSHOT" -eq 1 ] ; then
+    DAEMON_OPTS="${DAEMON_OPTS} -s"
+fi
+
+## Enable record on motion
+if [ "$MOTION_RECORD" -eq 1 ] ; then
+    DAEMON_OPTS="${DAEMON_OPTS} -r"
+fi
+
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 
