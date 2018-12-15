@@ -9,7 +9,7 @@ class LogTailer
         "webapp"   => '/tmp/sd/log/webapp.log',
         "bootlog"  => '/tmp/sd/log/ft_boot.log',
         "lighttpd" => '/tmp/sd/log/lighttpd.log',
-        "motion" => '/tmp/sd/log/motion.log',
+        "rtspd" => '/tmp/sd/log/rtspd.log',
     );
 
     static function Get($log, $seek) {
