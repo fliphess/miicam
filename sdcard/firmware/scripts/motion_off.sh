@@ -14,12 +14,6 @@ else
     exit 1
 fi
 
-## Turn IR Led off
-if [ "$MOTION_LIGHT_ALERT" -eq 1 ]
-then
-    ir_led off
-fi
-
 ## Message MQTT
 if [ "$ENABLE_MQTT" -eq 1 ]
 then
