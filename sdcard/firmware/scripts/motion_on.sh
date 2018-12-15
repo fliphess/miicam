@@ -26,5 +26,3 @@ then
     mqtt_send "${MOTION_TOPIC}" "$MOTION_MQTT_ON"
 fi
 
-echo "$( date ) - Motion: $MOTION_MQTT_ON" | tee -a "$LOGDIR/motion.log"
-
