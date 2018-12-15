@@ -601,9 +601,11 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 	@mkdir -p $(BUILDDIR)
 	@cd $(RTSPDDIR)                                  && \
 	$(TARGET)-gcc                                       \
+		-DLOG_USE_COLOR                                 \
 		-Wall                                           \
 		-I$(GMLIBDIR)/inc                               \
 		$(RTSPDDIR)/$(@F).c                             \
+		$(RTSPDDIR)/log/log.c                           \
 		$(RTSPDDIR)/librtsp.a                           \
 		-L$(GMLIBDIR)/lib                               \
 		-lpthread -lm -lrt -lgm -o $(RTSPDDIR)/rtspd
