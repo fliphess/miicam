@@ -327,6 +327,7 @@ $(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE) $(BUILDD
 		./configure                              \
 			--host=$(TARGET)                     \
 			--prefix="$(PREFIXDIR)"              \
+			--without-crypto                     \
 			ac_cv_linux_vers=3                && \
 		make -j$(PROCS)                       && \
 		make -j$(PROCS) install
