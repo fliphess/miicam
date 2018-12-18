@@ -29,6 +29,14 @@ NCURSESVERSION = 6.1
 NCURSESARCHIVE = ncurses-$(NCURSESVERSION).tar.gz
 NCURSESURI = https://ftp.gnu.org/pub/gnu/ncurses/$(NCURSESARCHIVE)
 
+READLINEVERSION = 7.0
+READLINEARCHIVE = readline-$(READLINEVERSION).tar.gz
+READLINEURI = https://ftp.gnu.org/gnu/readline/$(READLINEARCHIVE)
+
+OPENSSLVERSION = 1.0.2q
+OPENSSLARCHIVE = openssl-$(OPENSSLVERSION).tar.gz
+OPENSSLURI = https://www.openssl.org/source/$(OPENSSLARCHIVE)
+
 LIBPCAPVERSION = 1.9.0
 LIBPCAPARCHIVE = libpcap-$(LIBPCAPVERSION).tar.gz
 LIBPCAPURI = http://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
@@ -36,6 +44,10 @@ LIBPCAPURI = http://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
 TCPDUMPVERSION = 4.9.2
 TCPDUMPARCHIVE = tcpdump-$(TCPDUMPVERSION).tar.gz
 TCPDUMPURI = http://www.tcpdump.org/release/$(TCPDUMPARCHIVE)
+
+SOCATVERSION = 1.7.3.2
+SOCATARCHIVE = socat-$(SOCATVERSION).tar.gz
+SOCATURI = http://www.dest-unreach.org/socat/download/$(SOCATARCHIVE)
 
 DROPBEARVERSION = 2018.76
 DROPBEARARCHIVE = dropbear-$(DROPBEARVERSION).tar.bz2
@@ -113,11 +125,20 @@ $(SOURCEDIR)/$(OPENJPEGARCHIVE):
 $(SOURCEDIR)/$(NCURSESARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(NCURSESURI)  || rm -f $@
 
+$(SOURCEDIR)/$(READLINEARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(READLINEURI)  || rm -f $@
+
 $(SOURCEDIR)/$(LIBPCAPARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBPCAPURI)  || rm -f $@
 
 $(SOURCEDIR)/$(TCPDUMPARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(TCPDUMPURI)  || rm -f $@
+
+$(SOURCEDIR)/$(OPENSSLARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(OPENSSLURI)  || rm -f $@
+
+$(SOURCEDIR)/$(SOCATARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(SOCATURI)  || rm -f $@
 
 $(SOURCEDIR)/$(DROPBEARARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(DROPBEARURI)  || rm -f $@

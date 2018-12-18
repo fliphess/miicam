@@ -2,7 +2,7 @@
 TOOLCHAINDIR = /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin
 PATH  := $(TOOLCHAINDIR):$(PATH)
 TARGET = arm-unknown-linux-uclibcgnueabi
-PROCS = 5
+PROCS = 7
 
 BUILDENV :=                 \
 	AR=$(TARGET)-ar         \
@@ -14,27 +14,30 @@ BUILDENV :=                 \
 	RANLIB=$(TARGET)-ranlib \
 	STRIP=$(TARGET)-strip
 
-TOPDIR      := $(CURDIR)
-SOURCEDIR   := $(TOPDIR)/src
-PREFIXDIR   := $(TOPDIR)/prefix
-BUILDDIR    := $(TOPDIR)/build
+TOPDIR       := $(CURDIR)
+SOURCEDIR    := $(TOPDIR)/src
+PREFIXDIR    := $(TOPDIR)/prefix
+BUILDDIR     := $(TOPDIR)/build
 
-GMLIBDIR    := $(TOPDIR)/tools/gm_lib
-GMSAMPLES   := $(TOPDIR)/tools/samples
+GMLIBDIR     := $(TOPDIR)/tools/gm_lib
+GMSAMPLES    := $(TOPDIR)/tools/samples
 
-RTSPDDIR    := $(TOPDIR)/tools/rtspd
-UTILSDIR    := $(TOPDIR)/tools/utils
-PATCHESDIR  := $(TOPDIR)/tools/patches
+RTSPDDIR     := $(TOPDIR)/tools/rtspd
+UTILSDIR     := $(TOPDIR)/tools/utils
+PATCHESDIR   := $(TOPDIR)/tools/patches
 
-INSTALLDIR  := $(TOPDIR)/sdcard/firmware/bin
-WEBROOT     := $(TOPDIR)/sdcard/firmware/www
-COMPOSER    := /usr/local/bin/composer
+BINARIESDIR  := $(TOPDIR)/sdcard/firmware/bin
+LIBRARIESDIR := $(TOPDIR)/sdcard/firmware/lib
+WEBROOT      := $(TOPDIR)/sdcard/firmware/www
+COMPOSER     := /usr/local/bin/composer
 
 BINS =                                     \
 	smbpasswd smbstatus smbtree smbclient  \
 	scp dbclient dropbearkey               \
 	arm-php arm-php-cgi                    \
 	ffmpeg ffprobe                         \
+	openssl                                \
+	procan  socat filan                    \
 	lsof                                   \
 	nano                                   \
 	runas                                  \
@@ -42,12 +45,13 @@ BINS =                                     \
 	rtspd                                  \
 	strace
 
-SBINS =      \
-	dropbear \
-	lighttpd \
-	tcpdump  \
-	nmbd     \
+SBINS =             \
+	dropbear        \
+	lighttpd        \
+	tcpdump         \
+	nmbd            \
 	smbd
+
 
 include SOURCES.mk
 
@@ -99,8 +103,11 @@ all:                                 \
 	$(BUILDDIR)/pcre                 \
 	$(BUILDDIR)/x264                 \
 	$(BUILDDIR)/ncurses              \
+	$(BUILDDIR)/readline             \
 	$(BUILDDIR)/libpcap              \
 	$(BUILDDIR)/tcpdump              \
+	$(BUILDDIR)/openssl              \
+	$(BUILDDIR)/socat                \
 	$(BUILDDIR)/dropbear             \
 	$(BUILDDIR)/lighttpd             \
 	$(BUILDDIR)/nano                 \
@@ -271,6 +278,23 @@ $(BUILDDIR)/ncurses: $(SOURCEDIR)/$(NCURSESARCHIVE)
 	@touch $@
 
 
+$(BUILDDIR)/readline: $(SOURCEDIR)/$(READLINEARCHIVE)
+	@mkdir -p $(BUILDDIR) && rm -rf $@-$(READLINEVERSION)
+	@tar -xzf $(SOURCEDIR)/$(READLINEARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(READLINEVERSION)               && \
+	$(BUILDENV)                                \
+	CC='$(TOOLCHAINDIR)/$(TARGET)-gcc -static' \
+	CFLAGS='-fPIC'                             \
+		./configure                            \
+			--host=$(TARGET)                   \
+			--prefix=$(PREFIXDIR)              \
+			--disable-shared                   \
+			--enable-static                 && \
+		make -j$(PROCS)                     && \
+		make -j$(PROCS) install-static install-headers
+	@rm -rf $@-$(READLINEVERSION)
+	@touch $@
+
 $(BUILDDIR)/libpcap: $(SOURCEDIR)/$(LIBPCAPARCHIVE)
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPCAPVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIBPCAPARCHIVE) -C $(BUILDDIR)
@@ -289,7 +313,7 @@ $(BUILDDIR)/libpcap: $(SOURCEDIR)/$(LIBPCAPARCHIVE)
 	@touch $@
 
 
-$(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE)
+$(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE) $(BUILDDIR)/openssl
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(TCPDUMPVERSION)
 	@tar -xzf $(SOURCEDIR)/$(TCPDUMPARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(TCPDUMPVERSION)                  && \
@@ -301,7 +325,6 @@ $(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE)
 		CC="$(TOOLCHAINDIR)/$(TARGET)-gcc"       \
 		LIBS='-lpcap'                            \
 		./configure                              \
-			--without-crypto                     \
 			--host=$(TARGET)                     \
 			--prefix="$(PREFIXDIR)"              \
 			ac_cv_linux_vers=3                && \
@@ -311,11 +334,47 @@ $(BUILDDIR)/tcpdump: $(BUILDDIR)/libpcap $(SOURCEDIR)/$(TCPDUMPARCHIVE)
 	@touch $@
 
 
+$(BUILDDIR)/openssl: $(SOURCEDIR)/$(OPENSSLARCHIVE) $(BUILDDIR)/zlib
+	@mkdir -p $(BUILDDIR) && rm -rf $@-$(OPENSSLVERSION)
+	@tar -xzf $(SOURCEDIR)/$(OPENSSLARCHIVE) -C $(BUILDDIR)
+	cd $@-$(OPENSSLVERSION)                   && \
+	$(BUILDENV)                                  \
+	CC='$(TOOLCHAINDIR)/$(TARGET)-gcc -static'   \
+	LDFLAGS="-L$(PREFIXDIR)/lib"                 \
+	CPPFLAGS="-I$(PREFIXDIR)/include"            \
+		./Configure no-shared no-async linux-armv4 -DL_ENDIAN \
+			--prefix=$(PREFIXDIR)                \
+			--openssldir=$(PREFIXDIR)         && \
+		make -j$(PROCS) depend                && \
+		make -j$(PROCS)                       && \
+		make -j$(PROCS) install
+	@rm -rf $@-$(OPENSSLVERSION)
+	@touch $@
+
+
+$(BUILDDIR)/socat: $(SOURCEDIR)/$(SOCATARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/readline $(BUILDDIR)/openssl
+	@mkdir -p $(BUILDDIR) && rm -rf $@-$(SOCATVERSION)
+	@tar -xzf $(SOURCEDIR)/$(SOCATARCHIVE) -C $(BUILDDIR)
+	cd $@-$(SOCATVERSION)                   && \
+	$(BUILDENV)                                \
+	CC="$(TOOLCHAINDIR)/$(TARGET)-gcc -static" \
+	CFLAGS="-fPIC"                             \
+	CPPFLAGS="-I$(PREFIXDIR)/include -DNETDB_INTERNAL=-1" \
+	LDFLAGS="-L$(PREFIXDIR)/lib"               \
+		./configure                            \
+			--host=$(TARGET)                   \
+			--prefix=$(PREFIXDIR)           && \
+		make -j$(PROCS)                     && \
+		make -j$(PROCS) install
+	@rm -rf $@-$(SOCATVERSION)
+	@touch $@
+
+
 $(BUILDDIR)/dropbear: $(SOURCEDIR)/$(DROPBEARARCHIVE) $(BUILDDIR)/zlib
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(DROPBEARVERSION)
 	@tar -xjf $(SOURCEDIR)/$(DROPBEARARCHIVE) -C $(BUILDDIR)
 	@sed -i 's|\(#define DROPBEAR_PATH_SSH_PROGRAM\).*|\1 "/tmp/sd/ft/dbclient"|' $@-$(DROPBEARVERSION)/options.h
-	@sed -i 's|\(#define DEFAULT_PATH\).*|\1 "/bin:/sbin:/usr/bin:/usr/sbin:/tmp/sd/ft:/mnt/data/ft"|' $@-$(DROPBEARVERSION)/options.h
+	@sed -i 's|\(#define DEFAULT_PATH\).*|\1 "/bin:/sbin:/usr/bin:/usr/sbin:/tmp/sd/firmware/bin:/tmp/sd/ft:/mnt/data/ft"|' $@-$(DROPBEARVERSION)/options.h
 	@cd $@-$(DROPBEARVERSION)         && \
 		$(BUILDENV)                      \
 		./configure                      \
@@ -346,12 +405,10 @@ $(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDI
 		expire                          \
 		extforward                      \
 		fastcgi                         \
-		flv_streaming                   \
 		indexfile                       \
 		proxy                           \
 		redirect                        \
 		rewrite                         \
-		rrdtool                         \
 		scgi                            \
 		secdownload                     \
 		setenv                          \
@@ -360,10 +417,7 @@ $(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDI
 		staticfile                      \
 		status                          \
 		uploadprogress                  \
-		userdir                         \
-		usertrack                       \
-		vhostdb                         \
-		webdav;                         \
+		usertrack;                      \
 	do                                  \
 		echo "PLUGIN_INIT(mod_$$i)" >> $@-$(LIGHTTPDVERSION)/src/plugin-static.h; \
 	done                             && \
@@ -378,6 +432,8 @@ $(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDI
 			--enable-static             \
 			--with-zlib=$(PREFIXDIR)    \
 			--with-pcre=$(PREFIXDIR)    \
+			--with-openssl=$(PREFIXDIR) \
+			--with-openssl-libs=$(PREFIXDIR)/lib \
 			--without-mysql             \
 			--without-bzip2          && \
 		make -j$(PROCS)              && \
@@ -403,6 +459,18 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 			--with-jpeg-dir=$(PREFIXDIR)   \
 			--with-png-dir=$(PREFIXDIR)    \
 			--with-zlib-dir=$(PREFIXDIR)   \
+			--with-mhash                \
+			--with-pdo-mysql            \
+			--with-sqlite3              \
+			--with-pdo-sqlite           \
+			--with-xmlrpc               \
+			--with-zlib                 \
+			--with-pcre-regex           \
+			--with-pcre-jit             \
+			--with-gd                   \
+			--with-xpm-dir=no           \
+			--without-pear              \
+			--without-xsl               \
 			--enable-pdo                \
 			--enable-simplexml          \
 			--enable-json               \
@@ -424,18 +492,6 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 			--enable-zip                \
 			--disable-mbregex           \
 			--disable-opcache           \
-			--with-mhash                \
-			--with-pdo-mysql            \
-			--with-sqlite3              \
-			--with-pdo-sqlite           \
-			--with-xmlrpc               \
-			--with-zlib                 \
-			--with-pcre-regex           \
-			--with-pcre-jit             \
-			--with-gd                   \
-			--with-xpm-dir=no           \
-			--without-pear              \
-			--without-xsl               \
 			--disable-all            && \
 		make -j$(PROCS)              && \
 		make -j$(PROCS) install-binaries
@@ -629,13 +685,17 @@ sdcard/manufacture.bin:
 
 
 install: all
-	@mkdir -p $(INSTALLDIR)                                                                     && \
-	echo "*** Moving binaries to $(INSTALLDIR)"                                                 && \
-	cd $(PREFIXDIR)/bin  && cp $(BINS) $(INSTALLDIR)                                            && \
-	cd $(PREFIXDIR)/sbin && cp $(SBINS) $(INSTALLDIR)                                           && \
-	cd $(TOPDIR)/tools  && find . -maxdepth 1 -type f -exec cp {} $(INSTALLDIR) \;              && \
+	@mkdir -p $(BINARIESDIR)                                                                    && \
+	echo "*** Moving binaries to $(BINARIESDIR)"                                                && \
+	cd $(PREFIXDIR)/bin  && cp $(BINS)  $(BINARIESDIR)                                          && \
+	cd $(PREFIXDIR)/sbin && cp $(SBINS) $(BINARIESDIR)                                          && \
+	cd $(TOPDIR)/tools   && find . -maxdepth 1 -type f -exec cp {} $(BINARIESDIR) \;            && \
+	echo "*** Moving libraries to $(LIBRARIESDIR)"                                              && \
+	cd $(PREFIXDIR)/lib  && cp *.a $(LIBRARIESDIR)                                              && \
 	echo "*** Stripping binaries"                                                               && \
-	$(TARGET)-strip $(INSTALLDIR)/*
+	$(TARGET)-strip $(BINARIESDIR)/*                                                            && \
+	echo "*** Stripping libraries"                                                              && \
+	find $(LIBRARIESDIR) -type f -not -name 'cacert.pem' -exec $(TARGET)-strip {} \;
 
 
 website: all install
@@ -657,11 +717,11 @@ images: all install website
 uninstall:
 	cd $(TOPDIR)/                                                                               && \
 	rm -f chuangmi-720p-hack.tgz chuangmi-720p-hack.zip                                         && \
-	rm -rf $(INSTALLDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                  && \
+	rm -rf $(BINARIESDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                 && \
 	cd $(TOPDIR)/ && find tools -maxdepth 1 -type f -not -name 'README' | xargs rm -f
 
 
 clean:
-	rm -rf $(INSTALLDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                  && \
+	rm -rf $(BINARIESDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                 && \
 	cd $(TOPDIR)/ && find tools -maxdepth 1 -type f -not -name 'README' | xargs rm -f
 
