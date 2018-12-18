@@ -65,10 +65,6 @@ SAMBAVERSION = 3.6.25
 SAMBAARCHIVE = samba-$(SAMBAVERSION).tar.gz
 SAMBAURI = https://download.samba.org/pub/samba/$(SAMBAARCHIVE)
 
-MIJIACTRLVERSION = master
-MIJIACTRLARCHIVE = mijia-720p-ctrl-$(MIJIACTRLVERSION).zip
-MIJIACTRLURI = https://github.com/cck56/mijia-720p-ctrl/archive/$(MIJIACTRLVERSION).zip
-
 NANOVERSION = 2.9.8
 NANOARCHIVE = nano-$(NANOVERSION).tar.gz
 NANOURI = https://www.nano-editor.org/dist/v2.9/$(NANOARCHIVE)
@@ -151,9 +147,6 @@ $(SOURCEDIR)/$(PHPARCHIVE):
 
 $(SOURCEDIR)/$(SAMBAARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(SAMBAURI)     || rm -f $@
-
-$(SOURCEDIR)/$(MIJIACTRLARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(MIJIACTRLURI) || rm -f $@
 
 $(SOURCEDIR)/$(RSYNCARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RSYNCURI)     || rm -f $@
