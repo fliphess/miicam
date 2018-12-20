@@ -25,7 +25,6 @@ class Configuration
         "ENABLE_MQTT",
         "ENABLE_RESTARTD",
         "ENABLE_RTSP",
-        "ENABLE_SAMBA",
         "ENABLE_SSHD",
         "ENABLE_TELNETD",
         "HOSTNAME",

@@ -62,7 +62,6 @@ Chuangmi 720P hack configuration:
   ENABLE_SSHD    = ${ENABLE_SSHD}
   ENABLE_HTTPD   = ${ENABLE_HTTPD}
   ENABLE_FTPD    = ${ENABLE_FTPD}
-  ENABLE_SAMBA   = ${ENABLE_SAMBA}
   ENABLE_LOGGING = ${ENABLE_LOGGING}
   ENABLE_RTSP    = ${ENABLE_RTSP}
 
@@ -182,19 +181,8 @@ if [ -n "${ROOT_PASSWORD}" ]
 then
     echo "*** Setting root password... "
     echo "root:${ROOT_PASSWORD}" | chpasswd
-
-    if [ -f "${SD_MOUNTDIR}/firmware/bin/smbpasswd" ]
-    then
-        if ! [ -d "${SD_MOUNTDIR}/firmware/tmp/samba" ]
-        then
-            mkdir -p "${SD_MOUNTDIR}/firmware/tmp/samba"
-        fi
-
-        printf "*** Setting Samba root password... "
-        (echo "${ROOT_PASS}"; echo "${ROOT_PASS}") | "${SD_MOUNTDIR}/firmware/bin/smbpasswd" -a -s 2>&1
-    fi
 else
-    echo "WARN: root password must be set for SSH and SAMBA"
+    echo "WARN: root password must be set for SSH and or Telnet"
 fi
 
 

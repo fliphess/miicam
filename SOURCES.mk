@@ -61,10 +61,6 @@ PHPVERSION = 7.2.12
 PHPARCHIVE = php-$(PHPVERSION).tar.bz2
 PHPURI = http://php.net/get/$(PHPARCHIVE)/from/this/mirror
 
-SAMBAVERSION = 3.6.25
-SAMBAARCHIVE = samba-$(SAMBAVERSION).tar.gz
-SAMBAURI = https://download.samba.org/pub/samba/$(SAMBAARCHIVE)
-
 NANOVERSION = 2.9.8
 NANOARCHIVE = nano-$(NANOVERSION).tar.gz
 NANOURI = https://www.nano-editor.org/dist/v2.9/$(NANOARCHIVE)
@@ -144,9 +140,6 @@ $(SOURCEDIR)/$(LIGHTTPDARCHIVE):
 
 $(SOURCEDIR)/$(PHPARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(PHPURI)       || rm -f $@
-
-$(SOURCEDIR)/$(SAMBAARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(SAMBAURI)     || rm -f $@
 
 $(SOURCEDIR)/$(RSYNCARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RSYNCURI)     || rm -f $@
