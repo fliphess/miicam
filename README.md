@@ -37,7 +37,6 @@ This hack includes:
 * RTSP server - _Enabled by default._
 * SSH server - _Enabled by default._
 * FTP server - _Disabled by default._
-* Samba Server - _Disabled by default._
 * Syslog to SD card - _Enabled by default and not to be disabled currently._
 * Configure Timezone and use ntpclient to set date and time over Internet
 * Confgurable cronjobs
@@ -147,3 +146,5 @@ Please file issues and PR's if you notice something that could've been handled i
 
 Have a look at the [wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki) to find some additional documentation.
 If you struggle setting up your camera using this hack, please file an issue so we can create some additional docs.
+
+
