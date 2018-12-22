@@ -1,6 +1,4 @@
 
-DOWNLOADCMD := wget -t 5 -T 10 -c -O
-
 ZLIBVERSION = 1.2.11
 ZLIBARCHIVE = zlib-$(ZLIBVERSION).tar.gz
 ZLIBURI = https://www.zlib.net/$(ZLIBARCHIVE)
@@ -88,74 +86,4 @@ STRACEURI = https://downloads.sourceforge.net/project/strace/strace/$(STRACEVERS
 LSOFVERSION = master
 LSOFARCHIVE = $(LSOFVERSION).tar.gz
 LSOFURI = https://github.com/Distrotech/lsof/archive/$(LSOFVERSION).tar.gz
-
-
-$(SOURCEDIR)/$(ZLIBARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(ZLIBURI)      || rm -f $@
-
-$(SOURCEDIR)/$(LIBXML2ARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBXML2URI)   || rm -f $@
-
-$(SOURCEDIR)/$(LIBJPEGARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBJPEGURI)   || rm -f $@
-
-$(SOURCEDIR)/$(LIBPNGARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBPNGURI)    || rm -f $@
-
-$(SOURCEDIR)/$(LIBGDARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBGDURI)     || rm -f $@
-
-$(SOURCEDIR)/$(PCREARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(PCREURI)      || rm -f $@
-
-$(SOURCEDIR)/$(X264ARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(X264URI)      || rm -f $@
-
-$(SOURCEDIR)/$(OPENJPEGARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(OPENJPEGURI)  || rm -f $@
-
-$(SOURCEDIR)/$(NCURSESARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(NCURSESURI)  || rm -f $@
-
-$(SOURCEDIR)/$(READLINEARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(READLINEURI)  || rm -f $@
-
-$(SOURCEDIR)/$(LIBPCAPARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBPCAPURI)  || rm -f $@
-
-$(SOURCEDIR)/$(TCPDUMPARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(TCPDUMPURI)  || rm -f $@
-
-$(SOURCEDIR)/$(OPENSSLARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(OPENSSLURI)  || rm -f $@
-
-$(SOURCEDIR)/$(SOCATARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(SOCATURI)  || rm -f $@
-
-$(SOURCEDIR)/$(DROPBEARARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(DROPBEARURI)  || rm -f $@
-
-$(SOURCEDIR)/$(LIGHTTPDARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIGHTTPDURI)  || rm -f $@
-
-$(SOURCEDIR)/$(PHPARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(PHPURI)       || rm -f $@
-
-$(SOURCEDIR)/$(RSYNCARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RSYNCURI)     || rm -f $@
-
-$(SOURCEDIR)/$(RUNASARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RUNASURI)     || rm -f $@
-
-$(SOURCEDIR)/$(NANOARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(NANOURI)     || rm -f $@
-
-$(SOURCEDIR)/$(FFMPEGARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(FFMPEGURI)    || rm -f $@
-
-$(SOURCEDIR)/$(STRACEARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(STRACEURI)    || rm -f $@
-
-$(SOURCEDIR)/$(LSOFARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LSOFURI)      || rm -f $@
 
