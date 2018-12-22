@@ -1,6 +1,6 @@
 
 # Set LDD Library PATH
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/tmp/sd/firware/lib";
+export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 
 # Set the path
 PATH="/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:$PATH"
