@@ -413,7 +413,6 @@ $(BUILDDIR)/openssl: $(SOURCEDIR)/$(OPENSSLARCHIVE) $(BUILDDIR)/zlib
 	$(BUILDENV)                                      \
 		./Configure no-async linux-armv4 -DL_ENDIAN  \
 			--prefix=$(PREFIXDIR)                    \
-			--cross-compile-prefix=$(TARGET)-        \
 			--openssldir=/tmp/sd/firmware/etc/ssl && \
 		make -j$(PROCS) depend                    && \
 		make -j$(PROCS)                           && \
