@@ -1,8 +1,6 @@
 
 alias php='/tmp/sd/firmware/bin/arm-php'
 alias ssh='/tmp/sd/firmware/bin/dbclient'
-alias vim=vi
-alias view=less
 alias curl='curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem'
 alias w='who'
 alias crontab='crontab -c /var/run/cron'

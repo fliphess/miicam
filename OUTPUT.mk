@@ -6,18 +6,29 @@ BINS =                                     \
 	ffmpeg ffprobe                         \
 	openssl                                \
 	procan socat filan                     \
+	pcregrep pcretest                      \
 	lsof                                   \
 	nano                                   \
 	runas                                  \
 	rsync                                  \
 	rtspd                                  \
-	strace
+	strace                                 \
+	vim xxd
+
+## Extra tools and symlinks that should not be stripped
+BINEXTRAS =                                \
+	rview                                  \
+	vimdiff                                \
+	ex                                     \
+	rvim                                   \
+	view
 
 
 ## The compiled binaries in prefix/sbin that should be stripped and copied to firmware/bin
 SBINS =                                    \
 	dropbear                               \
 	lighttpd                               \
+	lighttpd-angel                         \
 	tcpdump
 
 
@@ -91,7 +102,7 @@ LIBS =                                     \
 
 
 ## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
-LIBUTILS =                                 \
+LIBEXTRAS =                                \
 	libavcodec.so                          \
 	libavcodec.so.58                       \
 	libavdevice.so                         \
@@ -134,3 +145,4 @@ LIBUTILS =                                 \
 	libxml2.so.2                           \
 	libz.so                                \
 	libz.so.1
+

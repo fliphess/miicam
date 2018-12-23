@@ -63,6 +63,10 @@ NANOVERSION = 2.9.8
 NANOARCHIVE = nano-$(NANOVERSION).tar.gz
 NANOURI = https://www.nano-editor.org/dist/v2.9/$(NANOARCHIVE)
 
+VIMVERSION = 8.1.0629
+VIMARCHIVE = vim-$(VIMVERSION)
+VIMURI = https://github.com/vim/vim/archive/v$(VIMVERSION).tar.gz
+
 RUNASVERSION = master
 RUNASARCHIVE = runas.zip
 RUNASURI = https://github.com/remram44/static-sudo/archive/$(RUNASVERSION).zip

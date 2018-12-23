@@ -17,7 +17,7 @@ BUILDENV :=                 \
 	STRIP=$(TARGET)-strip   \
 	CFLAGS="-fPIC"          \
 	CPPFLAGS="-I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib" \
-	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath=/tmp/sd/firmware/lib"
+	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath=/tmp/sd/firmware/lib,--enable-new-dtags"
 
 
 TOPDIR       := $(CURDIR)
@@ -97,6 +97,7 @@ all:                                 \
 	$(BUILDDIR)/socat                \
 	$(BUILDDIR)/dropbear             \
 	$(BUILDDIR)/lighttpd             \
+	$(BUILDDIR)/vim                  \
 	$(BUILDDIR)/nano                 \
 	$(BUILDDIR)/php                  \
 	$(BUILDDIR)/runas                \
@@ -585,6 +586,50 @@ $(BUILDDIR)/runas: $(PREFIXDIR)/bin $(SOURCEDIR)/$(RUNASARCHIVE)
 
 
 #################################################################
+## VIM                                                         ##
+#################################################################
+
+$(SOURCEDIR)/$(VIMARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(VIMURI) || rm -f $@
+
+
+$(BUILDDIR)/vim: $(SOURCEDIR)/$(VIMARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/readline $(BUILDDIR)/zlib
+	@mkdir -p $(BUILDDIR) && rm -rf $@-$(VIMVERSION)
+	@tar -xzf $(SOURCEDIR)/$(VIMARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(VIMVERSION)                                  && \
+	export vim_cv_tgetent=zero                            && \
+	export vim_cv_toupper_broken="set"                    && \
+	export vim_cv_terminfo="yes"                          && \
+	export vim_cv_getcwd_broken="yes"                     && \
+	export vim_cv_tty_group=0                             && \
+	export vim_cv_tty_mode="0750"                         && \
+	export vim_cv_stat_ignores_slash="yes"                && \
+	export vim_cv_memmove_handles_overlap="yes"           && \
+	$(BUILDENV)                                              \
+	CC="$(TARGET)-gcc"                                       \
+		./configure                                          \
+			--host=$(TARGET)                                 \
+			--prefix=$(PREFIXDIR)                            \
+			--enable-multibyte                               \
+			--enable-gui=no                                  \
+			--disable-gpm                                    \
+			--disable-gtktest                                \
+			--disable-xim                                    \
+			--disable-pythoninterp                           \
+			--disable-python3interp                          \
+			--disable-rubyinterp                             \
+			--disable-luainterp                              \
+			--disable-netbeans                               \
+			--with-features=normal                           \
+			--with-tlib=ncurses                              \
+			--without-x                                   && \
+		make CC=$(TARGET)-gcc -j$(PROCS)                  && \
+		make CC=$(TARGET)-gcc -j$(PROCS) install
+	@rm -rf $@-$(VIMVERSION)
+	@touch $@
+
+
+#################################################################
 ## NANO                                                        ##
 #################################################################
 
@@ -774,9 +819,10 @@ install: all
 	@mkdir -p $(BINARIESDIR)                                                                    && \
 	echo "*** Moving binaries to $(BINARIESDIR)"                                                && \
 	cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(BINS)  && cp $(BINS)  $(BINARIESDIR)              && \
+	cd $(PREFIXDIR)/bin  && cp $(BINEXTRAS) $(BINARIESDIR)                                      && \
 	cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(SBINS) && cp $(SBINS) $(BINARIESDIR)              && \
 	cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(LIBS)  && cp $(LIBS)  $(LIBRARIESDIR)             && \
-	cd $(PREFIXDIR)/lib  && cp $(LIBUTILS) $(LIBRARIESDIR)                                      && \
+	cd $(PREFIXDIR)/lib  && cp $(LIBEXTRAS) $(LIBRARIESDIR)                                     && \
 	cd $(TOPDIR)/tools   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR) \;
 
 
