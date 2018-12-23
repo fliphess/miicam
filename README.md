@@ -37,14 +37,15 @@ This hack includes:
 * RTSP server - _Enabled by default._
 * SSH server - _Enabled by default._
 * FTP server - _Disabled by default._
-* Syslog to SD card - _Enabled by default and not to be disabled currently._
+* Syslog to SD card and remote host - _Enabled by default_
 * Configure Timezone and use ntpclient to set date and time over Internet
-* Confgurable cronjobs
+* Configurable cronjobs
 * MQTT status updates
 * MQTT Control
 * Configuration using a basic web interface
 * Reintroduction of motion detection without the need for cloud
 * User authentication on RTSP daemon
+* SSL for webserver (not enabled by default yet)
 
 
 Planned futures:
@@ -56,8 +57,7 @@ Planned futures:
 * Replace Chinese voice files with English and more important: allow playback of those voices
 * Auto update mechanism for firmware
 * MQTT updates and control
-* SSL for webserver and rtspd
-* Remote syslogging
+* SSL for rtspd
 * Audio with RTSP stream
 
 
