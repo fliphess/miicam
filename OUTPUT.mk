@@ -27,6 +27,7 @@ BINEXTRAS =                                \
 ## The compiled binaries in prefix/sbin that should be stripped and copied to firmware/bin
 SBINS =                                    \
 	dropbear                               \
+	logrotate                              \
 	lighttpd                               \
 	lighttpd-angel                         \
 	tcpdump
@@ -54,6 +55,7 @@ LIBS =                                     \
 	libpcrecpp.so.0.0.1                    \
 	libpcreposix.so.0.0.6                  \
 	libpng16.so.16.36.0                    \
+	libpopt.so.0.0.0                       \
 	libpostproc.so.55.1.100                \
 	libreadline.so.7.0                     \
 	libssl.a                               \
@@ -130,6 +132,8 @@ LIBEXTRAS =                                \
 	libpng.so                              \
 	libpng16.so                            \
 	libpng16.so.16                         \
+	libpopt.so                             \
+	libpopt.so.0                           \
 	libpostproc.so                         \
 	libpostproc.so.55                      \
 	libreadline.so                         \

@@ -88,6 +88,7 @@ all:                                 \
 	$(BUILDDIR)/libpng               \
 	$(BUILDDIR)/libgd                \
 	$(BUILDDIR)/pcre                 \
+	$(BUILDDIR)/popt                 \
 	$(BUILDDIR)/x264                 \
 	$(BUILDDIR)/ncurses              \
 	$(BUILDDIR)/readline             \
@@ -95,6 +96,7 @@ all:                                 \
 	$(BUILDDIR)/tcpdump              \
 	$(BUILDDIR)/openssl              \
 	$(BUILDDIR)/socat                \
+	$(BUILDDIR)/logrotate            \
 	$(BUILDDIR)/dropbear             \
 	$(BUILDDIR)/lighttpd             \
 	$(BUILDDIR)/vim                  \
@@ -275,6 +277,30 @@ $(BUILDDIR)/pcre: $(SOURCEDIR)/$(PCREARCHIVE) $(BUILDDIR)/zlib
 
 
 #################################################################
+## Libpopt                                                     ##
+#################################################################
+
+$(SOURCEDIR)/$(LIBPOPTARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LIBPOPTURI) || rm -f $@
+
+
+$(BUILDDIR)/popt: $(SOURCEDIR)/$(LIBPOPTARCHIVE) $(BUILDDIR)/zlib
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPOPTVERSION)
+	tar -xzf $(SOURCEDIR)/$(LIBPOPTARCHIVE) -C $(BUILDDIR)
+	cd $@-$(LIBPOPTVERSION)           && \
+	$(BUILDENV)                          \
+		./configure                      \
+			--host=$(TARGET)             \
+			--prefix=$(PREFIXDIR)        \
+			--enable-shared              \
+			--disable-static          && \
+		make -j$(PROCS)               && \
+		make -j$(PROCS) install
+	rm -rf $@-$(LIBPOPTVERSION)
+	touch $@
+
+
+#################################################################
 ## X264                                                        ##
 #################################################################
 
@@ -443,6 +469,29 @@ $(BUILDDIR)/socat: $(SOURCEDIR)/$(SOCATARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/
 		make -j$(PROCS) install
 	@rm -rf $@-$(SOCATVERSION)
 	@touch $@
+
+
+#################################################################
+## LOGROTATE                                                   ##
+#################################################################
+
+$(SOURCEDIR)/$(LOGROTATEARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(LOGROTATEURI) || rm -f $@
+
+
+$(BUILDDIR)/logrotate: $(SOURCEDIR)/$(LOGROTATEARCHIVE) $(BUILDDIR)/popt
+	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LOGROTATEVERSION)
+	@tar -xzf $(SOURCEDIR)/$(LOGROTATEARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(LOGROTATEVERSION)          && \
+	$(BUILDENV)                            \
+		./configure                        \
+			--host=$(TARGET)               \
+			--prefix="$(PREFIXDIR)"     && \
+		make -j$(PROCS)                 && \
+		make -j$(PROCS) install
+	@rm -rf $@-$(LIBPCAPVERSION)
+	@touch $@
+
 
 
 #################################################################

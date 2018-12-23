@@ -23,6 +23,10 @@ PCREVERSION = 8.42
 PCREARCHIVE = pcre-$(PCREVERSION).zip
 PCREURI = https://ftp.pcre.org/pub/pcre/$(PCREARCHIVE)
 
+LIBPOPTVERSION = 1.16
+LIBPOPTARCHIVE = popt-$(LIBPOPTVERSION).tar.gz
+LIBPOPTURI = http://rpm5.org/files/popt/popt-$(LIBPOPTVERSION).tar.gz
+
 NCURSESVERSION = 6.1
 NCURSESARCHIVE = ncurses-$(NCURSESVERSION).tar.gz
 NCURSESURI = https://ftp.gnu.org/pub/gnu/ncurses/$(NCURSESARCHIVE)
@@ -90,4 +94,8 @@ STRACEURI = https://downloads.sourceforge.net/project/strace/strace/$(STRACEVERS
 LSOFVERSION = master
 LSOFARCHIVE = $(LSOFVERSION).tar.gz
 LSOFURI = https://github.com/Distrotech/lsof/archive/$(LSOFVERSION).tar.gz
+
+LOGROTATEVERSION = 3.15.0
+LOGROTATEARCHIVE = logrotate-$(LOGROTATEVERSION).tar.gz
+LOGROTATEURI = https://github.com/logrotate/logrotate/releases/download/$(LOGROTATEVERSION)/$(LOGROTATEARCHIVE)
 
