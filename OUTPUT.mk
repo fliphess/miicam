@@ -1,4 +1,5 @@
 
+## The compiled binaries in prefix/bin that should be stripped and copied to firmware/bin
 BINS =                                     \
 	scp dbclient dropbearkey               \
 	arm-php arm-php-cgi                    \
@@ -12,11 +13,15 @@ BINS =                                     \
 	rtspd                                  \
 	strace
 
+
+## The compiled binaries in prefix/sbin that should be stripped and copied to firmware/bin
 SBINS =                                    \
 	dropbear                               \
 	lighttpd                               \
 	tcpdump
 
+
+## Compiled library files that should be stripped and copied to firmware/lib
 LIBS =                                     \
 	libavcodec.so.58.18.100                \
 	libavdevice.so.58.3.100                \
@@ -84,6 +89,8 @@ LIBS =                                     \
 	mod_webdav.so                          \
 	mod_wstunnel.so
 
+
+## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
 LIBUTILS =                                 \
 	libavcodec.so                          \
 	libavcodec.so.58                       \
