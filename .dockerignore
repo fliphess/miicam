@@ -3,7 +3,6 @@
 .dockerignore
 .travis.yml
 Dockerfile
-manage.sh
 chuangmi.jpg
 sdcard/firmware/root/.ssh
 sdcard/firmware/bin/*

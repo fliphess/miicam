@@ -53,6 +53,14 @@ function log()
 }
 
 
+## Error out
+function die()
+{
+    log "ERROR - $@" > /dev/stderr
+    exit 1
+}
+
+
 ## Run a command in the container environment
 function run()
 {
@@ -112,32 +120,43 @@ function run_web() {
     php -S localhost:8080 -t ./public
 }
 
+
 ## Generate a selfsigned certificate
 function gencert() {
-    source sdcard/config.cfg
 
-    USE_NAME="$( grep ^HOSTNAME sdcard/config.cfg  | cut -d= -f2 | sed -e 's/"//g' )"
-
-    SSLDIR="sdcard/firmware/etc/ssl"
-    [ -d "${SSLDIR}" ] || mkdir -p "$SSLDIR"
-
-    if [ ! -x "$( command -v openssl )" ]
+    if ! ( awk -F/ '$2 == "docker"' /proc/self/cgroup 2>/dev/null | read )
     then
-        echo "openssl utility not found."
-        exit 1
-    fi
+        run '/env/manage.sh --gencert'
+    else
+        USE_NAME="$( grep ^HOSTNAME sdcard/config.cfg  | cut -d= -f2 | sed -e 's/"//g' )"
+        SSLDIR="/result/sdcard/firmware/etc/ssl"
 
-   ## Create a root ca key
-   echo "Creating a root ca key"
-   openssl genrsa -out "$SSLDIR/rootCA.key" 2048 || exit 1
+        [ -d "${SSLDIR}" ] || mkdir -p "$SSLDIR"
 
-   ## Create a root ca cert
-   echo "Creating a root ca cert"
-   openssl req -x509 -new -nodes -key "$SSLDIR/rootCA.key" -sha256 -days 1024  -out "$SSLDIR/rootCA.pem" || exit 1
+        if [ ! -x "$( command -v openssl )" ]
+        then
+            die "openssl utility not found."
+        fi
 
-   ## Create a config file
-   echo "Creating certificate config file"
-   cat > "$SSLDIR/v3.ext" <<EOF
+        ## Create a root ca key
+        if [ ! -f "$SSLDIR/rootCA.key" ]
+        then
+           echo "Creating a root ca key"
+           openssl genrsa -out "$SSLDIR/rootCA.key" 2048
+        fi
+
+        ## Create a root ca cert
+        if [ ! -f "$SSLDIR/rootCA.pem" ]
+        then
+            echo "Creating a root ca cert"
+            openssl req -x509 -new -nodes -key "$SSLDIR/rootCA.key" -sha256 -days 1024  -out "$SSLDIR/rootCA.pem" || die "Failed to create a root CA Cert"
+        fi
+
+        ## Create a config file
+        if [ ! -f "$SSLDIR/v3.ext" ]
+        then
+            echo "Creating certificate config file"
+            cat > "$SSLDIR/v3.ext" <<EOF
 authorityKeyIdentifier=keyid,issuer
 basicConstraints=CA:FALSE
 keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
@@ -148,16 +167,24 @@ DNS.2 = $USE_NAME.local
 DNS.3 = $USE_NAME.home
 ## Add your own aliases here
 EOF
-    echo "Editting config file"
-    vim "$SSLDIR/v3.ext"
+            echo "Editting config file"
+            vim "$SSLDIR/v3.ext"
+        fi
 
-    ## Create a CSR and a key at once
-    openssl req -new -nodes -out "$SSLDIR/server.csr" -newkey rsa:2048 -keyout "$SSLDIR/server.key"
+        if [ ! -f "$SSLDIR/server.csr" ]
+        then
+            ## Create a CSR and a key at once
+            openssl req -new -nodes -out "$SSLDIR/server.csr" -newkey rsa:2048 -keyout "$SSLDIR/server.key"
+        fi
 
-    ## Create a certificate
-    openssl x509 -req -in "$SSLDIR/server.csr" -CA "$SSLDIR/rootCA.pem" -CAkey "$SSLDIR/rootCA.key" -CAcreateserial -out "$SSLDIR/server.crt" -days 500 -sha256 -extfile "$SSLDIR/v3.ext"
+        if [ ! -f "$SSLDIR/server.crt" ]
+        then
+            ## Create a certificate
+            openssl x509 -req -in "$SSLDIR/server.csr" -CA "$SSLDIR/rootCA.pem" -CAkey "$SSLDIR/rootCA.key" -CAcreateserial -out "$SSLDIR/server.crt" -days 500 -sha256 -extfile "$SSLDIR/v3.ext"
+        fi
 
-    echo "The certificates are created in $SSLDIR. You can load rootCA.pem in your browser to trust the connection"
+        echo "The certificates are created in $SSLDIR. You can load rootCA.pem in your browser to trust the connection"
+    fi
 }
 
 
