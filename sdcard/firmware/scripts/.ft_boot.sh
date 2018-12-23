@@ -15,7 +15,6 @@ fi
 ## Config                                                                       ##
 ##################################################################################
 
-export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 export SD_MOUNTDIR="/tmp/sd"
 
 if [ -f "${SD_MOUNTDIR}/config.cfg" ]
@@ -100,7 +99,7 @@ then
 fi
 
 ##################################################################################
-## Make /root writablle                                                         ##
+## Make /root writable                                                          ##
 ##################################################################################
 
 echo "*** Mounting /root from sd card"
@@ -115,6 +114,17 @@ fi
 if ! mountpoint -q /root
 then
     mount --rbind /tmp/root /root
+fi
+
+##################################################################################
+## Mount GMLIB configuration                                                    ##
+##################################################################################
+
+echo "** Setting up our own gmlib config"
+
+if [ -f /tmp/sd/firmware/etc/gmlib.cfg ]
+then
+    mount --rbind /tmp/sd/firmware/etc/gmlib.cfg /gm/config/gmlib.cfg
 fi
 
 ##################################################################################
