@@ -40,6 +40,12 @@ if [ "$MOTION_RECORD" -eq 1 ] ; then
     DAEMON_OPTS="${DAEMON_OPTS} -r"
 fi
 
+## export RTSP settings for subshells
+if [ "x${RTSP_USER}" != "x" ] && [ "x${RTSP_PASS}" != "x" ]
+then
+    export RTSP_USER="${RTSP_USER}"
+    export RTSP_PASS="${RTSP_PASS}"
+fi
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 
