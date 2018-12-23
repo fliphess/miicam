@@ -183,6 +183,18 @@ EOF
             openssl x509 -req -in "$SSLDIR/server.csr" -CA "$SSLDIR/rootCA.pem" -CAkey "$SSLDIR/rootCA.key" -CAcreateserial -out "$SSLDIR/server.crt" -days 500 -sha256 -extfile "$SSLDIR/v3.ext"
         fi
 
+        if [ ! -f "$SSLDIR/server.pem" ]
+        then
+            ## Combine files into a single PEM file
+            cat "$SSLDIR/server.key" "$SSLDIR/server.crt" > "$SSLDIR/server.pem"
+        fi
+
+        if [ ! -f "$SSLDIR/dh2048.pem" ]
+        then
+            echo "Generating DH Params file"
+            openssl dhparam -out "$SSLDIR/dh2048.pem" -outform PEM -2 2048
+        fi
+
         echo "The certificates are created in $SSLDIR. You can load rootCA.pem in your browser to trust the connection"
     fi
 }
