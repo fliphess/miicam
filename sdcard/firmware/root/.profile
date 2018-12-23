@@ -1,9 +1,12 @@
 
+# Set the LD library path
+export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
+
 # Set the path
-PATH="/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:$PATH"
+export PATH="/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:$PATH"
 
 # Set the correct terminal
-TERM=xterm-color
+export TERM=xterm-color
 
 # overlay new busybox commands over system ones
 . ~/.busybox_aliases

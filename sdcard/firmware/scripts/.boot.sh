@@ -15,7 +15,8 @@ else
     exit 1
 fi
 
-LOGFILE="${LOGDIR}/ft_boot.log"
+export LOGFILE="${LOGDIR}/ft_boot.log"
+export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 
 (
 
