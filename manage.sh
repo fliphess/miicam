@@ -30,6 +30,8 @@ function usage()
 
       --run-web      - Run the php inbuild web server in www/public
 
+      --gencert      - Create a self-signed certificate for use with lighttpd
+
     Download toolchain: https://fliphess.com/toolchain/
     Repo: https://github.com/fliphess/chuangmi-720p-hack
 
@@ -110,6 +112,54 @@ function run_web() {
     php -S localhost:8080 -t ./public
 }
 
+## Generate a selfsigned certificate
+function gencert() {
+    source sdcard/config.cfg
+
+    USE_NAME="$( grep ^HOSTNAME sdcard/config.cfg  | cut -d= -f2 | sed -e 's/"//g' )"
+
+    SSLDIR="sdcard/firmware/etc/ssl"
+    [ -d "${SSLDIR}" ] || mkdir -p "$SSLDIR"
+
+    if [ ! -x "$( command -v openssl )" ]
+    then
+        echo "openssl utility not found."
+        exit 1
+    fi
+
+   ## Create a root ca key
+   echo "Creating a root ca key"
+   openssl genrsa -out "$SSLDIR/rootCA.key" 2048 || exit 1
+
+   ## Create a root ca cert
+   echo "Creating a root ca cert"
+   openssl req -x509 -new -nodes -key "$SSLDIR/rootCA.key" -sha256 -days 1024  -out "$SSLDIR/rootCA.pem" || exit 1
+
+   ## Create a config file
+   echo "Creating certificate config file"
+   cat > "$SSLDIR/v3.ext" <<EOF
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = $USE_NAME
+DNS.2 = $USE_NAME.local
+DNS.3 = $USE_NAME.home
+## Add your own aliases here
+EOF
+    echo "Editting config file"
+    vim "$SSLDIR/v3.ext"
+
+    ## Create a CSR and a key at once
+    openssl req -new -nodes -out "$SSLDIR/server.csr" -newkey rsa:2048 -keyout "$SSLDIR/server.key"
+
+    ## Create a certificate
+    openssl x509 -req -in "$SSLDIR/server.csr" -CA "$SSLDIR/rootCA.pem" -CAkey "$SSLDIR/rootCA.key" -CAcreateserial -out "$SSLDIR/server.crt" -days 500 -sha256 -extfile "$SSLDIR/v3.ext"
+
+    echo "The certificates are created in $SSLDIR. You can load rootCA.pem in your browser to trust the connection"
+}
+
 
 ## Spawn a shell in the container environment
 function shell()
@@ -140,6 +190,9 @@ function main()
         ;;
         --run-web)
             run_web
+        ;;
+        --gencert)
+            gencert
         ;;
         --all)
             build_docker
