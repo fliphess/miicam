@@ -238,9 +238,9 @@ class NVRAM
         exec($command, $output, $return);
 
         if ($return != 0) {
-            throw new \Exception(
-                sprintf('Error retrieving NVRAM value for key %s: %s', $key, implode(" ", $output))
-            );
+            $message = sprintf("Error retrieving NVRAM value for key %s: ", $key);
+            $message .= (!empty($output)) ? trim(implode(" ", $output)) : "Not found";
+            throw new \Exception($message);
         }
 
         return trim(implode("", $output));
