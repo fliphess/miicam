@@ -121,7 +121,7 @@ fi
 ## Mount GMLIB configuration                                                    ##
 ##################################################################################
 
-echo "** Setting up our own gmlib config"
+echo "*** Setting up our own gmlib config"
 
 if [ -f /tmp/sd/firmware/etc/gmlib.cfg ]
 then
