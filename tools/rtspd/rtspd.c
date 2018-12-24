@@ -355,8 +355,8 @@ void take_snapshot(void)
     snapshot.image_quality = 80;                        // The value of image quality from 1(worst) ~ 100(best)
     snapshot.bs_buf = snapshot_buf;
     snapshot.bs_buf_len = MAX_SNAPSHOT_LEN;
-    snapshot.bs_width = 320;
-    snapshot.bs_height = 240;
+    snapshot.bs_width = 1280;
+    snapshot.bs_height = 720;
 
     snapshot_len = gm_request_snapshot(&snapshot, 500); // Timeout value 500ms
 
