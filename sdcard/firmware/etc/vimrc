@@ -1,0 +1,27 @@
+syntax on
+
+set backspace=2
+set background=dark
+
+" Tabs to spaces "
+set expandtab
+set shiftwidth=4
+set tabstop=4
+
+" Folding "
+filetype plugin on
+set foldmethod=marker
+set title
+
+if has("autocmd")
+	filetype indent on
+endif
+
+" Remove trailing whitespace "
+autocmd BufWritePre * :%s/\s\+$//e
+
+" Autoreplace "
+iab functino function
+
+"do not enter replace mode on insert; warning: make sure the line below ends with > not a whitespace
+imap <INS> <NoP>
