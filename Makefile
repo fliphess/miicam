@@ -901,7 +901,7 @@ install: all
 website: all install
 	@echo '*** Running composer install in $(WEBROOT)'                                          && \
 	cd $(WEBROOT)                                                                               && \
-	$(COMPOSER) install --no-dev                                                                && \
+	$(COMPOSER) install --no-dev --ignore-platform-reqs --no-interaction --prefer-source        && \
 	echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues'         && \
 	find $(WEBROOT)/vendor -type l -delete
 
