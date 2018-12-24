@@ -15,42 +15,51 @@ fi
 NAME="dropbear"
 DESC="SSH server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
-DAEMON_OPTS="-R -p 22"
+DAEMON_OPTS="-R -p 22 $DROPBEAR_EXTRA_ARGS"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 
+recover_key() {
+   if [ -d "${SD_MOUNTDIR}/firmware/etc/dropbear" ]
+   then
+       printf "*** Copying previous files to /etc/dropbear... "
+       cp ${SD_MOUNTDIR}/firmware/etc/dropbear/* /etc/dropbear/
+       ok_fail "$?"
+   else
+       printf "*** Generating a new SSH key for $NAME $DESC... "
+       [ -f /etc/dropbear/dropbear_ecdsa_host_key ] && rm /etc/dropbear/dropbear_ecdsa_host_key
+       ${SD_MOUNTDIR}/firmware/bin/dropbearkey -f /etc/dropbear/dropbear_ecdsa_host_key -t ecdsa
+       ok_fail "$?"
+   fi
+}
+
+
+save_key() {
+    if [ ! -s "${SD_MOUNTDIR}/firmware/etc/dropbear/dropbear_ecdsa_host_key" ] && [ -s /etc/dropbear/dropbear_ecdsa_host_key ]
+    then
+        [ ! -d "${SD_MOUNTDIR}/firmware/etc/dropbear" ] && mkdir -p ${SD_MOUNTDIR}/firmware/etc/dropbear
+
+        printf "*** Copying SSH key to sd card... "
+        cp /etc/dropbear/dropbear_ecdsa_host_key "${SD_MOUNTDIR}/firmware/etc/dropbear/"
+	    ok_fail "$?"
+    fi
+}
+
+
 case "$1" in
   start)
         [ ! -d /etc/dropbear ] && mkdir -p /etc/dropbear
 
-        ## Recover previoys RSA keys from sdcard
-        if [ -s "${SD_MOUNTDIR}/firmware/etc/dropbear/dropbear_ecdsa_host_key" ]
-        then
-            printf "*** Copying previous key to /etc/dropbear... "
-            cp "${SD_MOUNTDIR}/firmware/etc/dropbear/dropbear_ecdsa_host_key" /etc/dropbear
-	    ok_fail "$?"
-        else
-            printf "*** Generating a new SSH key for $NAME $DESC... "
-            ## Generate a new key
-	    [ -f /etc/dropbear/dropbear_ecdsa_host_key ] && rm /etc/dropbear/dropbear_ecdsa_host_key
-            ${SD_MOUNTDIR}/firmware/bin/dropbearkey -f /etc/dropbear/dropbear_ecdsa_host_key -t ecdsa
-	    ok_fail "$?"
-        fi
+        ## Recover previous files from sdcard
+        recover_key
 
+        ## start the daemon
         start_daemon
 
-        ## Save the keys in the sdcard
-        if [ ! -s "${SD_MOUNTDIR}/firmware/etc/dropbear/dropbear_ecdsa_host_key" ] && [ -s /etc/dropbear/dropbear_ecdsa_host_key ]
-        then
-            [ ! -d "${SD_MOUNTDIR}/firmware/etc/dropbear" ] && mkdir -p ${SD_MOUNTDIR}/firmware/etc/dropbear
-
-            printf "*** Copying generated SSH key to sd card... "
-            cp /etc/dropbear/dropbear_ecdsa_host_key "${SD_MOUNTDIR}/firmware/etc/dropbear/"
-	    ok_fail "$?"
-        fi
-
+        ## Save the key to the sdcard
+        save_key
     ;;
   stop)
     stop_daemon

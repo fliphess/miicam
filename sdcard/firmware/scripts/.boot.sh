@@ -15,7 +15,8 @@ else
     exit 1
 fi
 
-LOGFILE="${LOGDIR}/ft_boot.log"
+export LOGFILE="${LOGDIR}/ft_boot.log"
+export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 
 (
 
@@ -94,11 +95,13 @@ fi
 
 if [ "${ENABLE_CRON}" -eq 1 ]
 then
+    ## Load the crontab file by restarting the daemon
     if [ -s "${SD_MOUNTDIR}/firmware/etc/crontab" ]
     then
         sh ${SD_MOUNTDIR}/firmware/etc/init/S99crond restart
     fi
 
+    ## Setup restartd
     if ! grep -q '^crond' /tmp/etc/restartd.conf
     then
         echo "crond \"/usr/sbin/crond\" \"${SD_MOUNTDIR}/firmware/etc/init/S99crond restart\" \"/bin/echo '*** crond was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
@@ -134,15 +137,6 @@ fi
 if [ "${ENABLE_FTPD}" -eq 1 ]
 then
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99ftpd start
-fi
-
-####################################
-## Samba                          ##
-####################################
-
-if [ "${ENABLE_SAMBA}" -eq 1 ]
-then
-    sh ${SD_MOUNTDIR}/firmware/etc/init/S99samba start
 fi
 
 ####################################

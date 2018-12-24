@@ -14,13 +14,9 @@ else
     exit 1
 fi
 
-## Bail out if MQTT is disabled in config.cfg
-if [ "$ENABLE_MQTT" -ne 1 ]
+## Message MQTT
+if [ "$ENABLE_MQTT" -eq 1 ]
 then
-    echo "MQTT Support is disabled in the configuration."
-    exit 0
+    mqtt_send "${MOTION_TOPIC}" "$MOTION_MQTT_ON"
 fi
-
-echo "$( date ) - Motion ON" | tee -a "$LOGDIR/motion.log"
-mqtt_send "${MOTION_TOPIC}" "ON"
 

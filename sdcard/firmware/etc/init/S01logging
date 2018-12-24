@@ -12,32 +12,51 @@ else
     exit 1
 fi
 
-FT_MODE=`cat /tmp/ft_mode`
+if [ -d "/mnt/media/mmcblk0p1" ]
+then
+    LOGDIR="/mnt/media/mmcblk0p1/log"
+else
+    LOGDIR="/tmp/log"
+fi
 
-if [ "$FT_MODE" == "4" ]
+[ -d "${LOGDIR}" ] || mkdir -p "${LOGDIR}"
+
+NAME="syslogd"
+DESC="System Logging"
+DAEMON="/sbin/syslogd"
+DAEMON_OPTS="-n -D -b 10 -S"
+PIDFILE="/var/run/${NAME}.pid"
+LOGFILE="${LOGDIR}/syslog"
+
+
+## Set daemon opts if ft_mode = 4
+FT_MODE=`cat /tmp/ft_mode`
+if [ "${FT_MODE}" == "4" ]
 then
     [ -x /etc/init.d/S10mdev  ] && /etc/init.d/S10mdev start
 
-    if [ -d "/mnt/media/mmcblk0p1" ]
-    then
-        LOGDIR="/mnt/media/mmcblk0p1/log"
-    else
-        LOGDIR="/tmp/log"
-    fi
+    DAEMON_OPTS="-n -D -b 99 -s 2097151 -S -O ${LOGFILE}"
+fi
 
-    [ -d $LOGDIR ] || mkdir -p $LOGDIR
+
+## Setup remote syslogging if enabled and syslog host is set
+if [ "${ENABLE_REMOTE_SYSLOG}" -eq 1 ] && [ "x${REMOTE_SYSLOG_HOST}" != "x" ]
+then
+    DAEMON_OPTS="${DAEMON_OPTS} -L -R \"${REMOTE_SYSLOG_HOST}\""
+fi
+
+
+## Use syslog configuration file if existent
+SYSLOG_CONFIG="${SD_MOUNTDIR}/firmware/etc/syslog.conf"
+if [ -f "${SYSLOG_CONFIG}" ]
+then
+    DAEMON_OPTS="${DAEMON_OPTS} -F ${SYSLOG_CONFIG}"
 fi
 
 
 start() {
     printf "*** Starting logging... "
-    if [ "$FT_MODE" == "4" ]
-    then
-        start-stop-daemon -b -S -q -m -p /var/run/syslogd.pid --exec /sbin/syslogd -- -n -b 99 -s 2097151 -S -O $LOGDIR/syslog
-    else
-        start-stop-daemon -b -S -q -m -p /var/run/syslogd.pid --exec /sbin/syslogd -- -n -b 10 -S
-    fi
-
+    start-stop-daemon -b -S -q -m -p ${PIDFILE} --exec ${DAEMON} -- ${DAEMON_OPTS}
     start-stop-daemon -b -S -q -m -p /var/run/klogd.pid --exec /sbin/klogd -- -n
     ok_fail "$?"
 }
@@ -45,11 +64,13 @@ start() {
 
 stop() {
     printf "*** Stopping logging... "
-    start-stop-daemon -K -q -p /var/run/syslogd.pid
+    start-stop-daemon -K -q -p ${PIDFILE}
     start-stop-daemon -K -q -p /var/run/klogd.pid
     ok_fail "$?"
 }
 
+
+check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
     start)

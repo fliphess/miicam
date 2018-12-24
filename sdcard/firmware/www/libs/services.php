@@ -23,7 +23,6 @@ class Services
         "ntpd"            => false,
         "restartd"        => true,
         "rtsp"            => true,
-        "samba"           => true,
         "syslogd"         => false,  // Syslogging can't be stopped for now for debugging reasons
         "telnet"          => true,
         "udhcpc"          => false,

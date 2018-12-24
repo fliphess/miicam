@@ -6,25 +6,30 @@
  * $Date: 2014/12/30 05:37:57 $
  *
  */
-#include <pthread.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <ctype.h>
 #include <string.h>
 #include <signal.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
+#include <libgen.h>
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <net/if.h>
 #include <dirent.h>
 
-#include "librtsp.h"
 #include "gmlib.h"
+#include "librtsp.h"
+#include "log/log.h"
 #include "algorithm/capture_motion_detection.c"
 
 #define DVR_ENC_EBST_ENABLE      0x55887799
@@ -60,11 +65,17 @@
 #define MAX_SNAPSHOT_LEN         (256 * 1024)
 #define MD_DATA_LEN              (720 * 576 / 4)
 
+#define MOTION_ON_SCRIPT         "/tmp/sd/firmware/scripts/motion_on.sh"
+#define MOTION_OFF_SCRIPT        "/tmp/sd/firmware/scripts/motion_off.sh"
+
+#define RTSPD_LOGFILE            "/tmp/sd/log/rtspd.log"
+
+
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
         if ((ch_num >= CAP_CH_NUM || ch_num < 0) || \
             (sub_num >= RTSP_NUM_PER_CAP || sub_num < 0)) {    \
-            fprintf(stderr, "%s: ch_num=%d, sub_num=%d error!\n",__FUNCTION__, ch_num, sub_num);    \
+            log_error("%s: ch_num=%d, sub_num=%d error!",__FUNCTION__, ch_num, sub_num);    \
             return -1; \
         }    \
     } while(0)    \
@@ -154,6 +165,7 @@ typedef struct st_priv_bs {
 typedef struct st_av {
     // * Public data
     avbs_t bs[RTSP_NUM_PER_CAP];  // * VIDEO, 0: main-bitstream, 1: sub1-bitstream, 2:sub2-bitstream
+
     // * Update data
     pthread_mutex_t ubs_mutex;
 
@@ -166,6 +178,7 @@ typedef struct st_av {
 pthread_t enqueue_thread_id   = 0;
 pthread_t encode_thread_id    = 0;
 pthread_t motion_thread_id    = 0;
+pthread_t snapshot_thread_id  = 0;
 
 unsigned int sys_tick         = 0;
 struct timeval sys_sec        = {-1, -1};
@@ -175,7 +188,9 @@ char *ipptr                   = NULL;
 static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
 static int rtspd_avail_ch     = 0;
+
 char *snapshot_buf            = 0;
+static int snapshot_create    = 0;
 
 pthread_mutex_t stream_queue_mutex;
 av_t enc[CAP_CH_NUM];
@@ -188,6 +203,8 @@ void *encode_object;
 void *sub_enc_object;             // * Create encoder object (scaler)
 void *sub_bindfd;                 // * Create encoder object (scaler) bind
 
+FILE *logfile_handler = NULL;     // * File handler for logging
+
 
 struct CommandLineArguments {
     int framerate;
@@ -196,6 +213,9 @@ struct CommandLineArguments {
     int bitrate;
     int bitrateMode;
     int encoderType;
+    int snapshot;
+    int record;
+    int motion;
 } cliArgs;
 
 
@@ -205,28 +225,9 @@ static char *rtsp_enc_type_str[] = {
     "MJPEG"
 };
 
-
-static char getch(void)
-{
-    int n = 1;
-    unsigned char ch;
-    struct timeval tv;
-    fd_set rfds;
-
-    FD_ZERO(&rfds);
-    FD_SET(0, &rfds);
-
-    tv.tv_sec = 10;
-    tv.tv_usec = 0;
-    n = select(1, &rfds, NULL, NULL, &tv);
-    if (n > 0) {
-        n = read(0, &ch, 1);
-        if (n == 1)
-            return ch;
-        return n;
-    }
-    return -1;
-}
+char *rtsp_password = NULL;
+char *rtsp_username = NULL;
+static int rtsp_use_auth = 0;
 
 
 static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
@@ -239,7 +240,7 @@ static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
 
     ret = gm_set_cap_motion(cap_vch, &cap_motion);
     if (ret < 0) {
-        printf("MD_Test: gm_set_cap_motion error!\n");
+        log_error("Failed to run gm_set_cap_motion");
         return -1;
     }
     return 0;
@@ -269,7 +270,7 @@ static int set_interesting_area(int ch)
 
     mdt_alg.mb_cell_en = (unsigned char *)malloc(sizeof(unsigned char) * mb_w_num * mb_h_num);
     if (mdt_alg.mb_cell_en == NULL) {
-        printf("Error to allocate mb_cell_en\n");
+        log_error("Failed to allocate mb_cell_en");
         ret = -1;
         goto err_ext;
     }
@@ -297,7 +298,7 @@ static int set_interesting_area(int ch)
     ret = motion_detection_update(param->bindfd[0], &mdt_alg);
 
     if (ret != 0) {
-        printf("Error to execute motion_detection_update at CH(%d)\n", ch);
+        log_error("Failed to execute motion_detection_update");
         ret = -1;
         goto err_ext;
     }
@@ -310,33 +311,71 @@ err_ext:
 }
 
 
+static void create_directory(const char *dir)
+{
+    char tmp[256];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp),"%s",dir);
+    len = strlen(tmp);
+
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+
+    for(p = tmp + 1; *p; p++) {
+        if(*p == '/') {
+           *p = 0;
+           mkdir(tmp, S_IRWXU);
+           *p = '/';
+        }
+    }
+    mkdir(tmp, S_IRWXU);
+}
+
+
 void take_snapshot(void)
 {
-    static int filecount = 0;
+    struct tm *sTm;
+    time_t now = time(0);
+    sTm = gmtime(&now);
+
+    char dirstring[40];
+    char filestring[40];
+    char full_file_path[80];
+
     int snapshot_len = 0;
     FILE *snapshot_fd = NULL;
-    char filename[80];
 
     gm_enc_t *param;
     snapshot_t snapshot;
 
     param = &enc_param[0][0];
     snapshot.bindfd = param->bindfd[0];
-    snapshot.image_quality = 100;                        // The value of image quality from 1(worst) ~ 100(best)
+    snapshot.image_quality = 80;                        // The value of image quality from 1(worst) ~ 100(best)
     snapshot.bs_buf = snapshot_buf;
     snapshot.bs_buf_len = MAX_SNAPSHOT_LEN;
-    snapshot.bs_width = 320;
-    snapshot.bs_height = 240;
+    snapshot.bs_width = 1280;
+    snapshot.bs_height = 720;
 
     snapshot_len = gm_request_snapshot(&snapshot, 500); // Timeout value 500ms
 
     if (snapshot_len > 0) {
-        sprintf(filename, "/tmp/sd/RECORDED_IMAGES/snapshot_%d.jpg", filecount++);
-        printf("Image %s size %d bytes\n", filename, snapshot_len);
+        strftime(dirstring, sizeof(dirstring), "/tmp/sd/RECORDED_IMAGES/%Y/%m/%d", sTm);
 
-        snapshot_fd = fopen(filename, "wb");
+        struct stat st = {0};
+        if (stat(dirstring, &st) != 0) {
+            create_directory(dirstring);
+        }
+
+        strftime(filestring, sizeof(filestring), "snapshot_%H%M%S.jpg", sTm);
+        sprintf(full_file_path, "%s/%s", dirstring, filestring);
+
+        log_info("Image %s size %d bytes", full_file_path, snapshot_len);
+
+        snapshot_fd = fopen(full_file_path, "wb");
         if (snapshot_fd == NULL) {
-            printf("Error: Failed to open file %s\n", filename);
+            log_error("Failed to open file %s", full_file_path);
             exit(EXIT_FAILURE);
         }
 
@@ -345,11 +384,11 @@ void take_snapshot(void)
     }
 	else {
         if (snapshot_len == -1) {
-            printf("Error: Failed to retrieve snapshot data\n");
+            log_error("Failed to retrieve snapshot data");
         } else if (snapshot_len == -2) {
-            printf("Error: Buffer too small to store snapshot data\n");
+            log_error("Buffer too small to store snapshot data");
         } else if (snapshot_len == -4) {
-            printf("Error: Timeout while waiting for snapshot data\n");
+            log_error("Timeout while waiting for snapshot data");
         }
 	}
 }
@@ -367,7 +406,7 @@ static int do_queue_alloc(int type)
 
 static unsigned int get_tick_gm(unsigned int tv_ms)
 {
-    sys_tick = tv_ms*(RTP_HZ/1000);
+    sys_tick = tv_ms*(RTP_HZ / 1000);
     return sys_tick;
 }
 
@@ -388,7 +427,7 @@ static int convert_gmss_media_type(int type)
             break;
         default:
             media_type  = -1;
-            fprintf(stderr, "convert_gmss_media_type: type=%d, error!\n", type);
+            log_error("convert_gmss_media_type: type=%d, error!", type);
             break;
     }
     return media_type;
@@ -412,7 +451,12 @@ static int open_live_streaming(int ch_num, int sub_num)
     pb->sr = stream_reg(livename, pb->video.qno, pb->video.sdpstr, 0, 0, 1, 0, 0, 0, 0, 0, 0);
 
     if (pb->sr < 0)
-        fprintf(stderr, "open_live_streaming: ch_num=%d, sub_num=%d setup error\n", ch_num, sub_num);
+        log_error("open_live_streaming: ch_num=%d, sub_num=%d setup error", ch_num, sub_num);
+
+    // * Enable authentication for the stream if the username and password are set
+    if (rtsp_use_auth == 1) {
+        stream_authorization(pb->sr, rtsp_username, rtsp_password);
+    }
 
     strcpy(pb->name, livename);
 
@@ -453,16 +497,16 @@ static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len
             pb->congest = 1;
 
             if ( TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000 )
-                fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d full\n", ch_num, sub_num);
+                log_error("ext enqueue queue ch_num=%d, sub_num=%d full", ch_num, sub_num);
         }
         else if ((ret != ERR_NOTINIT)&& (ret != ERR_MUTEX) && (ret != ERR_NOTRUN)) {
 
             if (TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000)
-                fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d error %d\n", ch_num, sub_num, ret);
+                log_error("ext enqueue queue ch_num=%d, sub_num=%d error %d", ch_num, sub_num, ret);
         }
 
         if ( TIMEVAL_DIFF(err_print_tval, curr_tval) > 5000000) {
-            fprintf(stderr, "ext enqueue queue ch_num=%d, sub_num=%d error %d\n", ch_num, sub_num, ret);
+            log_error("ext enqueue queue ch_num=%d, sub_num=%d error %d", ch_num, sub_num, ret);
             gettimeofday(&err_print_tval, NULL );
         }
         goto exit_free_audio_buf;
@@ -501,7 +545,7 @@ static int close_live_streaming(int ch_num, int sub_num)
 
 err_exit:
     if (ret < 0)
-        fprintf(stderr, "%s: stream_dereg(%d) err %d\n", __func__, pb->sr, ret);
+        log_error("%s: stream_dereg(%d) err %d", __func__, pb->sr, ret);
 
     return ret;
 }
@@ -636,20 +680,20 @@ int env_set_bs_new_event(int ch_num, int sub_num, int event)
                 goto err_exit;
 
             if (b->enabled == DVR_ENC_EBST_ENABLE) {
-                fprintf(stderr, "Already enabled: ch_num=%d, sub_num=%d\n", ch_num, sub_num);
+                log_error("Already enabled: ch_num=%d, sub_num=%d", ch_num, sub_num);
                 ret = -1;
                 goto err_exit;
             }
             break;
         case STOP_BS_EVENT:
             if (b->enabled != DVR_ENC_EBST_ENABLE) {
-                fprintf(stderr, "Already disabled: ch_num=%d, sub_num=%d\n", ch_num, sub_num);
+                log_error("Already disabled: ch_num=%d, sub_num=%d", ch_num, sub_num);
                 ret = -1;
                 goto err_exit;
             }
             break;
         default:
-            fprintf(stderr, "env_set_bs_new_event: ch_num=%d, sub_num=%d, event=%d, error\n", ch_num, sub_num, event);
+            log_error("env_set_bs_new_event: ch_num=%d, sub_num=%d, event=%d, error", ch_num, sub_num, event);
             ret = -1;
             goto err_exit;
     }
@@ -768,7 +812,7 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                 gm_enc = &enc_param[pb->video.cap_ch][pb->video.cap_path].enc[pb->video.rec_track];
                 get_enc_res(gm_enc, &enc_type, &w, &h);
                 sprintf(res_str, "%dx%d", w, h);
-                printf("/live/ch%02d_%d: cap%d_%d %9s %s %d.%02d fps %d kbps\n",
+                log_info("/live/ch%02d_%d: cap%d_%d %9s %s %d.%02d fps %d kbps",
                         i,
                         j,
                         pb->video.cap_ch,
@@ -799,7 +843,7 @@ static void env_release_resources(void)
     av_t *e;
 
     if ((ret = stream_server_stop()))
-        fprintf(stderr, "stream_server_stop() error %d\n", ret);
+        log_error("stream_server_stop() error %d", ret);
 
     for (ch_num = 0; ch_num < CAP_CH_NUM; ch_num++) {
         e = &enc[ch_num];
@@ -868,7 +912,7 @@ static int cmd_cb(char *name, int sno, int cmd, void *p)
             break;
 
         case GM_STREAM_CMD_OPEN:
-            printf("%s:%d <GM_STREAM_CMD_OPEN>\n", __FUNCTION__, __LINE__);
+            log_error("%s:%d <GM_STREAM_CMD_OPEN>", __FUNCTION__, __LINE__);
             ERR_GOTO(-10, cmd_cb_err);
             break;
 
@@ -889,7 +933,7 @@ static int cmd_cb(char *name, int sno, int cmd, void *p)
             break;
 
         case GM_STREAM_CMD_PAUSE:
-            printf("%s:%d <GM_STREAM_CMD_PAUSE>\n", __FUNCTION__, __LINE__);
+            log_info("%s:%d <GM_STREAM_CMD_PAUSE>", __FUNCTION__, __LINE__);
             ret = 0;
             break;
 
@@ -903,17 +947,36 @@ static int cmd_cb(char *name, int sno, int cmd, void *p)
             break;
 
         default:
-            fprintf(stderr, "%s: not support cmd %d\n", __func__, cmd);
+            log_error("%s: not support cmd %d", __func__, cmd);
             break;
     }
 
 cmd_cb_err:
     if ( ret < 0 ) {
-        fprintf(stderr, "%s: cmd %d error %d\n", __func__, cmd, ret);
+        log_error("%s: cmd %d error %d", __func__, cmd, ret);
     }
     return ret;
 }
 
+
+static void *snapshot_thread(void *arg)
+{
+    while (rtspd_sysinit) {
+        if (access("/dev/shm/rtspd_snapshot", F_OK ) != -1 ) {
+            unlink("/dev/shm/rtspd_snapshot");
+            snapshot_create = 1;
+        }
+
+        if (snapshot_create == 1) {
+            log_info("Creating a snapshot of the current data stream");
+            snapshot_create = 0;
+            take_snapshot();
+        }
+        usleep(1000);
+    }
+
+    return 0;
+}
 
 static void *motion_thread(void *arg)
 {
@@ -926,7 +989,7 @@ static void *motion_thread(void *arg)
     gm_multi_cap_md_t *cap_md = NULL;
     cap_md = (gm_multi_cap_md_t *) malloc(sizeof(gm_multi_cap_md_t) * 1);
     if (cap_md == NULL) {
-        printf("Error to allocate capture motion info!\n");
+        log_fatal("Failed to allocate capture motion info!");
         goto thread_exit;
     }
 
@@ -937,58 +1000,75 @@ static void *motion_thread(void *arg)
     cap_md[0].cap_md_info.md_buf = (char *) malloc(CAP_MOTION_SIZE);
 
     if (cap_md[0].cap_md_info.md_buf == NULL) {
-        printf("Error to allocate capture motion buffer!\n");
+        log_fatal("Failed to allocate capture motion buffer!");
         goto thread_exit;
     }
+
+    int training_detected = 0;
+    int motion_detected = 0;
 
     while (rtspd_sysinit) {
         ret = gm_recv_multi_cap_md(cap_md, 1);
 
-        if (ret < 0) { //-1:error,0:sucess
-            printf("Error parameter to get motion data\n");
+        if (ret < 0) {                  // * -1: Error, 0: Success
+            log_error("Failed to retrieve motion data (gm_recv_multi_cap_md)");
             continue;
         }
 
         ret = motion_detection_handling(cap_md, &mdt_result[0], 1);
-        if (ret < 0) { //-1:error,0:sucess
-            printf("Error to do motion_detection_handling\n");
+        if (ret < 0) {                  // * -1: Error, 0: Success
+            log_fatal("Failed to handle motion data (motion_detection_handling)");
             goto thread_exit;
         }
 
         for (ch = 0; ch < 1; ch++) {
+            if (mdt_result[ch].result == MOTION_PARSING_ERROR)
+                log_error("Failed parsing motion data.");
 
-            if (mdt_result[ch].result == MOTION_DETECTED)
-                printf("[---Area Has Motion Detected---] at CH(%d)\n", ch);
+            else if (mdt_result[ch].result == MOTION_INIT_ERROR)
+                log_error("Motion init error.");
 
+            else if (mdt_result[ch].result == MOTION_ALGO_ERROR)
+                log_error("Motion algorithm failed.");
+
+            else if (mdt_result[ch].result == MOTION_DATA_ERROR)
+                log_error("Motion data retrieval failed.");
+
+            // * MD Training
+            else if (mdt_result[ch].result == MOTION_IS_TRAINING) {
+                if (training_detected == 0) {
+                    training_detected = 1;
+                    log_info("Motion detection training running.");
+                }
+            }
+
+            // * Motion ON
+            else if (mdt_result[ch].result == MOTION_DETECTED) {
+                if (motion_detected == 0) {
+                    motion_detected = 1;
+
+                    if (cliArgs.snapshot == 1)
+                        snapshot_create = 1;
+
+                    log_info("Motion ON - executing motion on script");
+                    system(MOTION_ON_SCRIPT);
+                }
+            }
+
+            // * Motion OFF
             else if (mdt_result[ch].result == NO_MOTION) {
-                // TODO - Add motion off if time is expired and no motion detected
-            }
-
-            else if (mdt_result[ch].result == MOTION_IS_TRAINING)
-                printf("[---Motion Is training---] at CH(%d)\n", ch);
-
-            else if (mdt_result[ch].result == MOTION_PARSING_ERROR) {
-                printf("[---Paring data error---] at CH(%d)\n", ch);
-            }
-
-            else if (mdt_result[ch].result == MOTION_INIT_ERROR) {
-                printf("[---Motion init error---] at CH(%d)\n", ch);
-            }
-
-            else if (mdt_result[ch].result == MOTION_ALGO_ERROR) {
-                printf("[---Motion Algorithm Error---] at CH(%d)\n", ch);
-            }
-
-            else if (mdt_result[ch].result == MOTION_DATA_ERROR) {
-                printf("[---Motion data error---] at CH(%d)\n", ch);
+                if (motion_detected == 1) {
+                    motion_detected = 0;
+                    log_info("Motion OFF - executing motion off script");
+                    system(MOTION_OFF_SCRIPT);
+                }
             }
 
             else {
-                printf("[---Motion Message not Defined Error---] at CH(%d)\n", ch);
+                log_error("Undefined Motion Event");
             }
         }
-
-        usleep(200000);   //two second period to detect motion
+        usleep(200000);   // * Use a two second period to detect motion
     }
 
 thread_exit:
@@ -1004,7 +1084,6 @@ thread_exit:
         free(cap_md);
 
     motion_detection_end();
-
     pthread_exit(NULL);
     motion_thread_id = (pthread_t)NULL;
 
@@ -1068,7 +1147,7 @@ int env_init(void)
         e = &enc[ch_num];
 
         if (pthread_mutex_init(&e->ubs_mutex, NULL)) {
-            perror("env_init: mutex init failed:");
+            log_error("env_init: mutex init failed");
             exit(-1);
         }
 
@@ -1087,7 +1166,7 @@ int env_init(void)
             pb->sr            = -1;
 
             if (pthread_mutex_init(&pb->video.priv_vbs_mutex, NULL)) {
-                perror("env_enc_init: priv_vbs mutex init failed:");
+                log_error("env_enc_init: priv_vbs mutex init failed");
                 exit(-1);
             }
         }
@@ -1099,10 +1178,10 @@ int env_init(void)
     srand((unsigned int)time(NULL));
 
     if ((ret = stream_server_init(ipptr, (int) sys_port, 0, 1444, 256, SR_MAX, VQ_MAX, VQ_LEN, AQ_MAX, AQ_LEN, frm_cb, cmd_cb)) < 0)
-        fprintf(stderr, "stream_server_init, ret %d\n", ret);
+        log_error("stream_server_init, ret %d", ret);
 
     if ((ret = stream_server_start()) < 0)
-        fprintf(stderr, "stream_server_start, ret %d\n", ret);
+        log_error("stream_server_start, ret %d", ret);
 
     return ret;
 }
@@ -1183,25 +1262,29 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
             break;
 
         default:
-            printf("Encoder type not supported: %s\n", rtsp_enc_type_str[enc_type]);
+            log_error("Encoder type not supported: %s", rtsp_enc_type_str[enc_type]);
             break;
     }
 
     // * Bind channel recording
     param->bindfd[rec_track] = gm_bind(enc_groupfd, param->cap.obj, param->enc[rec_track].obj);
 
-    // * Enable motion detection
-    motion_detection_init();
+    // * Set motion detection
+    if (cliArgs.motion == 1) {
 
-    // * Set area for motion detection
-    int ret = 0;
-    ret = set_interesting_area(rec_track);
+        // * Enable motion detection
+        motion_detection_init();
 
-    if (ret != 0) {
-        perror("Error running set_interesting_area!\n");
+        // * Set area for motion detection
+        int ret = 0;
+        ret = set_interesting_area(rec_track);
+
+        if (ret != 0) {
+            log_error("Failed running set_interesting_area!");
+        }
     }
 
-    // * Requires Scaler Encoder (only for H264)
+    // * Enable Scaler Encoder if downscaling is required (only for H264)
     if (enc_type == ENC_TYPE_H264 && (width < 1280 || height < 720)) {
         h264e_attr.ratectl.bitrate      = bitrate;
         h264e_attr.frame_info.framerate = framerate;
@@ -1329,7 +1412,7 @@ void gm_graph_init(void)
     gm_init();
     gm_get_sysinfo(&gm_system);
 
-    if (cliArgs.framerate>0)
+    if (cliArgs.framerate > 0)
         poll_wait_time = 1000000 / (cliArgs.framerate + 2);
     else
         poll_wait_time = 15000;
@@ -1461,7 +1544,7 @@ void *encode_thread(void *ptr)
         ret = gm_poll(&poll_fds[0][0], CAP_CH_NUM * RTSP_NUM_PER_CAP, 2000);
 
         if (ret == GM_TIMEOUT) {
-            printf("Poll timeout!!\n");
+            log_error("GM Poll timeout!!");
             continue;
         }
 
@@ -1479,7 +1562,7 @@ void *encode_thread(void *ptr)
                     continue;
 
                 if (poll_fds[i][j].revent.bs_len > pb->video.bs_buf_len) {
-                    printf("%d_%d: bindfd(%p) bitstream buffer length is not enough! (%d_bytes vs %d_bytes)\n", i, j, poll_fds[i][j].bindfd, poll_fds[i][j].revent.bs_len, pb->video.bs_buf_len);
+                    log_error("%d_%d: bindfd(%p) bitstream buffer length is not enough! (%d_bytes vs %d_bytes)", i, j, poll_fds[i][j].bindfd, poll_fds[i][j].revent.bs_len, pb->video.bs_buf_len);
                     continue;
                 }
 
@@ -1508,8 +1591,8 @@ void *encode_thread(void *ptr)
             break;
 
         if ( (ret = gm_recv_multi_bitstreams(&bs[0][0],CAP_CH_NUM * RTSP_NUM_PER_CAP)) < 0 ) {
-            // <=-1:fail, 0:success
-            printf("Error: failed to receive bitstream. ret(%d)\n", ret);
+            // <= -1: fail, 0: success
+            log_error("Failed to receive bitstream (gm_recv_multi_bitstreams).");
             continue;
         }
 
@@ -1520,9 +1603,13 @@ void *encode_thread(void *ptr)
 
                 pb = &enc[i].priv_bs[j];
                 avbs = &enc[i].bs[j];
+
                 if ((bs[i][j].retval < 0) && bs[i][j].bindfd)
-                    printf("CH%2d_%d Error to receive bitstream. ret=%d\n", i, j, bs[i][j].retval);
+                    log_error("Failed to receive bitstream.");
                 else if (bs[i][j].retval == GM_SUCCESS) {
+                    //
+                    // * TODO - Write to file if motion if set to 1
+                    //
                     if (avbs->video.enc_type != ENC_TYPE_MJPEG) {
                         if ((pb->play == 1) && (bs[i][j].bs.keyframe ==1))
                             first_play[i][j] = 1;
@@ -1580,7 +1667,7 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
     while(1) {
         ret = gm_poll(&poll_fds, 1, 2000);
         if ( ret == GM_TIMEOUT ) {
-            printf("Poll timeout!!\n");
+            log_error("GM Poll timeout");
             continue;
         }
 
@@ -1590,7 +1677,7 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
             continue;
 
         if ( poll_fds.revent.bs_len > bitstream_data_len) {
-            printf("bitstream buffer length is not enough! %d, %d\n", poll_fds.revent.bs_len, bitstream_data_len);
+            log_error("bitstream buffer length is too small! %d, %d", poll_fds.revent.bs_len, bitstream_data_len);
             continue;
         }
 
@@ -1606,12 +1693,12 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
         bs.bs.mv_buf = 0;
         bs.bs.mv_buf_len = 0;
 
-        ret = gm_recv_multi_bitstreams(&bs, 1); // -1:fail 0:scuess
+        ret = gm_recv_multi_bitstreams(&bs, 1);     // * -1: Fail 0: Success
 
         if ( ret < 0 )
-            printf("Error to receive bitstream.\n");
+            log_error("Failed to receive bitstream (gm_recv_multi_bitstreams).");
         else if ( (bs.retval < 0) && bs.bindfd )
-            printf("CH0 Error to receive bitstream. ret=%d\n", bs.retval);
+            log_error("Failed to receive bitstream.");
 
         else if ( ret == 0 && bs.retval == GM_SUCCESS ) {
             if (bs.bs.keyframe == 1 ) {
@@ -1626,8 +1713,8 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
                 break;
             }
             else {
-                if (++cnt>100) {
-                    printf("wait key frame fail\n");
+                if (++cnt > 100) {
+                    log_error("Timeout reached while waiting for keyframe");
                     break;
                 }
             }
@@ -1653,7 +1740,7 @@ static int rtspd_start(int port)
         return ret;
 
     if (pthread_mutex_init(&stream_queue_mutex, NULL)) {
-        perror("Error: rtspd_start: mutex init failed:");
+        log_error("rtspd_start: mutex init failed");
         exit(-1);
     }
 
@@ -1667,12 +1754,22 @@ static int rtspd_start(int port)
         pthread_attr_destroy(&attr);
     }
 
-    // * Motion Thread
-    if (motion_thread_id == (pthread_t)NULL) {
+    // * Snapshot Thread
+    if (snapshot_thread_id == (pthread_t)NULL) {
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        ret = pthread_create(&motion_thread_id, &attr, &motion_thread, NULL);
+        ret = pthread_create(&snapshot_thread_id, &attr, &snapshot_thread, NULL);
         pthread_attr_destroy(&attr);
+    }
+
+    // * Motion Thread
+    if (cliArgs.motion == 1) {
+        if (motion_thread_id == (pthread_t)NULL) {
+            pthread_attr_init(&attr);
+            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+            ret = pthread_create(&motion_thread_id, &attr, &motion_thread, NULL);
+            pthread_attr_destroy(&attr);
+        }
     }
 
     // * Enqueue Thread
@@ -1715,8 +1812,11 @@ int is_bs_all_disable(void)
 static void rtspd_stop()
 {
     pthread_mutex_destroy(&stream_queue_mutex);
-    motion_detection_end();
     rtspd_sysinit = 0;
+
+    if (cliArgs.motion == 1) {
+        motion_detection_end();
+    }
 }
 
 
@@ -1737,32 +1837,54 @@ char *get_local_ip(void)
 static void print_usage()
 {
     printf("Usage:\n");
-    printf("  ./rtspd [-bfwhm] [-j|-4]\n");
+    printf(" ./rtspd [-bfwhm] [-j|-4]\n");
     printf(
         "\nAvailable options:\n"
-        "-b [1-8192]    - Set the bitrate      (default: 8192)\n"
-        "-f [1-15]      - Set the framerate    (default: 15)\n"
-        "-w [1-1280]    - Set the image width  (default: 1280 pixels)\n"
-        "-h [1-720]     - Set the image height (default: 720 pixels)\n"
-        "-m [1-4]       - Set the bitrate mode (default: 1, CBR)\n"
-        "-j (optional)  - Use MJPEG encoding   (default: off)\n"
-        "-4 (optional)  - Use MPEG4 encoding   (default: off)\n\n"
-        );
+        "-b [1-8192]    - Set the bitrate         (default: 8192)\n"
+        "-f [1-15]      - Set the framerate       (default: 15)\n"
+        "-w [1-1280]    - Set the image width     (default: 1280 pixels)\n"
+        "-h [1-720]     - Set the image height    (default: 720 pixels)\n"
+        "-m [1-4]       - Set the bitrate mode    (default: 1, CBR)\n"
+        "-j (optional)  - Use MJPEG encoding      (default: off)\n"
+        "-4 (optional)  - Use MPEG4 encoding      (default: off)\n\n"
+
+        "-d (optional)  - Enable motion detection (default: off)\n"
+        "-s (optional)  - Take a snapshot when motion detected (default: off)\n"
+        "-r (optional)  - Record a 10 second clip on motion    (default: off)\n"
+    );
 
 	exit(EXIT_FAILURE);
 }
 
 
+void signal_handler(int sig){
+    log_fatal("Exiting rtspd: CTRL+C pressed, or exit requested");
+
+    rtspd_stop();
+    gm_graph_release();
+
+    exit(EXIT_SUCCESS);
+}
+
+void setup_logging(void)
+{
+    logfile_handler = fopen(RTSPD_LOGFILE, "a");
+    if(logfile_handler)
+        log_set_fp(logfile_handler);
+}
+
+
 int main(int argc, char *argv[])
 {
-    int i,j;
-    char key;
+    int i;
     int cap_ch, cap_path, rec_track;
 
-    snapshot_buf = (char *)malloc(MAX_SNAPSHOT_LEN);
+    // * Setup logging
+    setup_logging();
 
+    snapshot_buf = (char *)malloc(MAX_SNAPSHOT_LEN);
     if (snapshot_buf == NULL) {
-        perror("Error allocating snapshot memory buffer\n");
+        log_error("Failed allocating snapshot memory buffer");
         exit(1);
     }
 
@@ -1770,17 +1892,30 @@ int main(int argc, char *argv[])
     cliArgs.framerate   = 15;
     cliArgs.width       = 1280;
     cliArgs.height      = 720;
-    cliArgs.bitrateMode = GM_CBR;
+    cliArgs.bitrateMode = GM_EVBR;
     cliArgs.encoderType = ENC_TYPE_H264;
+
+    cliArgs.snapshot    = 0;
+    cliArgs.record      = 0;
+    cliArgs.motion      = 0;
 
     if (argc > 1) {
         for (i = 1; i < argc; i++) {
             if (argv[i][0] != '-' ) {
-                printf("Invalid input: %s!\n", argv[i]);
+                log_error("Invalid input: %s!", argv[i]);
                 print_usage();
                 return 1;
             } else {
                 switch (argv[i][1]) {
+                    case 'd':
+                        cliArgs.motion      = 1;    // * Enable motion detection
+                        break;
+                    case 's':
+                        cliArgs.snapshot    = 1;    // * Enable snapshot when motion detected
+                        break;
+                    case 'r':
+                        cliArgs.record      = 1;    // * Enable record stream when motion detected
+                        break;
                     case 'b':
                         cliArgs.bitrate     = atoi(&argv[i][2]);
                         break;
@@ -1803,7 +1938,7 @@ int main(int argc, char *argv[])
                         cliArgs.encoderType = ENC_TYPE_MPEG4;
                         break;
                     default:
-                        printf("Unknown argument: %s\n", argv[i]);
+                        log_error("Unknown argument: %s", argv[i]);
                         print_usage();
                         return 1;
                 }
@@ -1811,46 +1946,57 @@ int main(int argc, char *argv[])
         }
     }
 
+    if ((cliArgs.motion != 1) && (cliArgs.snapshot == 1 || cliArgs.record == 1)) {
+        log_error("-d is required when using -s or -r");
+        return 1;
+    }
+
     if ((cliArgs.bitrate < 1) || (cliArgs.bitrate > 8192)) {
-        printf("ERROR: Use a maximum bitrate of 8192 and a minimum of 1\n");
+        log_error("Use a maximum bitrate of 8192 and a minimum of 1");
         return 1;
     }
 
     if ((cliArgs.framerate < 1) || (cliArgs.framerate > 15)) {
-        printf("ERROR: A framerate below 1 or higher than 15 fps is not supported.\n");
+        log_error("A framerate below 1 or higher than 15 fps is not supported.");
         return 1;
     }
 
     if ((cliArgs.height < 1) || (cliArgs.height > 720)) {
-        printf("ERROR: A height bigger than 720p or below 1 is not supported.\n");
+        log_error("A height bigger than 720p or below 1 is not supported.");
         return 1;
     }
 
     if ((cliArgs.width < 1) || (cliArgs.width > 1280)) {
-        printf("ERROR: A width wider than 720p is not supported.\n");
+        log_error("A width wider than 720p is not supported.");
         return 1;
     }
 
     if ((cliArgs.bitrateMode < 1) || (cliArgs.bitrateMode > 4)) {
-        printf("ERROR: Bitrate mode should be in between 1 and 4\n");
+        log_error("Bitrate mode should be in between 1 and 4");
         return 1;
     }
 
-    printf("\n"
-        "*******************************************\n"
-        "** Starting the RTSP Daemon              **\n"
-        "*******************************************\n"
-    );
+    log_info("Starting the RTSP Daemon");
 
+    rtsp_password = getenv("RTSP_PASS");
+    rtsp_username = getenv("RTSP_USER");
+
+    if (rtsp_username != NULL && strcmp(rtsp_username, "") != 0 && rtsp_password != NULL && strcmp(rtsp_password, "") != 0) {
+        rtsp_use_auth = 1;
+        log_info("Enabling stream authentication.");
+        log_info("Stream username: %s", rtsp_username);
+        log_info("Stream password: %s", rtsp_password);
+    }
+
+    // * Initializing gmlib
     gm_graph_init();
 
-    printf("\nConfig Loaded:\n");
-    printf("  * bitrate:     %d\n", cliArgs.bitrate);
-    printf("  * framerate:   %d\n", cliArgs.framerate);
-    printf("  * width:       %d\n", cliArgs.width);
-    printf("  * height:      %d\n", cliArgs.height);
-    printf("  * bitrateMode: %d\n", cliArgs.bitrateMode);
-    printf("  * Encoder:     %s\n\n", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
+    log_info("Width        : %d", cliArgs.width);
+    log_info("Height       : %d", cliArgs.height);
+    log_info("Encoder      : %d", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
+    log_info("Framerate    : %d", cliArgs.framerate);
+    log_info("Bitrate      : %d", cliArgs.bitrate);
+    log_info("Bitrate Mode : %d", cliArgs.bitrateMode);
 
     for (cap_ch = 0; cap_ch < CAP_CH_NUM; cap_ch++) {
         for (cap_path = 0; cap_path < CAP_PATH_NUM; cap_path++) {
@@ -1860,42 +2006,17 @@ int main(int argc, char *argv[])
         }
     }
 
-    // * Setup Auth
-    const char* password;
-    password = getenv("ROOT_PASSWORD");
-    if (password != NULL) {
+    // * Use our handler for the signals so we can do some cleanup at quit
+    signal(SIGINT,  signal_handler);
+    signal(SIGHUP,  signal_handler);
+    signal(SIGTERM, signal_handler);
 
-    }
-
+    // * Start the rtsp threads
     rtspd_start(554);
 
-    printf("\nConnect command:\n");
-    for (i = 0; i < CAP_CH_NUM; i++) {
-        for (j = 0; j < rtspd_avail_ch; j++) {
-            printf("  * rtsp://%s/live/ch%02d_%d\n", get_local_ip(), i, j);
-        }
-    }
-
     while(1) {
-        key = getch();
-
-        if ((key == 's') || (access("/dev/shm/snapshot", F_OK ) != -1 )) {
-            unlink("/dev/shm/snapshot");
-
-            printf("Creating a snapshot of the current data stream\n");
-            take_snapshot();
-        }
-        else if (key == 'q' || key == 'Q')
-            break;
-
-        sleep(1);
+        usleep(10000);
     }
-
-    rtspd_stop();
-
-    gm_delete_groupfd(groupfd);
-    gm_graph_release();
-    gm_release();
 
     return 0;
 }

@@ -28,6 +28,7 @@ case "$1" in
         if [ ! -s "/etc/lighttpd.user" ] || ! ( grep -q "^root" /etc/lighttpd.user )
         then
             echo "root:$ROOT_PASSWORD" >> "/etc/lighttpd.user"
+            echo "$HTTP_API_USER:$HTTP_API_PASS" >> "/etc/lighttpd.user"
         fi
 
         start_daemon

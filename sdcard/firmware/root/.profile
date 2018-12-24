@@ -1,12 +1,6 @@
 
-# Set LDD Library PATH
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/tmp/sd/firware/lib";
-
-# Set the path
-PATH="/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:$PATH"
-
-# Set the correct terminal
-TERM=xterm-color
+# Set the LD library path
+export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 
 # overlay new busybox commands over system ones
 . ~/.busybox_aliases

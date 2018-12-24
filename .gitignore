@@ -6,6 +6,13 @@ sdcard/manufacture.bin
 sdcard/log
 sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key
 sdcard/firmware/etc/dropbear/dropbear_ecdsa_host_key.pub
+sdcard/firmware/etc/ssl/rootCA.key
+sdcard/firmware/etc/ssl/rootCA.pem
+sdcard/firmware/etc/ssl/rootCA.srl
+sdcard/firmware/etc/ssl/server.crt
+sdcard/firmware/etc/ssl/server.csr
+sdcard/firmware/etc/ssl/server.key
+sdcard/firmware/etc/ssl/v3.ext
 sdcard/firmware/root/.ssh
 sdcard/firmware/www/vendor
 sdcard/firmware/www/composer.lock
