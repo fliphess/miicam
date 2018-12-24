@@ -25,8 +25,6 @@ PREFIXDIR    := $(TOPDIR)/prefix
 BUILDDIR     := $(TOPDIR)/build
 
 GMLIBDIR     := $(TOPDIR)/tools/gm_lib
-GMSAMPLES    := $(TOPDIR)/tools/samples
-
 RTSPDDIR     := $(TOPDIR)/tools/rtspd
 UTILSDIR     := $(TOPDIR)/tools/utils
 PATCHESDIR   := $(TOPDIR)/tools/patches
@@ -41,40 +39,10 @@ include SOURCES.mk
 include OUTPUT.mk
 
 
-SAMPLES :=                                          \
-	tools/audio_livesound                           \
-	tools/audio_playback                            \
-	tools/audio_record                              \
-	tools/display_with_encode                       \
-	tools/encode_and_liveview_with_notification     \
-	tools/encode_capture_substream                  \
-	tools/encode_force_keyframe                     \
-	tools/encode_scaler_substream                   \
-	tools/encode_update_notification                \
-	tools/encode_with_advance_feature               \
-	tools/encode_with_av_sync                       \
-	tools/encode_with_capture_motion_detection      \
-	tools/encode_with_capture_motion_detection2     \
-	tools/encode_with_capture_tamper_detection      \
-	tools/encode_with_capture_tamper_detection2     \
-	tools/encode_with_deinterlace                   \
-	tools/encode_with_eptz                          \
-	tools/encode_with_getraw                        \
-	tools/encode_with_getraw2                       \
-	tools/encode_with_osd                           \
-	tools/encode_with_roi                           \
-	tools/encode_with_snapshot                      \
-	tools/encode_with_watermark_and_vui             \
-	tools/liveview_with_clearwin                    \
-	tools/liveview_with_pip
-
-
 UTILS :=                                            \
 	tools/chuangmi_ctrl                             \
 	tools/take_snapshot
 
-
-samples: $(SAMPLES)
 
 utils: $(UTILS)
 
@@ -109,7 +77,6 @@ all:                                 \
 	$(BUILDDIR)/ffmpeg               \
 	$(BUILDDIR)/rtspd                \
 	utils                            \
-	samples                          \
 	sdcard/manufacture.bin
 
 
@@ -864,16 +831,12 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 
 
 #################################################################
-## UTILS/SAMPLES                                               ##
+## UTILS                                                       ##
 #################################################################
 
 
 $(UTILS):
 	$(TARGET)-gcc -Wall -I$(GMLIBDIR)/inc -L$(GMLIBDIR)/lib -lpthread -lgm $(UTILSDIR)/$(@F).c -o $@ && $(TARGET)-strip $@
-
-
-$(SAMPLES):
-	$(TARGET)-gcc -Wall -I$(GMLIBDIR)/inc -L$(GMLIBDIR)/lib -lpthread -lgm $(GMSAMPLES)/$(@F).c -o $@ && $(TARGET)-strip $@
 
 
 sdcard/manufacture.bin:
