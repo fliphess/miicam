@@ -851,13 +851,15 @@ sdcard/manufacture.bin:
 
 
 install: all
-	@mkdir -p $(BINARIESDIR)                                                                    && \
+	mkdir -p $(BINARIESDIR)                                                                     && \
 	echo "*** Moving binaries to $(BINARIESDIR)"                                                && \
 	cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(BINS)  && cp $(BINS)  $(BINARIESDIR)              && \
 	cd $(PREFIXDIR)/bin  && cp $(BINEXTRAS) $(BINARIESDIR)                                      && \
 	cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(SBINS) && cp $(SBINS) $(BINARIESDIR)              && \
+	echo "*** Moving libraries to $(LIBRARIESDIR)"                                              && \
 	cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(LIBS)  && cp $(LIBS)  $(LIBRARIESDIR)             && \
 	cd $(PREFIXDIR)/lib  && cp $(LIBEXTRAS) $(LIBRARIESDIR)                                     && \
+	echo "*** Collecting our own crafts to $(BINARIESDIR)"                                      && \
 	cd $(TOPDIR)/tools   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR) \;
 
 
