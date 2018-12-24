@@ -2,6 +2,7 @@
 ## The compiled binaries in prefix/bin that should be stripped and copied to firmware/bin
 BINS =                                     \
 	scp dbclient dropbearkey               \
+	sftp-server                            \
 	arm-php arm-php-cgi                    \
 	ffmpeg ffprobe                         \
 	openssl                                \

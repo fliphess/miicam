@@ -97,6 +97,7 @@ all:                                 \
 	$(BUILDDIR)/openssl              \
 	$(BUILDDIR)/socat                \
 	$(BUILDDIR)/logrotate            \
+	$(BUILDDIR)/sftp                 \
 	$(BUILDDIR)/dropbear             \
 	$(BUILDDIR)/lighttpd             \
 	$(BUILDDIR)/vim                  \
@@ -498,15 +499,38 @@ $(BUILDDIR)/logrotate: $(SOURCEDIR)/$(LOGROTATEARCHIVE) $(BUILDDIR)/popt
 ## DROPBEAR                                                    ##
 #################################################################
 
+$(SOURCEDIR)/$(SFTPARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(SFTPURI) || rm -f $@
+
+
 $(SOURCEDIR)/$(DROPBEARARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(DROPBEARURI) || rm -f $@
 
 
-$(BUILDDIR)/dropbear: $(SOURCEDIR)/$(DROPBEARARCHIVE) $(BUILDDIR)/zlib
+$(BUILDDIR)/sftp: $(SOURCEDIR)/$(SFTPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/openssl
+	mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/openssh-$(SFTPVERSION)
+	tar -xzf $(SOURCEDIR)/$(SFTPARCHIVE) -C $(BUILDDIR)
+	cd $(BUILDDIR)/openssh-$(SFTPVERSION) && \
+	$(BUILDENV)                              \
+		./configure                          \
+			--host=$(TARGET)                 \
+			--prefix=$(PREFIXDIR)            \
+			--with-zlib=$(PREFIXDIR)         \
+			--sysconfdir=/etc                \
+			--enable-shared                  \
+			--disable-static              && \
+		make -j$(PROCS) sftp-server       && \
+		cp sftp-server $(PREFIXDIR)/bin
+	rm -rf $(BUILDDIR)/openssh-$(SFTPVERSION)
+	touch $@
+
+
+$(BUILDDIR)/dropbear: $(SOURCEDIR)/$(DROPBEARARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/sftp
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(DROPBEARVERSION)
 	@tar -xjf $(SOURCEDIR)/$(DROPBEARARCHIVE) -C $(BUILDDIR)
-	@sed -i 's|\(#define DROPBEAR_PATH_SSH_PROGRAM\).*|\1 "/tmp/sd/ft/dbclient"|' $@-$(DROPBEARVERSION)/options.h
-	@sed -i 's|\(#define DEFAULT_PATH\).*|\1 "/bin:/sbin:/usr/bin:/usr/sbin:/tmp/sd/firmware/bin:/tmp/sd/ft:/mnt/data/ft"|' $@-$(DROPBEARVERSION)/options.h
+	sed -i 's|\(#define DROPBEAR_PATH_SSH_PROGRAM\).*|\1 "/tmp/sd/ft/dbclient"|' $@-$(DROPBEARVERSION)/default_options.h
+	sed -i 's|\(#define SFTPSERVER_PATH\).*|\1 "/tmp/sd/firmware/bin/sftp-server"|' $@-$(DROPBEARVERSION)/default_options.h
+	sed -i 's|\(#define DEFAULT_PATH\).*|\1 "/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:/bin:/sbin:/usr/bin:/usr/sbin:/tmp/sd/ft:/mnt/data/ft"|' $@-$(DROPBEARVERSION)/default_options.h
 	@cd $@-$(DROPBEARVERSION)         && \
 	$(BUILDENV)                          \
 		./configure                      \
@@ -672,8 +696,8 @@ $(BUILDDIR)/vim: $(SOURCEDIR)/$(VIMARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/read
 			--with-features=normal                           \
 			--with-tlib=ncurses                              \
 			--without-x                                   && \
-		make CC=$(TARGET)-gcc -j$(PROCS)                  && \
-		make CC=$(TARGET)-gcc -j$(PROCS) install
+		make VIMRCLOC=/etc VIMRUNTIMEDIR=/tmp/sd/firmware/share/vim CC=$(TARGET)-gcc -j$(PROCS) && \
+		make -j$(PROCS) install
 	@rm -rf $@-$(VIMVERSION)
 	@touch $@
 

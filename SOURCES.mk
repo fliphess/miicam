@@ -51,6 +51,10 @@ SOCATVERSION = 1.7.3.2
 SOCATARCHIVE = socat-$(SOCATVERSION).tar.gz
 SOCATURI = http://www.dest-unreach.org/socat/download/$(SOCATARCHIVE)
 
+SFTPVERSION = 7.9p1
+SFTPARCHIVE = openssh-$(SFTPVERSION).tar.gz
+SFTPURI = https://ftp.nluug.nl/pub/OpenBSD/OpenSSH/portable/$(SFTPARCHIVE)
+
 DROPBEARVERSION = 2018.76
 DROPBEARARCHIVE = dropbear-$(DROPBEARVERSION).tar.bz2
 DROPBEARURI = https://matt.ucc.asn.au/dropbear/releases/$(DROPBEARARCHIVE)
