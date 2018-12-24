@@ -95,11 +95,13 @@ fi
 
 if [ "${ENABLE_CRON}" -eq 1 ]
 then
+    ## Load the crontab file by restarting the daemon
     if [ -s "${SD_MOUNTDIR}/firmware/etc/crontab" ]
     then
         sh ${SD_MOUNTDIR}/firmware/etc/init/S99crond restart
     fi
 
+    ## Setup restartd
     if ! grep -q '^crond' /tmp/etc/restartd.conf
     then
         echo "crond \"/usr/sbin/crond\" \"${SD_MOUNTDIR}/firmware/etc/init/S99crond restart\" \"/bin/echo '*** crond was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
