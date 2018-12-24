@@ -3,3 +3,5 @@ PATH=/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:/sbin:/bin:/usr/sbin:/usr/bin
 
 # min hour day_of_month month day_of_week command
 
+## Setup logrotation every night
+59    23   *            *     *           flock -n -x /tmp/.logrotate.lock -c logrotate /tmp/sd/firmware/etc/logrotate.conf

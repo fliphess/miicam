@@ -18,24 +18,31 @@ DAEMON_OPTS="-c /var/run/cron"
 PIDFILE="/var/run/${NAME}.pid"
 LOGFILE="${LOGDIR}/${NAME}.log"
 
+
+load_crontab() {
+    if [ -s "$SD_MOUNTDIR/firmware/etc/crontab" ]
+    then
+        ## Load crontab file
+        crontab $DAEMON_OPTS $SD_MOUNTDIR/firmware/etc/crontab
+
+        ## Execute all @reboot tasks
+        grep '@reboot' $SD_MOUNTDIR/firmware/etc/crontab | sed -e 's/@reboot//g' | while read command
+        do
+            exec $command
+        done
+    fi
+}
+
 check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
     start)
         mkdir -p /var/run/cron
-        start_daemon
-
-        if [ -s "$SD_MOUNTDIR/firmware/etc/crontab" ]
-        then
-            crontab $DAEMON_OPTS $SD_MOUNTDIR/firmware/etc/crontab
-            grep '@reboot' $SD_MOUNTDIR/firmware/etc/crontab | sed -e 's/@reboot//g' | while read command
-            do
-                exec $command
-            done
-        fi
+        start_daemon_background
+        load_crontab
     ;;
     stop)
-        stop_daemon "${PIDFILE}"
+        stop_daemon_background "${PIDFILE}"
     ;;
     restart|reload)
         "$0" stop
