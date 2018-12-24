@@ -17,8 +17,7 @@ BUILDENV :=                 \
 	STRIP=$(TARGET)-strip   \
 	CFLAGS="-fPIC"          \
 	CPPFLAGS="-I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib" \
-	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath=/tmp/sd/firmware/lib,--enable-new-dtags"
-
+	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
 
 TOPDIR       := $(CURDIR)
 SOURCEDIR    := $(TOPDIR)/src
