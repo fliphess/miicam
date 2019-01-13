@@ -5,7 +5,7 @@ FROM ubuntu:18.04
 ####################################################
 
 ENV TOOLCHAINDIR="/usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin"
-ENV PATH="${TOOLCHAINDIR}:${PATH}"
+ENV PATH="${TOOLCHAINDIR}:${PATH}:$HOME/.composer/vendor/mediamonks/composer-vendor-cleaner/bin"
 
 ENV TARGET="arm-unknown-linux-uclibcgnueabi"
 
@@ -50,6 +50,7 @@ RUN echo "*** Install required packages" \
       ncurses-dev                        \
       openssl                            \
       php-cli                            \
+      php-curl                           \
       php-mbstring                       \
       unrar                              \
       unzip                              \
@@ -71,7 +72,8 @@ RUN locale-gen en_US.UTF-8
 
 RUN echo "*** Installing composer"       \
  && mkdir -p /usr/local/bin              \
- && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+ && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+ && composer global require hirak/prestissimo mediamonks/composer-vendor-cleaner
 
 
 ####################################################
@@ -85,6 +87,14 @@ RUN echo "*** Downloading toolchain"     \
 RUN echo "*** Unpacking Toolchain"       \
  && cd /usr/src/arm-linux-3.3            \
  && tar xzf /tmp/toolchain.tgz
+
+
+####################################################
+## Source utils in profile                        ##
+####################################################
+
+RUN echo "*** Configuring bashrc" \
+ && echo "source /env/tools/dev/helpers.sh" >> /root/.bashrc
 
 
 ####################################################

@@ -130,7 +130,7 @@ enable_binary()
 
     printf "*** Enabling ${1##*/}... \n"
 
-    if ( mount|grep -q "${BINARY}" )
+    if ( mount | grep -q "${BINARY}" )
     then
         umount "${BINARY}"
     fi
@@ -368,41 +368,6 @@ set_gpio()
     return "${RC}"
 }
 
-##################################################################################
-## Create Snapshot                                                              ##
-##################################################################################
-
-update_snapshot() {
-    echo "Creating snapshot to /tmp/sd/firmware/www/public/snapshot.jpg"
-    /tmp/sd/firmware/bin/ffmpeg -loglevel fatal -i rtsp://localhost:554/live/ch00_0 -vframes 1 -r 1 -y /tmp/sd/firmware/www/public/snapshot.jpg
-}
-
-
-##################################################################################
-## Config manipulation functions                                                ##
-##################################################################################
-
-## Set config value in basecfg
-set_basecfg()
-{
-    VARIABLE="$1"
-    VALUE="$2"
-
-    if ( egrep -q "^[[:space:]]*${VARIABLE}=(|\")${VALUE}(|\"[[:space:]]*)$" "${BASECFG}" )
-    then
-        RC="0"
-    elif ( grep -q "^[[:space:]]*${VARIABLE}=" "${BASECFG}" )
-    then
-        sed -i -e "/^[[:space:]]*${VARIABLE}=/ s/=.*/=\"${VALUE}\"/" "${BASECFG}"
-        RC="$?"
-    else
-        echo "${VARIABLE}=\"${VALUE}\"" >> "${BASECFG}"
-        RC="$?"
-    fi
-
-    return "${RC}"
-}
-
 
 ##################################################################################
 ## LED Control                                                                  ##
@@ -476,358 +441,6 @@ yellow_led()
     return "${RC}"
 }
 
-## Control the infrared LED
-ir_led()
-{
-    INPUT="$1"
-
-    if [ ! -x "${CTRL}" ]
-    then
-        echo "could not find ${CTRL}"
-        return 1
-    fi
-
-    case "$INPUT" in
-        on)
-            ${CTRL} IRLED 255 > /dev/null
-            RC="$?"
-            set_nvram ir_led on
-        ;;
-        off)
-            ${CTRL} IRLED 0 > /dev/null
-            RC="$?"
-            set_nvram ir_led off
-        ;;
-        status)
-            echo "$( get_nvram ir_led )"
-            RC="$?"
-        ;;
-        *)
-            echo "Option $1 not supported"
-            RC="1"
-        ;;
-    esac
-
-    return "${RC}"
-}
-
-## Get the state of all leds
-led_status()
-{
-
-    YELLOW="$( get_nvram yellow_led )"
-    IR_LED="$( get_nvram ir_led     )"
-    BLUE="$(   get_nvram blue_led   )"
-
-    echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
-
-    return 0
-}
-
-##################################################################################
-## Camera Control                                                              ##
-##################################################################################
-
-## Control the infrared filter
-ir_cut()
-{
-    INPUT="$1"
-
-    case "$INPUT" in
-        on)
-            set_gpio 14 1
-            RC="$?"
-
-            set_gpio 15 0
-            RC="$?"
-
-            set_nvram ir_cut on
-        ;;
-        off)
-            set_gpio 14 0
-            RC="$?"
-
-            set_gpio 15 1
-            RC="$?"
-
-            set_nvram ir_cut off
-        ;;
-        status)
-            echo "$( get_nvram ir_cut )"
-            RC="$?"
-        ;;
-        *)
-            echo "Option $1 not supported"
-            RC="1"
-        ;;
-    esac
-
-    return "${RC}"
-}
-
-## Control the night mode
-night_mode()
-{
-    INPUT="$1"
-
-    case "$INPUT" in
-        on)
-            if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
-            then
-                ir_led on
-                RC="$?"
-
-                ir_cut off
-                RC="$?"
-
-                set_isp328 daynight 1
-                RC="$?"
-            fi
-        ;;
-        off)
-            if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
-            then
-                ir_led off
-                RC="$?"
-
-                ir_cut on
-                RC="$?"
-
-                set_isp328 daynight 0
-                RC="$?"
-            fi
-        ;;
-        status)
-            STATUS="$( get_isp328 daynight )"
-            RC="$?"
-
-            if [ "${AUTO_NIGHT_MODE}" -eq 1 ] || [ "$STATUS" == "DAY_MODE" ]
-            then
-                echo "off"
-            elif [ "$STATUS" == "NIGHT_MODE" ]
-            then
-                echo "on"
-            else
-                echo "$STATUS"
-            fi
-        ;;
-        *)
-            echo "Option $INPUT not supported"
-            RC="1"
-        ;;
-    esac
-
-    return "${RC}"
-}
-
-## Control flip mode
-flip()
-{
-    INPUT="$1"
-
-    case "$INPUT" in
-        on)
-            set_isp328 flip 1
-            RC="$?"
-        ;;
-        off)
-            set_isp328 flip 0
-            RC="$?"
-        ;;
-        status)
-            STATUS="$( get_isp328 flip )"
-            RC="$?"
-
-            if [ "$STATUS" -eq 0 ]
-            then
-                echo "off"
-            elif [ "$STATUS" -eq 1 ]
-            then
-                echo "on"
-            else
-                echo "UNKNOWN"
-            fi
-        ;;
-        *)
-            echo "Option $INPUT not supported"
-            RC="1"
-        ;;
-    esac
-
-    return "${RC}"
-}
-
-## Control mirror mode
-mirror()
-{
-    INPUT="$1"
-
-    case "$INPUT" in
-        on)
-            set_isp328 mirror 1
-            RC="$?"
-        ;;
-        off)
-            set_isp328 mirror 0
-            RC="$?"
-        ;;
-        status)
-            STATUS="$( get_isp328 mirror )"
-            RC="$?"
-
-            if [ "$STATUS" -eq 0 ]
-            then
-                echo "off"
-            elif [ "$STATUS" -eq 1 ]
-            then
-                echo "on"
-            else
-                echo "UNKNOWN"
-            fi
-        ;;
-        *)
-            echo "Option $1 not supported"
-            RC="1"
-        ;;
-    esac
-
-    return "${RC}"
-}
-
-##################################################################################
-## Image Control                                                                ##
-##################################################################################
-
-## Control Brightness
-set_brightness()
-{
-    VALUE="$1"
-
-    [ "$VALUE" -gt 255 ] || [ "$VALUE" -lt 0 ] && die "Use a brightness value between 0 and 255"
-
-    set_isp328 brightness "$VALUE"
-    RC="$?"
-
-    return "$RC"
-}
-
-get_brightness()
-{
-    echo $( get_isp328 brightness )
-    RC="$?"
-
-    return "$RC"
-}
-
-## Set contrast
-set_contrast()
-{
-    VALUE="$1"
-
-    [ "$VALUE" -gt 255 ] || [ "$VALUE" -lt 0 ] && die "Use a contrast value between 0 and 255"
-
-    set_isp328 contrast "$VALUE"
-    RC="$?"
-
-    return "$RC"
-}
-
-## Get contrast value
-get_contrast()
-{
-    echo $( get_isp328 contrast )
-    RC="$?"
-
-    return "$RC"
-}
-
-## Set hue
-set_hue()
-{
-    VALUE="$1"
-
-    [ "$VALUE" -gt 255 ] || [ "$VALUE" -lt 0 ] && die "Use a hue value between 0 and 255"
-
-    set_isp328 hue "$VALUE"
-    RC="$?"
-
-    return "$RC"
-}
-
-## Get hue value
-get_hue()
-{
-    echo $( get_isp328 hue )
-    RC="$?"
-
-    return "$RC"
-}
-
-## Set saturation
-set_saturation()
-{
-    VALUE="$1"
-
-    [ "$VALUE" -gt 255 ] || [ "$VALUE" -lt 0 ] && die "Use a saturation value between 0 and 255"
-
-    set_isp328 saturation "$VALUE"
-    RC="$?"
-
-    return "$RC"
-}
-
-## Get saturation value
-get_saturation()
-{
-    echo $( get_isp328 saturation )
-    RC="$?"
-
-    return "$RC"
-}
-
-## Set denoise
-set_denoise()
-{
-    VALUE="$1"
-
-    [ "$VALUE" -gt 255 ] || [ "$VALUE" -lt 0 ] && die "Use a denoise value between 0 and 255"
-
-    set_isp328 denoise "$VALUE"
-    RC="$?"
-
-    return "$RC"
-}
-
-## Get denoise value
-get_denoise()
-{
-    echo $( get_isp328 denoise )
-    RC="$?"
-
-    return "$RC"
-}
-
-## Set sharpness
-set_sharpness()
-{
-    VALUE="$1"
-
-    [ "$VALUE" -gt 255 ] || [ "$VALUE" -lt 0 ] && die "Use a sharpness value between 0 and 255"
-
-    set_isp328 sharpness "$VALUE"
-    RC="$?"
-
-    return "$RC"
-}
-
-## Get sharpness value
-get_sharpness()
-{
-    echo $( get_isp328 sharpness )
-    RC="$?"
-
-    return "$RC"
-}
 
 ##################################################################################
 ## MQTT Functions                                                               ##
@@ -869,34 +482,13 @@ mqtt_subscribe()
     ## Add generic moquitto options from config.cfg to string
     OPTIONS="${OPTIONS} ${MOSQUITTOOPTS} -v"
 
-    /usr/bin/mosquitto_sub ${OPTIONS} -t "${TOPIC}"
+    /usr/bin/mosquitto_sub -k 10 ${OPTIONS} -t "${TOPIC}"
 }
 
 
 ##################################################################################
 ##  Status tools                                                                ##
 ##################################################################################
-
-## Get camera status
-camera_status()
-{
-    MIRROR="$( mirror status )"
-    FLIP="$( flip status )"
-    NIGHT_MODE="$( night_mode status )"
-    IR_CUT="$( ir_cut status )"
-
-    BRIGHTNESS="$( get_brightness )"
-    CONTRAST="$( get_contrast )"
-    HUE="$( get_hue )"
-    SATURATION="$( get_saturation )"
-    DENOISE="$( get_denoise )"
-    SHARPNESS="$( get_sharpness )"
-
-    echo "{\"mirror\":\"$MIRROR\",\"flip\":\"$FLIP\",\"night_mode\":\"$NIGHT_MODE\",\"ir_cut\":\"$IR_CUR\",\"brightness\":\"$BRIGHTNESS\",\"contrast\":\"$CONTRAST\",\"hue\":\"$HUE\",\"denoise\":\"$DENOISE\",\"sharpness\":\"$SHARPNESS\"}"
-    RC="$?"
-
-    return "$RC"
-}
 
 ## Get the system status of the webcam / OS
 system_status()
@@ -918,17 +510,27 @@ system_status()
     return "$RC"
 }
 
-
-##################################################################################
-## Set a new http password                                                      ##
-##################################################################################
-
-reset_http_password()
+## Get the state of all leds
+led_status()
 {
-    echo "root:${ROOT_PASSWORD}" > /tmp/sd/firmware/etc/lighttpd.user
-    RC="$?"
 
-    return "$RC"
+    BLUE="$(   get_nvram blue_led   )"
+    YELLOW="$( get_nvram yellow_led )"
+    IR_LED="$( /tmp/sd/firmware/bin/ir_led -s | awk '{print $NF}' )"
+
+    echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
+
+    return 0
+}
+
+## Get the state of the camera modes
+mode_status()
+{
+    MIRROR="$( /tmp/sd/firmware/bin/mirrrormode -s | awk '{print $NF}' )"
+    FLIP="$(   /tmp/sd/firmware/bin/flipmode    -s | awk '{print $NF}' )"
+    NIGHT="$(  /tmp/sd/firmware/bin/nightmode   -s | awk '{print $NF}' )"
+    IR_CUT="$( /tmp/sd/firmware/bin/ir_cut      -s | awk '{print $NF}' )"
+    echo "{\"mirror_mode\":\"${MIRROR}\",\"flip_mode\":\"${FLIP}\",\"night_mode\":\"$NIGHT\",\"ir_cut\":\"$IR_CUT\"}"
 }
 
 

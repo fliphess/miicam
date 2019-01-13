@@ -70,6 +70,14 @@
 
 #define RTSPD_LOGFILE            "/tmp/sd/log/rtspd.log"
 
+#define CREATE_SNAPSHOT_FILE     "/dev/shm/rtspd_snapshot"
+#define LAST_SNAPSHOT_PATH       "/dev/shm/rtspd_last_snapshot_path"
+
+#define CREATE_VIDEO_FILE        "/dev/shm/rtspd_video"
+#define LAST_VIDEO_PATH          "/dev/shm/rtspd_last_video_path"
+
+#define RECORDING_DURATION       20
+#define RECORDING_MAX_DURATION   30
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -79,7 +87,6 @@
             return -1; \
         }    \
     } while(0)    \
-
 
 struct mdt_alg_t mdt_alg = {mb_cell_en: NULL};
 struct mdt_result_t mdt_result[ENC_TRACK_NUM];
@@ -108,25 +115,21 @@ typedef struct {
     void *bindfd[ENC_TRACK_NUM];
 } gm_enc_t;
 
-
 void *enc_groupfd;
 gm_enc_t enc_param[CAP_CH_NUM][CAP_PATH_NUM];
 
 typedef int (*open_container_fn)(int ch_num, int sub_num);
 typedef int (*close_container_fn)(int ch_num, int sub_num);
 
-
 typedef enum st_opt_type {
     OPT_NONE=0,
     RTSP_LIVE_STREAMING,
 } opt_type_t;
 
-
 typedef struct st_vbs {
     int enabled;                  // * DVR_ENC_EBST_ENABLE: enabled, DVR_ENC_EBST_DISABLE: disabled
     int enc_type;                 // * 0:ENC_TYPE_H264, 1:ENC_TYPE_MPEG4, 2:ENC_TYPE_MJPEG
 } vbs_t;
-
 
 typedef struct st_priv_vbs {
     char sdpstr[SDPSTR_MAX];
@@ -142,14 +145,12 @@ typedef struct st_priv_vbs {
     pthread_mutex_t priv_vbs_mutex;
 } priv_vbs_t;
 
-
 typedef struct st_bs {
     int event;                    // * Config change please set 1 for enqueue_thread to config this
     int enabled;                  // * DVR_ENC_EBST_ENABLE: enabled, DVR_ENC_EBST_DISABLE: disabled
     opt_type_t opt_type;          // * 1:rtsp_live_streaming, 2: file_avi_recording 3:file_h264_recording
     vbs_t video;                  // * VIDEO, 0: main-bitstream, 1: sub1-bitstream, 2:sub2-bitstream
 } avbs_t;
-
 
 typedef struct st_priv_bs {
     int play;
@@ -160,7 +161,6 @@ typedef struct st_priv_bs {
     close_container_fn close;
     priv_vbs_t video;             // * VIDEO, 0: main-bitstream, 1: sub1-bitstream, 2:sub2-bitstream
 } priv_avbs_t;
-
 
 typedef struct st_av {
     // * Public data
@@ -174,11 +174,10 @@ typedef struct st_av {
     priv_avbs_t priv_bs[RTSP_NUM_PER_CAP];
 } av_t;
 
-
 pthread_t enqueue_thread_id   = 0;
 pthread_t encode_thread_id    = 0;
 pthread_t motion_thread_id    = 0;
-pthread_t snapshot_thread_id  = 0;
+pthread_t media_thread_id     = 0;
 
 unsigned int sys_tick         = 0;
 struct timeval sys_sec        = {-1, -1};
@@ -191,6 +190,9 @@ static int rtspd_avail_ch     = 0;
 
 char *snapshot_buf            = 0;
 static int snapshot_create    = 0;
+static int video_create       = 0;
+
+static int motion_detected    = 0;
 
 pthread_mutex_t stream_queue_mutex;
 av_t enc[CAP_CH_NUM];
@@ -203,8 +205,17 @@ void *encode_object;
 void *sub_enc_object;             // * Create encoder object (scaler)
 void *sub_bindfd;                 // * Create encoder object (scaler) bind
 
-FILE *logfile_handler = NULL;     // * File handler for logging
+FILE *logfile = NULL;             // * File for logging
 
+struct VideoRecording {
+    int recording;
+    int waiting_for_keyframe;
+    struct timeval record_start;
+    FILE *fh;
+    char file_path[80];
+} VideoRecorder;
+
+struct timeval last_motion;
 
 struct CommandLineArguments {
     int framerate;
@@ -228,6 +239,95 @@ static char *rtsp_enc_type_str[] = {
 char *rtsp_password = NULL;
 char *rtsp_username = NULL;
 static int rtsp_use_auth = 0;
+
+
+static void create_directory(const char *dir)
+{
+    char tmp[256];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp), "%s", dir);
+    len = strlen(tmp);
+
+    if (tmp[len - 1] == '/')
+        tmp[len - 1] = 0;
+
+    for(p = tmp + 1; *p; p++) {
+        if(*p == '/') {
+           *p = 0;
+           mkdir(tmp, S_IRWXU);
+           *p = '/';
+        }
+    }
+    mkdir(tmp, S_IRWXU);
+}
+
+
+int start_recording(void)
+{
+    struct tm *sTm;
+    time_t now = time(0);
+    sTm = gmtime(&now);
+
+    char dirstring[40];
+    char filestring[40];
+
+    strftime(dirstring, sizeof(dirstring), "/tmp/sd/RECORDED_VIDEOS/%Y/%m/%d", sTm);
+
+    struct stat st = {0};
+    if (stat(dirstring, &st) != 0) {
+        create_directory(dirstring);
+    }
+
+    strftime(filestring, sizeof(filestring), "video_%H%M%S.h264", sTm);
+
+    sprintf(VideoRecorder.file_path, "%s/%s%c", dirstring, filestring, '\0');
+    log_info("Video recording to %s", VideoRecorder.file_path);
+
+    // * Open video recording file
+    VideoRecorder.fh = fopen(VideoRecorder.file_path, "wb");
+    if (VideoRecorder.fh == NULL) {
+        log_error("Failed to open file %s", VideoRecorder.file_path);
+        return EXIT_FAILURE;
+    }
+
+    // * Write filename of last video to file
+    FILE *last_video_path = fopen(LAST_VIDEO_PATH, "wb");
+    if (last_video_path == NULL) {
+        log_error("Failed to open file: %s", LAST_VIDEO_PATH);
+        return EXIT_FAILURE;
+    }
+
+    fputs(VideoRecorder.file_path, last_video_path);
+    fclose(last_video_path);
+
+    gettimeofday(&VideoRecorder.record_start, NULL);
+    VideoRecorder.recording = 1;
+    VideoRecorder.waiting_for_keyframe = 1;
+
+    return EXIT_SUCCESS;
+}
+
+
+int stop_recording(void)
+{
+    struct timeval now;
+    gettimeofday(&now, NULL);
+
+    log_info("Stopping video recording after %ld seconds", now.tv_sec - VideoRecorder.record_start.tv_sec);
+
+    // * Close video file
+    if (VideoRecorder.fh)
+        fclose(VideoRecorder.fh);
+
+    // * Reset all Recorder settings to zero
+    VideoRecorder.waiting_for_keyframe = 1;
+    VideoRecorder.recording = 0;
+    VideoRecorder.file_path[0] = '\0';
+
+    return EXIT_SUCCESS;
+}
 
 
 static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
@@ -306,31 +406,7 @@ static int set_interesting_area(int ch)
 err_ext:
     if (mdt_alg.mb_cell_en)
         free(mdt_alg.mb_cell_en);
-
     return ret;
-}
-
-
-static void create_directory(const char *dir)
-{
-    char tmp[256];
-    char *p = NULL;
-    size_t len;
-
-    snprintf(tmp, sizeof(tmp),"%s",dir);
-    len = strlen(tmp);
-
-    if (tmp[len - 1] == '/')
-        tmp[len - 1] = 0;
-
-    for(p = tmp + 1; *p; p++) {
-        if(*p == '/') {
-           *p = 0;
-           mkdir(tmp, S_IRWXU);
-           *p = '/';
-        }
-    }
-    mkdir(tmp, S_IRWXU);
 }
 
 
@@ -346,6 +422,7 @@ void take_snapshot(void)
 
     int snapshot_len = 0;
     FILE *snapshot_fd = NULL;
+    FILE *snapshot_name_fd = NULL;
 
     gm_enc_t *param;
     snapshot_t snapshot;
@@ -369,18 +446,27 @@ void take_snapshot(void)
         }
 
         strftime(filestring, sizeof(filestring), "snapshot_%H%M%S.jpg", sTm);
-        sprintf(full_file_path, "%s/%s", dirstring, filestring);
+        sprintf(full_file_path, "%s/%s%c", dirstring, filestring, '\0');
 
         log_info("Image %s size %d bytes", full_file_path, snapshot_len);
 
+        // * Write image to file
         snapshot_fd = fopen(full_file_path, "wb");
         if (snapshot_fd == NULL) {
             log_error("Failed to open file %s", full_file_path);
             exit(EXIT_FAILURE);
         }
-
         fwrite(snapshot_buf, 1, snapshot_len, snapshot_fd);
         fclose(snapshot_fd);
+
+        // * Write filename to /dev/shm
+        snapshot_name_fd = fopen(LAST_SNAPSHOT_PATH, "wb");
+        if (snapshot_name_fd == NULL) {
+            log_error("Failed to open file %s", LAST_SNAPSHOT_PATH);
+            exit(EXIT_FAILURE);
+        }
+        fputs(full_file_path, snapshot_name_fd);
+        fclose(snapshot_name_fd);
     }
 	else {
         if (snapshot_len == -1) {
@@ -475,7 +561,7 @@ static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len
     static struct timeval err_print_tval;
 
     pb = &enc[ch_num].priv_bs[sub_num];
-    b = &enc[ch_num].bs[sub_num];
+    b  = &enc[ch_num].bs[sub_num];
 
     if ( pb->play == 0 || (b->event != NONE_BS_EVENT) ) {
         ret = 1;
@@ -769,7 +855,6 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
 #define PRINT_INTERVAL_MS 5000
 static unsigned int frame_counts[CAP_CH_NUM][RTSP_NUM_PER_CAP] = {{0}};
 static unsigned int rec_bs_len[CAP_CH_NUM][RTSP_NUM_PER_CAP]   = {{0}};
-
 static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeval *cur_timeval)
 {
     int enc_type, w, h;
@@ -812,7 +897,8 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                 gm_enc = &enc_param[pb->video.cap_ch][pb->video.cap_path].enc[pb->video.rec_track];
                 get_enc_res(gm_enc, &enc_type, &w, &h);
                 sprintf(res_str, "%dx%d", w, h);
-                log_info("/live/ch%02d_%d: cap%d_%d %9s %s %d.%02d fps %d kbps",
+
+                log_info("path=/live/ch%02d_%d cap=%d_%d size=%s enc=%s fps=%d.%d kbps=%d record=%d motion=%d",
                         i,
                         j,
                         pb->video.cap_ch,
@@ -821,7 +907,15 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                         rtsp_enc_type_str[enc_type],
                         (frame_counts[i][j] * 1000 / total_ms),
                         (frame_counts[i][j] * 100000 / total_ms) % 100,
-                        (rec_bs_len[i][j] * 8 / 1024) * 1000 / total_ms);
+                        (rec_bs_len[i][j] * 8 / 1024) * 1000 / total_ms,
+                        VideoRecorder.recording,
+                        motion_detected
+                );
+
+                if (VideoRecorder.recording == 1) {
+                    log_info("Recording to %s", VideoRecorder.file_path);
+                }
+
                 frame_counts[i][j] = 0;
                 rec_bs_len[i][j] = 0;
             }
@@ -836,7 +930,6 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
 
 #define POLL_WAIT_TIME 15000
 static unsigned int poll_wait_time = 0;
-
 static void env_release_resources(void)
 {
     int ret, ch_num;
@@ -959,29 +1052,68 @@ cmd_cb_err:
 }
 
 
-static void *snapshot_thread(void *arg)
+static void *media_thread(void *arg)
 {
+    struct timeval now;
+
+    // * Reset all to zero before entering loop
+    VideoRecorder.recording    = 0;
+    VideoRecorder.file_path[0] = '\0';
+    VideoRecorder.fh           = NULL;
+
     while (rtspd_sysinit) {
-        if (access("/dev/shm/rtspd_snapshot", F_OK ) != -1 ) {
-            unlink("/dev/shm/rtspd_snapshot");
+        // * Check for external snapshot trigger
+        if (access(CREATE_SNAPSHOT_FILE, F_OK ) != -1 ) {
+            unlink(CREATE_SNAPSHOT_FILE);
             snapshot_create = 1;
         }
 
+        // * Check for internal snapshot trigger
         if (snapshot_create == 1) {
             log_info("Creating a snapshot of the current data stream");
             snapshot_create = 0;
             take_snapshot();
         }
+
+        // * Check for external video record trigger
+        if (access(CREATE_VIDEO_FILE, F_OK ) != -1 ) {
+            unlink(CREATE_VIDEO_FILE);
+            video_create = 1;
+        }
+
+        // * Check for internal video record trigger
+        if (video_create == 1) {
+            video_create = 0;
+
+            if (VideoRecorder.recording != 1) {
+                log_info("Creating a video of the next %d seconds of the data stream", RECORDING_DURATION);
+
+                if (start_recording() < 0)
+                    log_error("Failed to start recording in media thread");
+            }
+        }
+
+        // * Check if recordings duration is over 30 seconds
+        if (VideoRecorder.recording == 1) {
+            gettimeofday(&now, NULL);
+            if (now.tv_sec - VideoRecorder.record_start.tv_sec > (long)RECORDING_MAX_DURATION) {
+                if (stop_recording() < 0)
+                    log_error("Failed to stop recording in media thread");
+            }
+        }
+
         usleep(1000);
     }
 
     return 0;
 }
 
+
 static void *motion_thread(void *arg)
 {
     int ch;
     int ret;
+    struct timeval now;
 
     gm_enc_t *param;
     param = &enc_param[0][0];
@@ -1005,7 +1137,6 @@ static void *motion_thread(void *arg)
     }
 
     int training_detected = 0;
-    int motion_detected = 0;
 
     while (rtspd_sysinit) {
         ret = gm_recv_multi_cap_md(cap_md, 1);
@@ -1034,7 +1165,7 @@ static void *motion_thread(void *arg)
             else if (mdt_result[ch].result == MOTION_DATA_ERROR)
                 log_error("Motion data retrieval failed.");
 
-            // * MD Training
+            // * Motion Training
             else if (mdt_result[ch].result == MOTION_IS_TRAINING) {
                 if (training_detected == 0) {
                     training_detected = 1;
@@ -1045,10 +1176,14 @@ static void *motion_thread(void *arg)
             // * Motion ON
             else if (mdt_result[ch].result == MOTION_DETECTED) {
                 if (motion_detected == 0) {
+                    gettimeofday(&last_motion, NULL);
                     motion_detected = 1;
 
                     if (cliArgs.snapshot == 1)
                         snapshot_create = 1;
+
+                    if (cliArgs.record == 1)
+                        video_create = 1;
 
                     log_info("Motion ON - executing motion on script");
                     system(MOTION_ON_SCRIPT);
@@ -1059,6 +1194,16 @@ static void *motion_thread(void *arg)
             else if (mdt_result[ch].result == NO_MOTION) {
                 if (motion_detected == 1) {
                     motion_detected = 0;
+
+                    // * Turn recording off after 20 seconds
+                    if (VideoRecorder.recording == 1) {
+                        gettimeofday(&now, NULL);
+
+                        if (now.tv_sec - last_motion.tv_sec >= (long)RECORDING_DURATION) {
+                            if (stop_recording() < 0)
+                                log_error("Failed to stop recording in motion thread");
+                        }
+                    }
                     log_info("Motion OFF - executing motion off script");
                     system(MOTION_OFF_SCRIPT);
                 }
@@ -1383,7 +1528,7 @@ int gm_get_bandwidth_info(void)
     if (match == NULL)
         return 0;
 
-    match = strstr(match,"CH_0");
+    match = strstr(match, "CH_0");
 
     if (match == NULL)
         return 0;
@@ -1490,19 +1635,19 @@ void *encode_thread(void *ptr)
         for (cap_path = 0; cap_path < CAP_PATH_NUM; cap_path++) {
             param = &enc_param[cap_ch][cap_path];
             for (rec_track = 0; rec_track < ENC_TRACK_NUM; rec_track++) {
-
                 if (param->bindfd[rec_track]) {
                     poll_fds[cap_ch][ch].bindfd = param->bindfd[rec_track];
-                    poll_fds[cap_ch][ch].event = GM_POLL_READ;
+                    poll_fds[cap_ch][ch].event  = GM_POLL_READ;
 
                     avbs = &enc[cap_ch].bs[ch];
                     get_enc_res(&param->enc[rec_track], NULL, &w, &h);
+
                     pb = &enc[cap_ch].priv_bs[ch];
                     pb->video.bs_buf_len = w * h * 3 / 2;
-                    pb->video.bs_buf = malloc(pb->video.bs_buf_len);
-                    pb->video.cap_ch = cap_ch;
-                    pb->video.cap_path = cap_path;
-                    pb->video.rec_track = rec_track;
+                    pb->video.bs_buf     = malloc(pb->video.bs_buf_len);
+                    pb->video.cap_ch     = cap_ch;
+                    pb->video.cap_path   = cap_path;
+                    pb->video.rec_track  = rec_track;
                     ch++;
                 }
             }
@@ -1590,7 +1735,7 @@ void *encode_thread(void *ptr)
         if (rtspd_sysinit == 0)
             break;
 
-        if ( (ret = gm_recv_multi_bitstreams(&bs[0][0],CAP_CH_NUM * RTSP_NUM_PER_CAP)) < 0 ) {
+        if ( (ret = gm_recv_multi_bitstreams(&bs[0][0], CAP_CH_NUM * RTSP_NUM_PER_CAP)) < 0 ) {
             // <= -1: fail, 0: success
             log_error("Failed to receive bitstream (gm_recv_multi_bitstreams).");
             continue;
@@ -1598,6 +1743,7 @@ void *encode_thread(void *ptr)
 
         for (i = 0; i < CAP_CH_NUM; i++) {
             for (j = 0; j < RTSP_NUM_PER_CAP; j++) {
+
                 if (rtspd_sysinit == 0)
                     continue;
 
@@ -1606,12 +1752,20 @@ void *encode_thread(void *ptr)
 
                 if ((bs[i][j].retval < 0) && bs[i][j].bindfd)
                     log_error("Failed to receive bitstream.");
+
                 else if (bs[i][j].retval == GM_SUCCESS) {
-                    //
-                    // * TODO - Write to file if motion if set to 1
-                    //
+
+                    if (bs[i][j].bs.keyframe == 1)
+                        VideoRecorder.waiting_for_keyframe = 0;
+
+                    // * Write buffer to file in case recording is enabled
+                    if (VideoRecorder.recording == 1 && VideoRecorder.fh != NULL && VideoRecorder.waiting_for_keyframe == 0) {
+                        fwrite(bs[i][j].bs.bs_buf, 1, bs[i][j].bs.bs_len, VideoRecorder.fh);
+                        fflush(VideoRecorder.fh);
+                    }
+
                     if (avbs->video.enc_type != ENC_TYPE_MJPEG) {
-                        if ((pb->play == 1) && (bs[i][j].bs.keyframe ==1))
+                        if ((pb->play == 1) && (bs[i][j].bs.keyframe == 1))
                             first_play[i][j] = 1;
                     }
                     else
@@ -1619,16 +1773,18 @@ void *encode_thread(void *ptr)
 
                     if (first_play[i][j] == 1) {
                         pthread_mutex_lock(&pb->video.priv_vbs_mutex);
-                        pb->video.offs = (int) (bs[i][j].bs.bs_buf);
-                        pb->video.len = bs[i][j].bs.bs_len;
+                        pb->video.offs  = (int) (bs[i][j].bs.bs_buf);
+                        pb->video.len   = bs[i][j].bs.bs_len;
                         pb->video.tv_ms = bs[i][j].bs.timestamp;
                         pthread_mutex_unlock(&pb->video.priv_vbs_mutex);
 
-                        if (write_rtp_frame_ext(i, j, (void *)pb->video.offs, pb->video.len,bs[i][j].bs.timestamp) == 1) {
+                        // * Write buffer to the rtsp service and empty buffers
+                        if (write_rtp_frame_ext(i, j, (void *)pb->video.offs, pb->video.len, bs[i][j].bs.timestamp) == 1) {
                             pb->video.offs = (int)NULL;
-                            pb->video.len = 0;
+                            pb->video.len  = 0;
                         }
                     }
+
                     print_enc_average(i, j, bs[i][j].bs.bs_len, &prev);
                 }
             }
@@ -1755,10 +1911,10 @@ static int rtspd_start(int port)
     }
 
     // * Snapshot Thread
-    if (snapshot_thread_id == (pthread_t)NULL) {
+    if (media_thread_id == (pthread_t)NULL) {
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        ret = pthread_create(&snapshot_thread_id, &attr, &snapshot_thread, NULL);
+        ret = pthread_create(&media_thread_id, &attr, &media_thread, NULL);
         pthread_attr_destroy(&attr);
     }
 
@@ -1809,13 +1965,17 @@ int is_bs_all_disable(void)
 }
 
 
-static void rtspd_stop()
+static void rtspd_stop(void)
 {
     pthread_mutex_destroy(&stream_queue_mutex);
     rtspd_sysinit = 0;
 
-    if (cliArgs.motion == 1) {
+    if (cliArgs.motion == 1)
         motion_detection_end();
+
+    if (cliArgs.record == 1 && VideoRecorder.recording == 1) {
+        if (stop_recording() < 0)
+            log_error("Failed to stop recording in rtspd_stop");
     }
 }
 
@@ -1834,7 +1994,7 @@ char *get_local_ip(void)
 }
 
 
-static void print_usage()
+static void print_usage(void)
 {
     printf("Usage:\n");
     printf(" ./rtspd [-bfwhm] [-j|-4]\n");
@@ -1857,7 +2017,8 @@ static void print_usage()
 }
 
 
-void signal_handler(int sig){
+void signal_handler(int sig)
+{
     log_fatal("Exiting rtspd: CTRL+C pressed, or exit requested");
 
     rtspd_stop();
@@ -1868,9 +2029,9 @@ void signal_handler(int sig){
 
 void setup_logging(void)
 {
-    logfile_handler = fopen(RTSPD_LOGFILE, "a");
-    if(logfile_handler)
-        log_set_fp(logfile_handler);
+    logfile = fopen(RTSPD_LOGFILE, "a");
+    if(logfile)
+        log_set_fp(logfile);
 }
 
 

@@ -42,22 +42,23 @@ $app->get('/ping', function ($request, $response) {
 // **************************************************************
 
 $app->get('/snapshot/create', function ($request, $response) {
-    $output = Snapshot::Create();
-    if ($output) {
+    $filename = Snapshot::Create();
+
+    if ($filename and is_file($filename)) {
         $data = array(
             "success"  => true,
-            "output"   => $output,
-            "filename" => Snapshot::$snapshot_destination,
-            "url"      => '/snapshot.jpg',
+            "output"   => "Snapshot created",
+            "filename" => $filename,
+            "url"      => Snapshot::GetUrl($filename),
         );
     } else {
-        $data = array("success" => false);
+        $data = array("success" => false, "message" => "Failed to request snapshot");
     }
     return $response->withJson($data);
 })->setName('/snapshot/create');
 
-$app->get('/snapshot/save/new', function ($request, $response) {
-    $filename = Snapshot::SaveNew();
+$app->get('/snapshot/get_last', function ($request, $response) {
+    $filename = Snapshot::GetLast();
 
     if (($filename) && is_file($filename)) {
         $data = array(
@@ -65,14 +66,49 @@ $app->get('/snapshot/save/new', function ($request, $response) {
             "filename" => $filename,
         );
     } else {
-        $data = array("success" => false);
+        $data = array("success" => false, "message" => "Failed to request snapshot path");
     }
     return $response->withJson($data);
 
-})->setName('/snapshot/save/new');
+})->setName('/snapshot/get_last');
 
-$app->get('/snapshot/save/current', function ($request, $response) {
-    $filename = Snapshot::SaveCurrent();
+$app->get('/snapshot/get_url', function ($request, $response) {
+    $url = Snapshot::GetLastUrl();
+
+    if ($url) {
+        $data = array(
+            "success" => true,
+            "url"     => $url,
+        );
+    } else {
+        $data = array("success" => false, "message" => "Failed to request last snapshot url");
+    }
+    return $response->withJson($data);
+})->setName('/snapshot/get_url');
+
+
+// **************************************************************
+// ** Record                                                   **
+// **************************************************************
+
+$app->get('/record/create', function ($request, $response) {
+    $filename = VideoRecording::Create();
+
+    if ($filename and is_file($filename)) {
+        $data = array(
+            "success"  => true,
+            "output"   => "VideoRecording created",
+            "filename" => $filename,
+            "url"      => VideoRecording::GetUrl($filename),
+        );
+    } else {
+        $data = array("success" => false);
+    }
+    return $response->withJson($data);
+})->setName('/record/create');
+
+$app->get('/record/get_last', function ($request, $response) {
+    $filename = VideoRecording::GetLast();
 
     if (($filename) && is_file($filename)) {
         $data = array(
@@ -80,11 +116,25 @@ $app->get('/snapshot/save/current', function ($request, $response) {
             "filename" => $filename,
         );
     } else {
-        $data = array("success" => false);
+        $data = array("success" => false, "message" => "Failed to request last video url");
     }
     return $response->withJson($data);
-})->setName('/snapshot/save/current');
 
+})->setName('/record/get_last');
+
+$app->get('/record/get_url', function ($request, $response) {
+    $url = VideoRecording::GetLastUrl();
+
+    if ($url) {
+        $data = array(
+            "success" => true,
+            "url"     => $url,
+        );
+    } else {
+        $data = array("success" => false, "message" => "Failed to request last video url");
+    }
+    return $response->withJson($data);
+})->setName('/record/get_url');
 
 
 // **************************************************************

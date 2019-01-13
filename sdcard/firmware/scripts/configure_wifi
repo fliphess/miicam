@@ -67,6 +67,3 @@ then
     fi
 fi
 
-set_basecfg WIFI_SSID "${WIFI_SSID}"
-set_basecfg WIFI_PASS "${WIFI_PASS}"
-

@@ -4,7 +4,7 @@ ARGUMENTS=$*
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 CONTAINER_IMAGE="chuangmi-720p-hack"
-DOCKER_CLI="docker run -i -v ${SCRIPTPATH}:/result --detach=false --tty=true"
+DOCKER_CLI="docker run -i -v ${SCRIPTPATH}:/result --detach=false --rm --tty=true"
 
 ## Print help output
 function usage()
@@ -222,6 +222,10 @@ function main()
             build_docker
         ;;
         --shell)
+            shell
+        ;;
+        --newshell)
+            build_docker
             shell
         ;;
         --setup-web)

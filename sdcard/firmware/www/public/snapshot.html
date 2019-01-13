@@ -32,31 +32,41 @@
 
         <div style="padding:0 16px;">
             <h1>Snapshot</h1>
-            <p>View, Take and Save snapshots of the rtsp stream.
-                This is implemented by snapshotting the rtsp stream using ffmpeg (Heavy! Slow!) and thus only works if rtsp is enabled.
-                In the future, this will be managed from the rtsp software itself.
-            </p>
+            <p>View, Take and Save snapshots of the rtsp stream.</p>
 
             <div id="app">
                 <b-alert variant="danger"
-                     dismissible
-                     :show="show_alert"
-                     @dismissed="show_alert=false">
-                     {{ alert_message }}
+                    dismissible
+                    :show="error_show"
+                    @dismissed="error_show=false">
+                    {{ error_message }}
                 </b-alert>
+
+                <b-alert variant="success"
+                    dismissible
+                    :show="success_show"
+                    @dismissed="success_show=false">
+                    {{ success_message }}
+                </b-alert>
+
+                <b-alert variant="primary"
+                    dismissible
+                    :show="video_show"
+                    @dismissed="video_show=false">
+                    The latest video can be downloaded: <a v-bind:href="video_url" target="_blank" rel="noopener noreferrer">Here</a>
+                </b-alert>
+
                 <div id="buttons">
                     <b-button-group>
-                    <b-button v-on:click="TakeSnapshot">Refresh Snapshot</b-button>
-                    <b-button v-on:click="SaveCurImage">Save current snapshot image</b-button>
-                    <b-button v-on:click="SaveNewImage">Save new snapshot image</b-button>
+                    <b-button v-on:click="RequestSnapshot">Request Snapshot</b-button>
+                    <b-button v-on:click="RefreshImage">Refresh Image</b-button>
+                    <b-button v-on:click="RequestVideo">Request Recording</b-button>
+                    <b-button v-on:click="DownloadVideo">Download Last Video</b-button>
                     </b-button-group>
                 </div>
                 <br/>
                 <img img v-bind:src="image_url" />
                 <br/>
-                <div id="output">
-                <pre v-if="output"><code>{{ output }}</code></pre>
-                </div>
             </div>
         </div>
 
@@ -64,40 +74,97 @@
             const app = new Vue({
                 el: '#app',
                 data: {
-                    show_alert: false,
-                    alert_message: "",
-                    tag: 1,
-                    output: "",
-                    image_url: "./snapshot.jpg",
+                    error_show: false,
+                    error_message: null,
+                    success_show: false,
+                    success_message: null,
+                    image_url: "",
+                    video_show: false,
+                    video_url: "",
+                },
+                mounted: function() {
+                    this.refresh();
+                    this.interval = setInterval(this.refresh, 10000);
                 },
                 methods: {
-                    call: function(url) {
-                        axios.get(url)
-                            .then(response => {
-                                this.output = response.data;
-                                this.show_alert = false;
-                                this.image();
-
-                            })
-                            .catch(error => {
-                                this.output = "";
-                                this.show_alert = true;
-                                this.alert_message = error.response.data.message;
-                            });
+                    handle_success: function(message) {
+                        this.success_show    = true;
+                        this.error_show      = false;
+                        this.success_message = message;
                     },
-                    image: function() {
-                        this.tag += 1;
-                        this.image_url = './snapshot.jpg?tag=' + this.tag;
+                    handle_error: function(message)  {
+                        this.video_show    = false;
+                        this.success_show  = false;
+                        this.error_show    = true;
+                        this.error_message = message;
                     },
-                    SaveCurImage: function() {
-                        this.call(`/api/snapshot/save/current`);
+                    refresh: function() {
+                        axios.get(`/api/snapshot/get_url`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.image_url = response.data.url;
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
                     },
-                    SaveNewImage: function() {
-                        this.call(`/api/snapshot/save/new`);
+                    DownloadVideo: function() {
+                        axios.get(`/api/record/get_url`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.video_url = response.data.url;
+                                this.video_show = true;
+                            } else {
+                                this.video_show = false;
+                                this.handle_error("Failed to retrieve video download url from /api/record/get_url");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
                     },
-                    TakeSnapshot: function() {
-                        this.call(`/api/snapshot/create`);
+                    RequestVideo: function() {
+                        axios.get(`/api/record/create`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.handle_success("Recording requested");
+                            } else {
+                                this.handle_error("Failed to start recording video from /api/record/create");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
                     },
+                    RefreshImage: function() {
+                        axios.get(`/api/snapshot/get_url`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.handle_success("Snapshot image refreshed with most recent one");
+                                this.image_url = response.data.url;
+                            } else {
+                                this.handle_error("Failed to retrieve snapshot image url from /api/snapshot/get_url");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    },
+                    RequestSnapshot: function() {
+                        axios.get(`/api/snapshot/create`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.handle_success("Snapshot requested and image refreshed with most recent one");
+                                this.image_url = response.data.url;
+                            } else {
+                                this.handle_error("Failed to retrieve snapshot image url from /api/snapshot/get_url");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    }
                 }
             });
         </script>

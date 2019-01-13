@@ -1,6 +1,9 @@
 build
 prefix
 src
+tools/bin/*
+tools/lib/*.so
+tools/lib/*.o
 sdcard/firmware/bin/*
 sdcard/manufacture.bin
 sdcard/log
@@ -21,3 +24,4 @@ chuangmi-720p-hack.zip
 chuangmi-720p-hack.tgz
 .idea/
 .vscode
+tmp/

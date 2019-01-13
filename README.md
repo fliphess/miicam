@@ -5,7 +5,7 @@
 
 This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
-With this firmware I'll try to offer other methods of using this webcam that do not require an internet uplink.
+With this firmware an alternate method of using this webcam is created that does not require an internet uplink.
 
 **Please read the [security considerations in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Security-Considerations).**
 
@@ -15,50 +15,11 @@ With this firmware I'll try to offer other methods of using this webcam that do 
 ## Features
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
+Have a look in [the wiki for all the available options](https://github.com/fliphess/chuangmi-720p-hack/wiki).
 
-This camera has the default following features:
+## Screenshots
 
-* Wifi
-* Night vision
-* Motion detection: a video file is generated if a motion have been detected in the last 60 seconds.
-* Send video data over the network on Chinese servers in the cloud to allow people to view camera data from their smartphone wherever they are.
-* Setup thanks to a smartphone application.
-* Local video storage on a SD card
-* No RTSP server
-
-
-This hack includes:
-
-* No more cloud feature (nothing goes out of your local network)
-* No more need to use a smartphone application
-* Telnet server - _Disabled by default._
-* Web server with PHP support - _Enabled by default._
-* HTTP api for control of webcam.
-* RTSP server - _Enabled by default._
-* SSH server - _Enabled by default._
-* FTP server - _Disabled by default._
-* Syslog to SD card and remote host - _Enabled by default_
-* Configure Timezone and use ntpclient to set date and time over Internet
-* Configurable cronjobs
-* MQTT status updates
-* MQTT Control
-* Configuration using a basic web interface
-* Reintroduction of motion detection without the need for cloud
-* User authentication on RTSP daemon
-* SSL for webserver (not enabled by default yet)
-
-
-Planned futures:
-
-* Wiki showing how to integrate with home automation
-* Web based Image and Video viewer
-* Build a newer `tf_recovery.img` and u-boot using the toolchain
-* Capture video on motion and on command
-* Replace Chinese voice files with English and more important: allow playback of those voices
-* Auto update mechanism for firmware
-* MQTT updates and control
-* SSL for rtspd
-* Audio with RTSP stream
+Screenshots of the web interface [can be found in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Screenshots)
 
 
 ## Installation on the Chuangmi 720P camera

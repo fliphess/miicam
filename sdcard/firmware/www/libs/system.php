@@ -7,7 +7,6 @@
 
 class Configuration
 {
-
     public function __construct() {}
 
     public static $config_path  = '/tmp/sd/config.cfg';
@@ -48,7 +47,7 @@ class Configuration
         "WIFI_SSID",
     ];
 
-    public function Read() {
+    public static function Read() {
         // * Read the configuration and return as a single-key array
 
         $content = file_get_contents(self::$config_path);
@@ -62,7 +61,7 @@ class Configuration
         return $content;
     }
 
-    public function Write($content) {
+    public static function Write($content) {
         // * Save the content to the configuration file
 
         self::Verify($content);
@@ -73,11 +72,10 @@ class Configuration
                 sprintf('Failed to write new content to %s configuration content: %s (line: %s)', $line, $lines_count)
             );
         }
-
         return true;
     }
 
-    public function Verify($content) {
+    public static function Verify($content) {
         $lines = explode("\n", $content);
         $lines_count = 0;
 
@@ -102,7 +100,7 @@ class Configuration
         return true;
     }
 
-    public function Test() {
+    public static function Test() {
         // * Verify the syntax of the current config file on the command line
 
         $command = sprintf('/bin/busybox ash -n %s 2>&1 && echo "Syntax OK"', self::$config_path);
@@ -110,7 +108,7 @@ class Configuration
         return array("success" => ($return == 0) ? true : false, "message" => ($output) ? implode(" ", $output) : "No syntax errors detected in configuration file");
     }
 
-    public function ListBackups() {
+    public static function ListBackups() {
         // * Return a list of all available backup files in backup dir
 
         if (!is_dir(self::$backupdir)) {
@@ -126,7 +124,7 @@ class Configuration
         return $file_list;
     }
 
-    public function Backup() {
+    public static function Backup() {
         // * Backup the current configuration to backupdir
         $timestamp = strftime("%Y%m%d_%H%M%S");
 
@@ -144,7 +142,7 @@ class Configuration
         return sprintf('config_%s', $timestamp);
     }
 
-    public function RemoveBackups() {
+    public static function RemoveBackups() {
         // * Leave N backups and cleanup the rest
 
         $command = sprintf("rm -rf %s 2>&1", escapeshellarg(self::$backupdir));
@@ -158,7 +156,7 @@ class Configuration
         return true;
     }
 
-    public function BackupRestore($filename) {
+    public static function BackupRestore($filename) {
         // * Restore a given backup file as the current config
         $sourcefile = sprintf('%s/%s', self::$backupdir, $filename);
 
@@ -189,7 +187,7 @@ class GPIO
 {
     public function __construct() {}
 
-    public function Get(int $pin) {
+    public static function Get(int $pin) {
         $command = sprintf("cat '/sys/class/gpio/gpio%d/value' 2>&1", $pin);
         exec($command, $output, $return);
 
@@ -202,7 +200,7 @@ class GPIO
         return trim(implode(" ", $output));
     }
 
-    public function Set(int $pin, int $value) {
+    public static function Set(int $pin, int $value) {
 
         $current = self::Get($pin);
 
@@ -232,7 +230,7 @@ class NVRAM
 
     public function __construct() {}
 
-    public function Get(string $key) {
+    public static function Get(string $key) {
         $command = sprintf('%s get %s 2>&1', self::$nvram, escapeshellarg($key));
 
         exec($command, $output, $return);
@@ -246,7 +244,7 @@ class NVRAM
         return trim(implode("", $output));
     }
 
-    public function Set(string $key, string $value) {
+    public static function Set(string $key, string $value) {
         $current = self::Get($key);
 
         if ($current == $value) return true;
@@ -272,7 +270,7 @@ class NVRAM
         return true;
     }
 
-    public function Exists(string $key) {
+    public static function Exists(string $key) {
         $data = self::Show();
 
         if ($data) {
@@ -282,7 +280,7 @@ class NVRAM
         }
     }
 
-    public function Show() {
+    public static function Show() {
         $command = sprintf("%s show 2>&1", self::$nvram);
         exec($command, $output, $return);
 
@@ -300,7 +298,7 @@ class NVRAM
         return $data;
     }
 
-    public function Unset_Key(string $key) {
+    public static function Unset_Key(string $key) {
         if (!self::Exists($key)) return false;
 
         $command = sprintf("%s unset %s 2>&1", self::$nvram, escapeshellarg($key));

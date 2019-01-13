@@ -66,7 +66,7 @@ class Net_Wifi
     var $REG_WPA_IE_STRING        = 'WPA Version 1';
     var $REG_WPA2_IE_STRING       = 'IEEE 802.11i/WPA2 Version 1';
 
-    function get(string $strInterface)
+    static function get(string $strInterface)
     {
         $arLines = array();
         $command = sprintf('/sbin/iwconfig %s 2>&1', escapeshellarg($strInterface));
@@ -84,7 +84,7 @@ class Net_Wifi
     }
 
 
-    private function parse(string $strAll)
+    private static function parse(string $strAll)
     {
         $objConfig = new Net_Wifi_Config();
 
@@ -155,7 +155,7 @@ class Net_Wifi
         return $objConfig;
     }
 
-    function IfConfig() {
+    static function IfConfig() {
         // from http://www.highonphp.com/regex-pattern-parsing-ifconfig
         $interfaces = array();
         foreach (preg_split("/\n\n/", $data) as $int) {
@@ -208,16 +208,16 @@ class WIFI
 {
     public function __construct() {}
 
-    public function WifiConfig() {
+    public static function WifiConfig() {
         $wifi = new Net_Wifi();
         return $wifi->get("wlan0");
     }
-    public function IfConfig() {
+    public static function IfConfig() {
         $wifi = new Net_Wifi();
         return $wifi->IfConfig();
     }
 
-    public function DataDict() {
+    public static function DataDict() {
         $config = self::WifiConfig();
 
         return array(
@@ -244,7 +244,7 @@ class WIFI
         );
     }
 
-    public function WifiPass() {
+    public static function WifiPass() {
         $pass = $_ENV['WIFI_PASS'];
         $ssid = $_ENV['WIFI_SSID'];
 
@@ -261,7 +261,7 @@ class WIFI
     }
 
     // * Reset wifi credentials
-    public function ResetWifiCredentials() {
+    public static function ResetWifiCredentials() {
         if  (NVRAM::Unset_Key('miio_ssid')     && \
              NVRAM::Unset_Key('miio_key_mgmt') && \
              NVRAM::Unset_Key('miio_passwd')) {
@@ -271,31 +271,31 @@ class WIFI
     }
 
     // * Get the SSID of the wifi connection
-    public function Ssid() {
+    public static function Ssid() {
         $config = self::WifiConfig();
         return $config->ssid;
     }
 
     // * Get the bitrate of the wifi connection
-    public function Bitrate() {
+    public static function Bitrate() {
         $config = self::WifiConfig();
         return $config->rate;
     }
 
     // * Get the noise level of the wifi connection
-    public function NoiseLevel() {
+    public static function NoiseLevel() {
         $config = self::WifiConfig();
         return $config->noise;
     }
 
     // * Get the link quality value of the wifi connection
-    public function LinkQuality() {
+    public static function LinkQuality() {
         $config = self::WifiConfig();
         return $config->link_quality;
     }
 
     // * Get the signal level of the wifi connection
-    public function SignalLevel() {
+    public static function SignalLevel() {
         $config = self::WifiConfig();
         return $config->rssi;
     }

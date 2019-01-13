@@ -38,9 +38,17 @@ fi
 ##################################################################################
 
 echo "*** Configuring NVRAM"
-for setting in blue_led yellow_led ir_led ir_cut ; do
-    nvram set "${i}=off"
+for setting in blue_led yellow_led; do
+    /usr/sbin/nvram set "${setting}=off"
 done
+
+echo "*** Configuring Stealth mode"
+if [ "${STEALTH_MODE}" -eq 1 ]
+then
+    /usr/sbin/nvram set "light=off"
+else
+    /usr/sbin/nvram set "light=on"
+fi
 
 nvram commit
 
@@ -158,16 +166,6 @@ then
 else
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99auto_night_mode stop
 
-    NIGHT_MODE="$( get_nvram night_mode )"
-
-    case $NIGHT_MODE in
-        1)
-            night_mode off
-        ;;
-        2)
-            night_mode on
-        ;;
-    esac
 fi
 
 ####################################
@@ -211,8 +209,8 @@ fi
 
 if [ "$CEILING_MODE" -eq 1 ]
 then
-    flip on
-    mirror on
+    /tmp/sd/firmware/bin/flipmode -e
+    /tmp/sd/firmware/bin/mirrormode -e
 fi
 
 ##################################################################################

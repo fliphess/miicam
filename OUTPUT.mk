@@ -1,6 +1,14 @@
+## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
+THIRD_PARTY_SBINS =                        \
+	dropbear                               \
+	logrotate                              \
+	lighttpd                               \
+	lighttpd-angel                         \
+	tcpdump
 
-## The compiled binaries in prefix/bin that should be stripped and copied to firmware/bin
-BINS =                                     \
+
+## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
+THIRD_PARTY_BINS =                         \
 	scp dbclient dropbearkey               \
 	sftp-server                            \
 	arm-php arm-php-cgi                    \
@@ -10,14 +18,13 @@ BINS =                                     \
 	pcregrep pcretest                      \
 	lsof                                   \
 	nano                                   \
-	runas                                  \
 	rsync                                  \
-	rtspd                                  \
 	strace                                 \
 	vim xxd
 
-## Extra tools and symlinks that should not be stripped
-BINEXTRAS =                                \
+
+## Extra tools and symlinks that should not be stripped but copied too
+THIRD_PARTY_BIN_EXTRAS =                   \
 	rview                                  \
 	vimdiff                                \
 	ex                                     \
@@ -25,17 +32,8 @@ BINEXTRAS =                                \
 	view
 
 
-## The compiled binaries in prefix/sbin that should be stripped and copied to firmware/bin
-SBINS =                                    \
-	dropbear                               \
-	logrotate                              \
-	lighttpd                               \
-	lighttpd-angel                         \
-	tcpdump
-
-
-## Compiled library files that should be stripped and copied to firmware/lib
-LIBS =                                     \
+## Third party library files that should be stripped and copied to firmware/lib
+THIRD_PARTY_LIBS =                         \
 	libavcodec.so.58.18.100                \
 	libavdevice.so.58.3.100                \
 	libavfilter.so.7.16.100                \
@@ -105,7 +103,7 @@ LIBS =                                     \
 
 
 ## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
-LIBEXTRAS =                                \
+THIRD_PARTY_LIB_EXTRAS =                   \
 	libavcodec.so                          \
 	libavcodec.so.58                       \
 	libavdevice.so                         \

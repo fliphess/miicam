@@ -75,10 +75,6 @@ VIMVERSION = 8.1.0629
 VIMARCHIVE = vim-$(VIMVERSION)
 VIMURI = https://github.com/vim/vim/archive/v$(VIMVERSION).tar.gz
 
-RUNASVERSION = master
-RUNASARCHIVE = runas.zip
-RUNASURI = https://github.com/remram44/static-sudo/archive/$(RUNASVERSION).zip
-
 RSYNCVERSION = 3.1.3
 RSYNCARCHIVE = rsync-$(RSYNCVERSION).tar.gz
 RSYNCURI = https://download.samba.org/pub/rsync/src/$(RSYNCARCHIVE)

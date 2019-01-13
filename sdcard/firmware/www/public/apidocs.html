@@ -36,7 +36,7 @@
             <div id="app">
                  <div id="DocViewer">
                      <b-button-group>
-                         <b-button v-on:click="select('snapshot')">Snapshot</b-button>
+                         <b-button v-on:click="select('recording')">Recording</b-button>
                          <b-button v-on:click="select('camera')">Camera</b-button>
                          <b-button v-on:click="select('leds')">LEDS</b-button>
                          <b-button v-on:click="select('system')">System</b-button>
@@ -68,7 +68,7 @@
             const app = new Vue({
                 el: '#app',
                 data: {
-                    section: "snapshot",
+                    section: "recording",
                     title: "",
                     endpoints: [],
                     sections: {
@@ -84,12 +84,16 @@
                                { method: 'GET',  uri: '/api/config/restore/{filename}', desc: 'Restore an earlier created backup as the current configuration file'},
                             ]
                         },
-                        snapshot: {
-                            title: "Snapshot Control",
+                        recording: {
+                            title: "Media Recording",
                             endpoints: [
-                               { method: 'GET', uri: '/api/snapshot/create',            desc: 'Update the snapshot image by overwriting it with a new one (only works if rtspd is running)'},
-                               { method: 'GET', uri: '/api/snapshot/save/new',          desc: 'Create a snapshot image and save it in the image directory. (only works if rtspd is running)'},
-                               { method: 'GET', uri: '/api/snapshot/save/current',      desc: 'Save the current snapshot image in the image directory.'},
+                               { method: 'GET', uri: '/api/snapshot/create',            desc: 'Request the creation of a new snapshot (only works if rtspd is running)'},
+                               { method: 'GET', uri: '/api/snapshot/get_last',          desc: 'Get the full file path of the last created snapshot. (only works if rtspd is running)'},
+                               { method: 'GET', uri: '/api/snapshot/get_url',           desc: 'Get the url to the last created snapshot.'},
+
+                               { method: 'GET', uri: '/api/record/create',              desc: 'Request the creation of a new video recording (only works if rtspd is running)'},
+                               { method: 'GET', uri: '/api/record/get_last',            desc: 'Get the full file path of the last created video recording. (only works if rtspd is running)'},
+                               { method: 'GET', uri: '/api/record/get_url',             desc: 'Get the url to the last created video recording.'},
                             ]
                         },
                         camera: {

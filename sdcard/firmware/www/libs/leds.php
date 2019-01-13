@@ -4,7 +4,6 @@
 // ** led functions                                            **
 // **************************************************************
 
-
 class LED
 {
     private static $leds = [
@@ -25,13 +24,13 @@ class LED
 
     public function __construct() { }
 
-    public function GetState(string $led) {
+    public static function GetState(string $led) {
         // * Get the state of a led
         if (!in_array($led, self::$leds)) return;
         return NVRAM::Get($led);
     }
 
-    public function SetState(string $led, string $state) {
+    public static function SetState(string $led, string $state) {
         // * Set the state of a led
         if (!in_array($led, self::$leds) || !in_array($state, self::$states)) return;
         return NVRAM::Set($led, $state);
@@ -48,14 +47,14 @@ class LED
         }
     }
 
-    public function IsLedOn(string $led) {
+    public static function IsLedOn(string $led) {
         // * Returns True if led is on
         $state = self::GetState($led);
         return (($state == "on") || ($state == "blink")) ? true : false;
     }
 
     // * Get Led Json status
-    public function LedState() {
+    public static function LedState() {
         $data  = array();
         foreach (self::$leds as $led) {
             $data[$led] = self::IsLedOn($led);
@@ -71,15 +70,15 @@ class LED
 
 class Blue_Led extends LED
 {
-    public function IsOn() {
+    public static function IsOn() {
         return parent::IsLedOn('blue_led');
     }
 
-    public function IsOff() {
+    public static function IsOff() {
         return (parent::IsLedOn('blue_led') == true) ? false : true;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if (!self::IsOn()) {
             self::Ctl('LEDSTATUS 0 0');
             self::SetState('blue_led', 'on');
@@ -88,7 +87,7 @@ class Blue_Led extends LED
         else return false;
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if (self::IsOn()) {
             self::Ctl('LEDSTATUS 0 1');
             self::SetState('blue_led', 'off');
@@ -97,7 +96,7 @@ class Blue_Led extends LED
         else return false;
     }
 
-    public function TurnBlink() {
+    public static function TurnBlink() {
         self::Ctl('LEDSTATUS 0 2');
         self::SetState('blue_led', 'blink');
         return self::IsOn();
@@ -111,15 +110,15 @@ class Blue_Led extends LED
 
 class Yellow_Led extends LED
 {
-    public function IsOn() {
+    public static function IsOn() {
         return parent::IsLedOn('yellow_led');
     }
 
-    public function IsOff() {
+    public static function IsOff() {
         return (parent::IsLedOn('yellow_led') == true) ? false : true;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if (!self::IsOn()) {
             self::Ctl('LEDSTATUS 1 0');
             self::SetState('yellow_led', 'on');
@@ -128,7 +127,7 @@ class Yellow_Led extends LED
         else return false;
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if (self::IsOn()) {
             self::Ctl('LEDSTATUS 1 1');
             self::SetState('yellow_led', 'off');
@@ -137,7 +136,7 @@ class Yellow_Led extends LED
         else return false;
     }
 
-    public function TurnBlink() {
+    public static function TurnBlink() {
         self::Ctl('LEDSTATUS 1 2');
         self::SetState('yellow_led', 'blink');
         return self::IsOn();
@@ -149,31 +148,54 @@ class Yellow_Led extends LED
 // ** Infra Red led control                                    **
 // **************************************************************
 
-class IR_Led extends LED
+class IR_Led
 {
-    public function IsOn() {
-        return parent::IsLedOn('ir_led');
+    public static function IsOn() {
+        $command = "/tmp/sd/firmware/bin/ir_led -s | awk '{print \$NF}'";
+        exec($command, $output, $return);
+
+        if ($return != 0) {
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
+        }
+
+        if (($output) && (rtrim($output[0]) == "on")) {
+            return true;
+        } else { 
+            return false;
+        }
     }
 
-    public function IsOff() {
-        return (parent::IsLedOn('ir_led') == true) ? false : true;
+    public static function IsOff() {
+        return (self::IsOn() == true) ? false : true;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if (!self::IsOn()) {
-            self::Ctl('IRLED 255');
-            self::SetState('ir_led', 'on');
+            $command = "/tmp/sd/firmware/bin/ir_led -e";
+            exec($command, $output, $return);
+    
+            if ($return != 0) {
+                throw new \Exception(
+                    sprintf('Error executing %s: %s', $command, implode(" ", $output))
+                );
+            }
             return self::IsOn();
         }
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if (self::IsOn()) {
-            self::Ctl('IRLED 0');
-            self::SetState('ir_led', 'off');
+            $command = "/tmp/sd/firmware/bin/ir_led -d";
+            exec($command, $output, $return);
+    
+            if ($return != 0) {
+                throw new \Exception(
+                    sprintf('Error executing %s: %s', $command, implode(" ", $output))
+                );
+            }
             return self::IsOff();
         }
     }
 }
-
-

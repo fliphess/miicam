@@ -3,32 +3,28 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "chuangmi_utils.h"
+
 
 int main(int argc, char *argv[])
 {
-    FILE *fd;
-    fd = fopen("/dev/shm/rtspd_snapshot", "w");
+    if (request_snapshot() < 0) {
+        fprintf(stderr, "*** Error: Failed to request a snapshot by writing to %s\n", RTSPD_REQUEST_SNAPSHOT);
+        return EXIT_FAILURE;
+    }
 
-    if(!fd)
-        return 1;
-
-    fprintf(fd, "snap\n");
-    fclose(fd);
-
-    usleep(800);
-
-    if (access("/dev/shm/rtspd_snapshot", F_OK ) == -1 ) {
-        char dirstring[40];
-        struct tm *sTm;
-        time_t now = time(0);
-        sTm = gmtime(&now);
-        strftime(dirstring, sizeof(dirstring), "/tmp/sd/RECORDED_IMAGES/%Y/%m/%d", sTm);
-        printf("Snapshot created in %s\n", dirstring);
+    // * Wait until file is removed
+    if (wait_for_file_removal(RTSPD_REQUEST_SNAPSHOT) == 0) {
+        fprintf(stderr, "*** Success: Snapshot created!\n");
     }
     else {
-        printf("ERROR: No snapshot created! Is rtspd running?\n");
+        fprintf(stderr, "*** Error: No snapshot created! Is rtspd running?\n");
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    // * Retrieve filename of last created snapshot
+    int ret = get_last_snapshot();
+
+    return ret;
 }
 

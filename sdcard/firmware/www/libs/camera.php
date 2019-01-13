@@ -44,7 +44,7 @@ class ISP328
         "white_clip",
     ];
 
-    private function ReadValue() {
+    private static function ReadValue() {
         $output = @file_get_contents("/proc/isp328/command");
         if ($output == false) {
             throw new \Exception(
@@ -54,7 +54,7 @@ class ISP328
         return trim($output);
     }
 
-    public function Get(string $key) {
+    public static function Get(string $key) {
         if (!in_array($key, self::$all_isp_keys)) {
             throw new \Exception(
                 sprintf('Invalid input: Key %s not in known keys.', escapeshellarg($key))
@@ -74,7 +74,7 @@ class ISP328
         return self::ReadValue();
     }
 
-    public function Set(string $key, string $value) {
+    public static function Set(string $key, string $value) {
         if (!in_array($key, self::$all_isp_keys)) {
             throw new \Exception(
                 'Invalid input: Key %s not in known keys.'
@@ -105,31 +105,29 @@ class ISP328
 
 class IR_Cut extends ISP328
 {
-    public function IsOn() {
-        $state = NVRAM::Get("ir_cut");
-        return (($state == "on") || ($state == "auto")) ? true : false;
+    public static function IsOn() {
+        $state = GPIO::Get(14);
+        return ($state == "1") ? true : false;
     }
 
-    public function IsOff() {
-        $state = NVRAM::Get("ir_cut");
-        return ($state == "off") ? true : false;
+    public static function IsOff() {
+        $state = GPIO::Get(14);
+        return ($state == "0") ? true : false;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if (!self::IsOn()) {
             GPIO::Set(14, 1);
             GPIO::Set(15, 0);
-            NVRAM::Set("ir_cut", "on");
             return true;
         }
         else return false;
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if (self::IsOn()) {
             GPIO::Set(14, 0);
             GPIO::Set(15, 1);
-            NVRAM::Set("ir_cut", "off");
             return true;
         }
         else return false;
@@ -143,17 +141,17 @@ class IR_Cut extends ISP328
 
 class NightMode extends ISP328
 {
-    public function IsOn() {
+    public static function IsOn() {
         $current = self::Get('daynight');
         return (($_ENV['AUTO_NIGHT_MODE'] == 1) || ($current == 'NIGHT_MODE')) ? true : false;
     }
 
-    public function IsOff() {
+    public static function IsOff() {
         $current = self::Get('daynight');
         return (($_ENV['AUTO_NIGHT_MODE'] == 0) && ($current == 'DAY_MODE')) ? true : false;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if ($_ENV['AUTO_NIGHT_MODE'] == 1) return false;
 
         if (!self::IsOn()) {
@@ -165,7 +163,7 @@ class NightMode extends ISP328
         else return false;
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if ($_ENV['AUTO_NIGHT_MODE'] == 1) return false;
 
         if (self::IsOn()) {
@@ -185,17 +183,17 @@ class NightMode extends ISP328
 
 class FlipMode extends ISP328
 {
-    public function IsOn() {
+    public static function IsOn() {
         $current = self::Get('flip');
         return ($current == 1) ? true : false;
     }
 
-    public function IsOff() {
+    public static function IsOff() {
         $current = self::Get('flip');
         return ($current == 0) ? true : false;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if (!self::IsOn()) {
             self::Set('flip', 1);
             return true;
@@ -204,7 +202,7 @@ class FlipMode extends ISP328
         }
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if (self::IsOn()) {
             self::Set('flip', 0);
             return true;
@@ -221,17 +219,17 @@ class FlipMode extends ISP328
 
 class MirrorMode extends ISP328
 {
-    public function IsOn() {
+    public static function IsOn() {
         $current = self::Get('mirror');
         return ($current == 1) ? true : false;
     }
 
-    public function IsOff() {
+    public static function IsOff() {
         $current = self::Get('mirror');
         return ($current == 0) ? true : false;
     }
 
-    public function TurnOn() {
+    public static function TurnOn() {
         if (!self::IsOn()) {
             self::Set('mirror', 1);
             return true;
@@ -240,7 +238,7 @@ class MirrorMode extends ISP328
         }
     }
 
-    public function TurnOff() {
+    public static function TurnOff() {
         if (self::IsOn()) {
             self::Set('mirror', 0);
             return true;

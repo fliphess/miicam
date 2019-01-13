@@ -4,7 +4,7 @@ class LogTailer
 {
     public function __construct() { }
 
-    static $file_mapping = array(
+    public static $file_mapping = array(
         "syslog"   => '/tmp/sd/log/syslog',
         "webapp"   => '/tmp/sd/log/webapp.log',
         "bootlog"  => '/tmp/sd/log/ft_boot.log',
@@ -12,7 +12,7 @@ class LogTailer
         "rtspd" => '/tmp/sd/log/rtspd.log',
     );
 
-    static function Get($log, $seek) {
+    public static function Get($log, $seek) {
 
         if (!getenv('ENABLE_LOGGING') == 1) {
             throw new \Exception(

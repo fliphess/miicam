@@ -17,6 +17,8 @@ fi
 ## Message MQTT
 if [ "$ENABLE_MQTT" -eq 1 ]
 then
-    mqtt_send "${MOTION_TOPIC}" "$MOTION_MQTT_OFF"
+    mqtt_send "${MOTION_TOPIC}" "$MQTT_OFF"
 fi
 
+## Turn blue led to normal on
+blue_led on

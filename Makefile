@@ -23,11 +23,12 @@ TOPDIR       := $(CURDIR)
 SOURCEDIR    := $(TOPDIR)/src
 PREFIXDIR    := $(TOPDIR)/prefix
 BUILDDIR     := $(TOPDIR)/build
+TOOLSDIR     := $(TOPDIR)/tools
 
-GMLIBDIR     := $(TOPDIR)/tools/gm_lib
-RTSPDDIR     := $(TOPDIR)/tools/rtspd
-UTILSDIR     := $(TOPDIR)/tools/utils
-PATCHESDIR   := $(TOPDIR)/tools/patches
+PATCHESDIR   := $(TOOLSDIR)/patches
+GMLIBDIR     := $(TOOLSDIR)/gm_lib
+RTSPDDIR     := $(TOOLSDIR)/rtsp_server
+UTILSDIR     := $(TOOLSDIR)/utils
 
 BINARIESDIR  := $(TOPDIR)/sdcard/firmware/bin
 LIBRARIESDIR := $(TOPDIR)/sdcard/firmware/lib
@@ -39,12 +40,29 @@ include SOURCES.mk
 include OUTPUT.mk
 
 
-UTILS :=                                            \
-	tools/chuangmi_ctrl                             \
-	tools/take_snapshot
+LIBS :=                              \
+	$(BUILDDIR)/chuangmi_ircut       \
+	$(BUILDDIR)/chuangmi_isp328      \
+	$(BUILDDIR)/chuangmi_pwm         \
+	$(BUILDDIR)/chuangmi_utils
+
+
+UTILS :=                             \
+	$(BUILDDIR)/chuangmi_ctrl        \
+	$(BUILDDIR)/take_snapshot        \
+	$(BUILDDIR)/take_video           \
+	$(BUILDDIR)/ir_cut               \
+	$(BUILDDIR)/ir_led               \
+	$(BUILDDIR)/mirrormode           \
+	$(BUILDDIR)/nightmode            \
+	$(BUILDDIR)/flipmode             \
+	$(BUILDDIR)/camera_adjust
 
 
 utils: $(UTILS)
+
+
+libs: $(LIBS)
 
 
 all:                                 \
@@ -70,12 +88,12 @@ all:                                 \
 	$(BUILDDIR)/vim                  \
 	$(BUILDDIR)/nano                 \
 	$(BUILDDIR)/php                  \
-	$(BUILDDIR)/runas                \
 	$(BUILDDIR)/rsync                \
 	$(BUILDDIR)/lsof                 \
 	$(BUILDDIR)/strace               \
 	$(BUILDDIR)/ffmpeg               \
 	$(BUILDDIR)/rtspd                \
+	libs                             \
 	utils                            \
 	sdcard/manufacture.bin
 
@@ -98,7 +116,7 @@ $(SOURCEDIR)/$(ZLIBARCHIVE):
 
 $(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(ZLIBVERSION)
-	@tar -xzf $(SOURCEDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
+	tar -xzf $(SOURCEDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(ZLIBVERSION)             && \
 	$(BUILDENV)                          \
 		./configure                      \
@@ -607,24 +625,6 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 
 
 #################################################################
-## RUNAS                                                       ##
-#################################################################
-
-$(SOURCEDIR)/$(RUNASARCHIVE):
-	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(RUNASURI) || rm -f $@
-
-
-$(BUILDDIR)/runas: $(PREFIXDIR)/bin $(SOURCEDIR)/$(RUNASARCHIVE)
-	@mkdir -p $(BUILDDIR) && rm -rf $(BUILDDIR)/static-sudo-$(RUNASVERSION)
-	@unzip $(SOURCEDIR)/$(RUNASARCHIVE) -d $(BUILDDIR)
-	cd $(BUILDDIR)/static-sudo-$(RUNASVERSION)                                  && \
-	$(TARGET)-gcc -static -W -Wall -Wextra -Werror -pedantic rpzsudo.c -o runas && \
-	cp runas $(PREFIXDIR)/bin/runas
-	@rm -rf $(BUILDDIR)/static-sudo-$(RUNASVERSION)
-	@touch $@
-
-
-#################################################################
 ## VIM                                                         ##
 #################################################################
 
@@ -815,18 +815,18 @@ $(BUILDDIR)/ffmpeg: $(SOURCEDIR)/$(FFMPEGARCHIVE) $(BUILDDIR)/x264 $(BUILDDIR)/z
 #################################################################
 
 $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
-	@mkdir -p $(BUILDDIR)
-	@cd $(RTSPDDIR)                                       && \
-	$(TARGET)-gcc                                            \
-		-DLOG_USE_COLOR                                      \
-		-Wall                                                \
-		-I$(GMLIBDIR)/inc                                    \
-		$(RTSPDDIR)/$(@F).c                                  \
-		$(RTSPDDIR)/log/log.c                                \
-		$(RTSPDDIR)/librtsp.a                                \
-		-L$(GMLIBDIR)/lib                                    \
-		-lpthread -lm -lrt -lgm -o $(PREFIXDIR)/bin/rtspd && \
-		$(TARGET)-strip $(PREFIXDIR)/bin/rtspd
+	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
+	cd $(RTSPDDIR) && \
+	$(TARGET)-gcc \
+		-DLOG_USE_COLOR \
+		-Wall \
+		-I$(GMLIBDIR)/inc \
+		$(RTSPDDIR)/$(@F).c \
+		$(RTSPDDIR)/log/log.c \
+		$(RTSPDDIR)/librtsp.a \
+		-L$(GMLIBDIR)/lib \
+		-lpthread -lm -lrt -lgm -o $(TOOLSDIR)/bin/rtspd && \
+		$(TARGET)-strip $(TOOLSDIR)/bin/rtspd
 	@touch $@
 
 
@@ -834,9 +834,25 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 ## UTILS                                                       ##
 #################################################################
 
+$(LIBS):
+	@mkdir -p $(BUILDDIR)
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/lib$(@F).so -fPIC $(TOOLSDIR)/lib/$(@F).c && \
+	touch $(BUILDDIR)/$(@F)
 
-$(UTILS):
-	$(TARGET)-gcc -Wall -I$(GMLIBDIR)/inc -L$(GMLIBDIR)/lib -lpthread -lgm $(UTILSDIR)/$(@F).c -o $@ && $(TARGET)-strip $@
+
+$(UTILS): $(PREFIXDIR)/bin $(LIBS)
+	@mkdir -p $(BUILDDIR)
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc \
+		-Wall \
+		-o $(TOOLSDIR)/bin/$(@F) $(UTILSDIR)/$(@F).c \
+		-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib \
+		-lchuangmi_ircut \
+		-lchuangmi_utils \
+		-lchuangmi_isp328 \
+		-lchuangmi_pwm && \
+	touch $(BUILDDIR)/$(@F)
 
 
 sdcard/manufacture.bin:
@@ -847,46 +863,67 @@ sdcard/manufacture.bin:
 ##                                                             ##
 #################################################################
 
-.PHONY: install website images uninstall clean
+.PHONY: website install images uninstall clean
+
+website:
+	@cd $(WEBROOT) \
+	\
+	&& echo '*** Running composer install in $(WEBROOT)' \
+	&& $(COMPOSER) install --no-dev --ignore-platform-reqs --no-interaction --prefer-source \
+	\
+	&& echo "***Removing all unneeded crap from the vendor dir" \
+	&& php $(HOME)/.composer/vendor/mediamonks/composer-vendor-cleaner/bin/clean --dir vendor/ \
+	\
+	&& echo "*** Recreating class mappings" \
+	&& $(COMPOSER) dump-autoload --classmap-authoritative \
+	\
+	&& echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues' \
+	&& find $(WEBROOT)/vendor -type l -delete
 
 
-install: all
-	mkdir -p $(BINARIESDIR)                                                                     && \
-	echo "*** Moving binaries to $(BINARIESDIR)"                                                && \
-	cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(BINS)  && cp $(BINS)  $(BINARIESDIR)              && \
-	cd $(PREFIXDIR)/bin  && cp $(BINEXTRAS) $(BINARIESDIR)                                      && \
-	cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(SBINS) && cp $(SBINS) $(BINARIESDIR)              && \
-	echo "*** Moving libraries to $(LIBRARIESDIR)"                                              && \
-	cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(LIBS)  && cp $(LIBS)  $(LIBRARIESDIR)             && \
-	cd $(PREFIXDIR)/lib  && cp $(LIBEXTRAS) $(LIBRARIESDIR)                                     && \
-	echo "*** Collecting our own crafts to $(BINARIESDIR)"                                      && \
-	cd $(TOPDIR)/tools   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR) \;
+install: all website
+	@mkdir -p $(BINARIESDIR) \
+	\
+	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
+	&& cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(THIRD_PARTY_SBINS) && cp $(THIRD_PARTY_SBINS) $(BINARIESDIR) \
+	&& cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(THIRD_PARTY_BINS)  && cp $(THIRD_PARTY_BINS)  $(BINARIESDIR) \
+	&& cd $(PREFIXDIR)/bin  && cp $(THIRD_PARTY_BIN_EXTRAS) $(BINARIESDIR) \
+	\
+	&& echo "*** Copying third party libraries and extras to $(LIBRARIESDIR)" \
+	&& cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(THIRD_PARTY_LIBS) && cp $(THIRD_PARTY_LIBS) $(LIBRARIESDIR) \
+	&& cd $(PREFIXDIR)/lib  && cp $(THIRD_PARTY_LIB_EXTRAS) $(LIBRARIESDIR) \
+	\
+	&& echo "*** Copying our own binaries to $(BINARIESDIR)" \
+	&& cd $(TOOLSDIR)/bin   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR) \; \
+	\
+	&& echo "*** Copying our own libraries to $(BINARIESDIR)" \
+	&& cd $(TOOLSDIR)/lib   && find . -maxdepth 1 -type f -name '*.so' -exec $(TARGET)-strip {} \; -exec cp {} $(LIBRARIESDIR) \;
 
 
-website: all install
-	@echo '*** Running composer install in $(WEBROOT)'                                          && \
-	cd $(WEBROOT)                                                                               && \
-	$(COMPOSER) install --no-dev --ignore-platform-reqs --no-interaction --prefer-source        && \
-	echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues'         && \
-	find $(WEBROOT)/vendor -type l -delete
-
-
-images: all install website
-	@echo "*** Creating archive of sdcard/ to chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz" && \
-	find . -maxdepth 1 -type f -name 'chuangmi-720p-hack.zip' -or -name 'chuangmi-720p-hack.tgz' -delete    && \
-	zip -r --quiet chuangmi-720p-hack.zip README.md sdcard                                       && \
-	tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard                                 && \
-	echo "*** chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz created"
-
-
-uninstall:
-	cd $(TOPDIR)/                                                                               && \
-	rm -f chuangmi-720p-hack.tgz chuangmi-720p-hack.zip                                         && \
-	rm -rf $(BINARIESDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                 && \
-	cd $(TOPDIR)/ && find tools -maxdepth 1 -type f -not -name 'README' | xargs rm -f
+images: all website install
+	@cd $(TOPDIR) \
+	\
+	&& echo "*** Removing older version of chuangmi-720p-hack.tgz and chuangmi-720p-hack.zip" \
+	&& find $(TOPDIR) -maxdepth 1 -type f -name 'chuangmi-720p-hack.zip' -or -name 'chuangmi-720p-hack.tgz' -delete \
+	\
+	&& echo "*** Creating zip archive of sdcard/ to chuangmi-720p-hack.zip" \
+	&& zip -r --quiet chuangmi-720p-hack.zip README.md sdcard \
+	\
+	&& echo "*** Creating tar archive of sdcard/ to chuangmi-720p-hack.tgz" \
+	&& tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard \
+	\
+	&& echo "*** chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz created"
 
 
 clean:
-	rm -rf $(BINARIESDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR)                                 && \
-	cd $(TOPDIR)/ && find tools -maxdepth 1 -type f -not -name 'README' | xargs rm -f
+	@cd $(TOPDIR) \
+	\
+	&& echo "*** Removing directories with build artifacts" \
+	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR) \
+	\
+	&& echo "Removing all own-brewed binaries" \
+	&& find $(TOOLSDIR)/bin -maxdepth 1 -type f -delete \
+	\
+	&& echo "Removing all self-brewed libraries" \
+	&& find $(TOOLSDIR)/lib -maxdepth 1 -type f -name '*.so' -delete
 

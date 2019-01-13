@@ -58,7 +58,7 @@ class Services
         }
     }
 
-    public function Run(string $service, string $action) {
+    public static function Run(string $service, string $action) {
 
         if (!in_array($action, self::$all_actions)) {
             throw new \Exception(
@@ -111,7 +111,7 @@ class Services
         return self::Run($service, 'stop');
     }
 
-    public function Restart(string $service) {
+    public static function Restart(string $service) {
         if (!self::IsRunning($service)) {
             throw new \Exception(
                 sprintf('Error: service %s not running!', $service)
