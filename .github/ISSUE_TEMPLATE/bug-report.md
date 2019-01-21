@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+It's only 5 questions, and if they're not relevant you can skip them, but please describe as much as possible to make it easy for me to understand what is going on.
+
+
 **Do you use the command line, MQTT or the web interface?**
 ...
 

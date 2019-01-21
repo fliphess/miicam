@@ -2,7 +2,7 @@
 name: I just need some help setting up my camera
 about: Fill this form if you need some help to get the hack working
 title: ''
-labels: Question, New Created Issue
+labels: New Created Issue, Question
 assignees: ''
 
 ---
