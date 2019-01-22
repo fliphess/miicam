@@ -7,18 +7,12 @@ assignees: ''
 
 ---
 
-It's only 5 questions, and if they're not relevant you can skip them, but please describe as much as possible to make it easy for me to understand what is going on.
+It's only 3 questions, and if they're not relevant you can wipe them, but please describe as much as possible to make it easy for me to understand what is going on.
+
+See https://github.com/fliphess/chuangmi-720p-hack/wiki/How-to-tar-or-zip-the-logs-when-filing-an-issue 
 
 
-**Do you use the command line, MQTT or the web interface?**
-...
-
-
-**What are you trying to do? What is the expected result?**
-...
-
-
-**What is the behaviour you experience? Can you describe what is going wrong?**
+**What are you trying to do but fails due to a bug? What is the expected result?**
 ...
 
 
