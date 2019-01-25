@@ -17,7 +17,6 @@ DESC="Restartd daemon"
 DAEMON="/mnt/data/restartd/restartd"
 DAEMON_OPTS="-i 30 -c /etc/restartd.conf"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

@@ -13,7 +13,6 @@ $app->get('/info', function ($request, $response, $args) {
 })->setName('/info');
 
 
-
 // **************************************************************
 // ** Logviewer Ajax endpoint                                  **
 // **************************************************************
@@ -26,7 +25,6 @@ $app->get('/logviewer/{log}/refresh', function ($request, $response, $args) {
 })->setName('/logviewer/refresh');
 
 
-
 // **************************************************************
 // ** Ping                                                     **
 // **************************************************************
@@ -36,106 +34,119 @@ $app->get('/ping', function ($request, $response) {
 })->setName('/api/ping');
 
 
-
 // **************************************************************
 // ** Snapshot                                                 **
 // **************************************************************
 
-$app->get('/snapshot/create', function ($request, $response) {
-    $filename = Snapshot::Create();
+$app->group('/snapshot', function () use ($app) {
 
-    if ($filename and is_file($filename)) {
-        $data = array(
-            "success"  => true,
-            "output"   => "Snapshot created",
-            "filename" => $filename,
-            "url"      => Snapshot::GetUrl($filename),
-        );
-    } else {
-        $data = array("success" => false, "message" => "Failed to request snapshot");
-    }
-    return $response->withJson($data);
-})->setName('/snapshot/create');
+    $app->get('/create', function ($request, $response) {
+        $filename = Snapshot::Create();
 
-$app->get('/snapshot/get_last', function ($request, $response) {
-    $filename = Snapshot::GetLast();
+        if ($filename and is_file($filename)) {
+            $data = array(
+                "success"  => true,
+                "output"   => "Snapshot created",
+                "filename" => $filename,
+                "url"      => Snapshot::GetUrl($filename),
+            );
+        } else {
+            $data = array("success" => false, "message" => "Failed to request snapshot");
+        }
+        return $response->withJson($data);
+    })->setName('/snapshot/create');
 
-    if (($filename) && is_file($filename)) {
-        $data = array(
-            "success"  => true,
-            "filename" => $filename,
-        );
-    } else {
-        $data = array("success" => false, "message" => "Failed to request snapshot path");
-    }
-    return $response->withJson($data);
+    $app->get('/image', function ($request, $response) {
+        header('Content-type: image/jpeg');
+        Snapshot::GetImage();
+        return $response->withHeader('Content-Type', "image/jpeg");
 
-})->setName('/snapshot/get_last');
+    })->setName('/snapshot/image');
 
-$app->get('/snapshot/get_url', function ($request, $response) {
-    $url = Snapshot::GetLastUrl();
+    $app->get('/get_last', function ($request, $response) {
+        $filename = Snapshot::GetLast();
 
-    if ($url) {
-        $data = array(
-            "success" => true,
-            "url"     => $url,
-        );
-    } else {
-        $data = array("success" => false, "message" => "Failed to request last snapshot url");
-    }
-    return $response->withJson($data);
-})->setName('/snapshot/get_url');
+        if (($filename) && is_file($filename)) {
+            $data = array(
+                "success"  => true,
+                "filename" => $filename,
+            );
+        } else {
+            $data = array("success" => false, "message" => "Failed to request snapshot path");
+        }
+        return $response->withJson($data);
 
+    })->setName('/snapshot/get_last');
+
+    $app->get('/get_url', function ($request, $response) {
+        $url = Snapshot::GetLastUrl();
+
+        if ($url) {
+            $data = array(
+                "success" => true,
+                "url"     => $url,
+            );
+        } else {
+            $data = array("success" => false, "message" => "Failed to request last snapshot url");
+        }
+        return $response->withJson($data);
+    })->setName('/snapshot/get_url');
+
+});
 
 // **************************************************************
 // ** Record                                                   **
 // **************************************************************
 
-$app->get('/record/create', function ($request, $response) {
-    $filename = VideoRecording::Create();
+$app->group('/record', function () use ($app) {
 
-    if ($filename and is_file($filename)) {
-        $data = array(
-            "success"  => true,
-            "output"   => "VideoRecording created",
-            "filename" => $filename,
-            "url"      => VideoRecording::GetUrl($filename),
-        );
-    } else {
-        $data = array("success" => false);
-    }
-    return $response->withJson($data);
-})->setName('/record/create');
+    $app->get('/create', function ($request, $response) {
+        $filename = VideoRecording::Create();
 
-$app->get('/record/get_last', function ($request, $response) {
-    $filename = VideoRecording::GetLast();
+        if ($filename and is_file($filename)) {
+            $data = array(
+                "success"  => true,
+                "output"   => "VideoRecording created",
+                "filename" => $filename,
+                "url"      => VideoRecording::GetUrl($filename),
+            );
+        } else {
+            $data = array("success" => false);
+        }
 
-    if (($filename) && is_file($filename)) {
-        $data = array(
-            "success"  => true,
-            "filename" => $filename,
-        );
-    } else {
-        $data = array("success" => false, "message" => "Failed to request last video url");
-    }
-    return $response->withJson($data);
+        return $response->withJson($data);
+    })->setName('/record/create');
 
-})->setName('/record/get_last');
+    $app->get('/get_last', function ($request, $response) {
+        $filename = VideoRecording::GetLast();
 
-$app->get('/record/get_url', function ($request, $response) {
-    $url = VideoRecording::GetLastUrl();
+        if (($filename) && is_file($filename)) {
+            $data = array(
+                "success"  => true,
+                "filename" => $filename,
+            );
+        } else {
+            $data = array("success" => false, "message" => "Failed to request last video url");
+        }
+        return $response->withJson($data);
 
-    if ($url) {
-        $data = array(
-            "success" => true,
-            "url"     => $url,
-        );
-    } else {
-        $data = array("success" => false, "message" => "Failed to request last video url");
-    }
-    return $response->withJson($data);
-})->setName('/record/get_url');
+    })->setName('/record/get_last');
 
+    $app->get('/get_url', function ($request, $response) {
+        $url = VideoRecording::GetLastUrl();
+
+        if ($url) {
+            $data = array(
+                "success" => true,
+                "url"     => $url,
+            );
+        } else {
+            $data = array("success" => false, "message" => "Failed to request last video url");
+        }
+        return $response->withJson($data);
+    })->setName('/record/get_url');
+
+});
 
 // **************************************************************
 // ** WIFI                                                     **
@@ -152,7 +163,6 @@ $app->get('/wifi/ifconfig', function ($request, $response) {
     $data = ($state) ? $state : array("success" => false, "output" => "Failed to parse ifconfig output");
     return $response->withJson($data);
 })->setName('/wifi/ifconfig');
-
 
 
 // **************************************************************
@@ -293,18 +303,32 @@ $app->group('/led', function () use ($app) {
 });
 
 
-
 // **************************************************************
 // ** Camera                                                   **
 // **************************************************************
 
 $app->group('/camera', function () use ($app) {
 
+    $app->get('/save_state', function ($request, $response) {
+        $output = SaveState();
+        $success = ($output) ? true : false;
+
+        $data = array("success" => $success, "message" => $output);
+        return $response->withJson($data);
+    })->setName('/camera/save_state');
+
     $app->get('/state', function ($request, $response) {
         $camerastate = CameraState();
         $data = ($camerastate) ? $camerastate : array("success" => false);
         return $response->withJson($data);
-    })->setName('/camera');
+    })->setName('/camera/state');
+
+    $app->get('/reset', function ($request, $response) {
+        $success = CameraReset();
+        $message = ($success) ? "Camera settings have been reset" : "Failed to reset camera settings";
+        $data = array("message" => $message, "success" => $success);
+        return $response->withJson($data);
+    })->setName('/camera/reset');
 
     // *********************************
     // ** ISP328                      **
@@ -368,7 +392,7 @@ $app->group('/camera', function () use ($app) {
     $app->get('/ir_cut/set/off', function ($request, $response, $args) {
         IR_Cut::TurnOff();
         $data = array(
-            "led"     => "ir_cut",
+            "key"     => "ir_cut",
             "action"  => "TurnOff",
             "success" => (IR_Cut::IsOff()) ? true : false,
         );
@@ -400,7 +424,7 @@ $app->group('/camera', function () use ($app) {
     $app->get('/night_mode/set/off', function ($request, $response, $args) {
         NightMode::TurnOff();
         $data = array(
-            "led"     => "night_mode",
+            "key"     => "night_mode",
             "action"  => "TurnOff",
             "success" => (NightMode::IsOff()) ? true : false,
         );
@@ -431,7 +455,7 @@ $app->group('/camera', function () use ($app) {
     $app->get('/flip_mode/set/off', function ($request, $response, $args) {
         FlipMode::TurnOff();
         $data = array(
-            "led"     => "flip_mode",
+            "key"     => "flip_mode",
             "action"  => "TurnOff",
             "success" => (FlipMode::IsOff()) ? true : false,
         );
@@ -462,12 +486,276 @@ $app->group('/camera', function () use ($app) {
     $app->get('/mirror_mode/set/off', function ($request, $response, $args) {
         MirrorMode::TurnOff();
         $data = array(
-            "led"     => "mirror_mode",
+            "key"     => "mirror_mode",
             "action"  => "TurnOff",
             "success" => (MirrorMode::IsOff()) ? true : false,
         );
         return $response->withJson($data);
     })->setName('/camera/mirror_mode/off');
+
+    // *********************************
+    // ** Auto Exposure               **
+    // *********************************
+    $app->get('/auto_exposure', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "auto_exposure",
+             "state" => ISP328::Get("ae_en"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/auto_exposure');
+
+    $app->get('/auto_exposure/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("ae_en", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_exposure",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_exposure/on');
+
+    $app->get('/auto_exposure/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("ae_en", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_exposure",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_exposure/off');
+
+    // *********************************
+    // ** Auto Focus                  **
+    // *********************************
+    $app->get('/auto_focus', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "auto_focus",
+             "state" => ISP328::Get("af_en"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/auto_focus');
+
+    $app->get('/auto_focus/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("af_en", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_focus",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_focus/on');
+
+    $app->get('/auto_focus/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("af_en", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_focus",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_focus/off');
+
+    // *********************************
+    // ** Auto White Balance          **
+    // *********************************
+    $app->get('/auto_white_balance', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "auto_white_balance",
+             "state" => ISP328::Get("awb_en"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/auto_white_balance');
+
+    $app->get('/auto_white_balance/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("awb_en", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_white_balance",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_white_balance/on');
+
+    $app->get('/auto_white_balance/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("awb_en", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_white_balance",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_white_balance/off');
+
+    // *********************************
+    // ** Auto Sharpen                **
+    // *********************************
+    $app->get('/auto_sharpen', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "auto_sharpen",
+             "state" => ISP328::Get("sp_en"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/auto_sharpen');
+
+    $app->get('/auto_sharpen/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("sp_en", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_sharpen",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_sharpen/on');
+
+    $app->get('/auto_sharpen/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("sp_en", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "auto_sharpen",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/auto_sharpen/off');
+
+    // *********************************
+    // ** Black Level Correction      **
+    // *********************************
+    $app->get('/black_level_correction', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "black_level_correction",
+             "state" => ISP328::Get("adjust_blc"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/black_level_correction');
+
+    $app->get('/black_level_correction/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_blc", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "black_level_correction",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/black_level_correction/on');
+
+    $app->get('/black_level_correction/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_blc", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "black_level_correction",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/black_level_correction/off');
+
+    // *********************************
+    // ** Contrast Enhancement        **
+    // *********************************
+    $app->get('/contrast_enhancement', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "contrast_enhancement",
+             "state" => ISP328::Get("adjust_ce"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/contrast_enhancement');
+
+    $app->get('/contrast_enhancement/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_ce", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "contrast_enhancement",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/contrast_enhancement/on');
+
+    $app->get('/contrast_enhancement/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_ce", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "contrast_enhancement",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/contrast_enhancement/off');
+
+    // *********************************
+    // ** Gamma Curve Correction      **
+    // *********************************
+    $app->get('/gamma_curve_correction', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "gamma_curve_correction",
+             "state" => ISP328::Get("adjust_gamma"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/gamma_curve_correction');
+
+    $app->get('/gamma_curve_correction/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_gamma", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "gamma_curve_correction",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/gamma_curve_correction/on');
+
+    $app->get('/gamma_curve_correction/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_gamma", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "gamma_curve_correction",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/gamma_curve_correction/off');
+
+    // *********************************
+    // ** Noise Reduction             **
+    // *********************************
+    $app->get('/noise_reduction', function ($request, $response, $args) {
+        $data = array(
+             "key"   => "noise_reduction",
+             "state" => ISP328::Get("adjust_nr"),
+         );
+         return $response->withJson($data);
+    })->setName('/camera/noise_reduction');
+
+    $app->get('/noise_reduction/set/on', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_nr", 1);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "noise_reduction",
+            "action"  => "TurnOn",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/noise_reduction/on');
+
+    $app->get('/noise_reduction/set/off', function ($request, $response, $args) {
+        $changed = ISP328::Set("adjust_nr", 0);
+        $success =  ($changed) ? true : false;
+        $data = array(
+            "key"     => "noise_reduction",
+            "action"  => "TurnOff",
+            "success" => $success,
+        );
+        return $response->withJson($data);
+    })->setName('/camera/noise_reduction/off');
 });
 
 
@@ -475,54 +763,57 @@ $app->group('/camera', function () use ($app) {
 // ** Config                                                   **
 // **************************************************************
 
-$app->get('/config/read', function ($request, $response) {
-    $content = Configuration::Read();
-    $success =  ($content) ? true : false;
-    $data    = array("success" => $success, "content" => $content, "message" => "Succesfully read config file");
-    return $response->withJson($data);
-})->setName('/config/read');
+$app->group('/config', function () use ($app) {
 
-$app->get('/config/write', function ($request, $response) {
-    return $response->withJson(array("success" => false, "message" => "Use a POST request to update"));
-})->setName('/config/write/get');
+    $app->get('/read', function ($request, $response) {
+        $content = Configuration::Read();
+        $success =  ($content) ? true : false;
+        $data    = array("success" => $success, "content" => $content, "message" => "Succesfully read config file");
+        return $response->withJson($data);
+    })->setName('/config/read');
 
-$app->post('/config/write', function ($request, $response) {
-    $post    = $request->getParsedBody();
-    $content = $post['content'];
-    $success = Configuration::Write($content);
-    $data    = array("success" => $success, "message" => "Config written succesfully");
+    $app->get('/write', function ($request, $response) {
+        return $response->withJson(array("success" => false, "message" => "Use a POST request to update"));
+    })->setName('/config/write/get');
 
-    return $response->withJson($data);
-})->setName('/config/write');
+    $app->post('/write', function ($request, $response) {
+        $post    = $request->getParsedBody();
+        $content = $post['content'];
+        $success = Configuration::Write($content);
+        $data    = array("success" => $success, "message" => "Config written succesfully");
 
-$app->get('/config/test', function ($request, $response) {
-    $data = Configuration::Test();
-    return $response->withJson($data);
-})->setName('/config/test');
+        return $response->withJson($data);
+    })->setName('/config/write');
 
-$app->get('/config/backup/list', function ($request, $response) {
-    $data = Configuration::ListBackups();
-    return $response->withJson($data);
-})->setName('/config/backup/list');
+    $app->get('/test', function ($request, $response) {
+        $data = Configuration::Test();
+        return $response->withJson($data);
+    })->setName('/config/test');
 
-$app->get('/config/backup/create', function ($request, $response) {
-    $filename = Configuration::Backup();
-    $data  = ($filename) ? array("message" => sprintf("New backup created: %s", $filename), "success" => true) : array("success" => false, "message" => "Backup creation failed");
-    return $response->withJson($data);
-})->setName('/config/backup/create');
+    $app->get('/backup/list', function ($request, $response) {
+        $data = Configuration::ListBackups();
+        return $response->withJson($data);
+    })->setName('/config/backup/list');
 
-$app->get('/config/backup/remove', function ($request, $response) {
-    $success = Configuration::RemoveBackups();
-    $data    = array("success" => true, "message" => "Backups deleted");
-    return $response->withJson($data);
-})->setName('/config/backup/remove');
+    $app->get('/backup/create', function ($request, $response) {
+        $filename = Configuration::Backup();
+        $data  = ($filename) ? array("message" => sprintf("New backup created: %s", $filename), "success" => true) : array("success" => false, "message" => "Backup creation failed");
+        return $response->withJson($data);
+    })->setName('/config/backup/create');
 
-$app->get('/config/restore/{filename}', function ($request, $response, $args) {
-    $filename = $args['filename'];
-    $message  = Configuration::BackupRestore($filename);
-    $data     = array("message" => $message, "success" => true);
-    return $response->withJson($data);
-})->setName('/config/backup/restore');
+    $app->get('/backup/remove', function ($request, $response) {
+        $success = Configuration::RemoveBackups();
+        $data    = array("success" => true, "message" => "Backups deleted");
+        return $response->withJson($data);
+    })->setName('/config/backup/remove');
+
+    $app->get('/restore/{filename}', function ($request, $response, $args) {
+        $filename = $args['filename'];
+        $message  = Configuration::BackupRestore($filename);
+        $data     = array("message" => $message, "success" => true);
+        return $response->withJson($data);
+    })->setName('/config/backup/restore');
+});
 
 
 // **************************************************************
@@ -609,7 +900,6 @@ $app->group('/nvram', function () use ($app) {
     })->setName('/nvram/overwrite');
 
 });
-
 
 
 // **************************************************************
@@ -732,7 +1022,6 @@ $app->group('/system', function () use ($app) {
 });
 
 
-
 // **************************************************************
 // ** Services                                                 **
 // **************************************************************
@@ -800,9 +1089,7 @@ $app->group('/services', function () use ($app) {
         );
         return $response->withJson($data);
     })->setName('/service/restart');
-
 });
-
 
 
 // **************************************************************

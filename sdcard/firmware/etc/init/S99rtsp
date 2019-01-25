@@ -21,9 +21,21 @@ NAME="rtspd"
 DESC="RTSP server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE $RTSP_EXTRA_ARGS"
+
+## Find last created snapshot and print to file
+get_last_image > /dev/shm/rtspd_last_snapshot_path
+
+## Find last created  video and print to file
+get_last_video > /dev/shm/rtspd_last_video_path
+
+
+## Set max FPS to 30 if fps > 15
+if [ "$RTSP_FRAMERATE" -gt 15 ]
+then
+    echo w sen_fps 30 > /proc/isp328/command
+fi
 
 ## Enable motion detection
 if [ "$MOTION_DETECTION" -eq 1 ] ; then

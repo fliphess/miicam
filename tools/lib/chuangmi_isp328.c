@@ -342,7 +342,7 @@ int brightness_reset(void)
     }
 }
 
-int brightness_get(void) 
+int brightness_get(void)
 {
     int value;
 
@@ -420,7 +420,7 @@ int contrast_get(void)
     return value;
 }
 
-int contrast_print(void) 
+int contrast_print(void)
 {
     int value = contrast_get();
 
@@ -484,7 +484,7 @@ int hue_get(void)
 }
 
 
-int hue_print(void) 
+int hue_print(void)
 {
     int value = hue_get();
 
@@ -548,7 +548,7 @@ int saturation_get(void)
     return value;
 }
 
-int saturation_print(void) 
+int saturation_print(void)
 {
     int value = saturation_get();
 
@@ -614,7 +614,7 @@ int denoise_get(void)
 
 int denoise_print(void)
 {
-    int value = denoise_get();    
+    int value = denoise_get();
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for denoise!\n");
         return EXIT_FAILURE;
@@ -675,7 +675,7 @@ int sharpness_get(void)
     return value;
 }
 
-int sharpness_print(void) 
+int sharpness_print(void)
 {
     int value = sharpness_get();
 
@@ -693,7 +693,7 @@ int sharpness_print(void)
 // ** Status                                                               ** //
 // ************************************************************************** //
 
-int print_camera_info_json(void) 
+int print_camera_info_json(void)
 {
         fprintf(stdout, "{");
         fprintf(stdout, "\"brightness\":%d,", brightness_get());
@@ -708,7 +708,19 @@ int print_camera_info_json(void)
 }
 
 
-int print_camera_info(void) 
+int print_camera_info_shell(void)
+{
+        fprintf(stdout, "BRIGHTNESS=\"%d\"\n", brightness_get());
+        fprintf(stdout, "CONTRAST=\"%d\"\n",   contrast_get());
+        fprintf(stdout, "HUE=\"%d\"\n",        hue_get());
+        fprintf(stdout, "SATURATION=\"%d\"\n", saturation_get());
+        fprintf(stdout, "DENOISE=\"%d\"\n",    denoise_get());
+        fprintf(stdout, "SHARPNESS=\"%d\"\n",   sharpness_get());
+        return EXIT_SUCCESS;
+}
+
+
+int print_camera_info(void)
 {
         fprintf(stdout, "*** Settings:\n");
         fprintf(stdout, "- Brightness: %d\n", brightness_get());
@@ -722,7 +734,6 @@ int print_camera_info(void)
         return EXIT_SUCCESS;
 }
 
-
 // ************************************************************************** //
 // ** Reset                                                                ** //
 // ************************************************************************** //
@@ -730,11 +741,11 @@ int print_camera_info(void)
 int reset_camera_adjustments(void)
 {
     fprintf(stderr, "*** Resetting all settings to default!\n");
-    
-    if (brightness_reset()  < 0 || 
+
+    if (brightness_reset()  < 0 ||
         contrast_reset()    < 0 ||
         hue_set(128)        < 0 ||
-        saturation_set(128) < 0 || 
+        saturation_set(128) < 0 ||
         denoise_set(128)    < 0 ||
         sharpness_set(128)  < 0)
             return EXIT_FAILURE;

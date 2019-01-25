@@ -18,6 +18,9 @@ then
     . "${BASECFG}"
 fi
 
+## Print the last field
+alias last_f="awk '{print \$NF}'"
+
 
 ##################################################################################
 ## System Functions                                                             ##
@@ -78,6 +81,29 @@ wait_for_network_until()
        echo " OK"
        return 0
     fi
+}
+
+get_last_image()
+{
+    ## Find last created snapshot
+    if [ -d /tmp/sd/RECORDED_IMAGES ]
+    then
+        find /tmp/sd/RECORDED_IMAGES/ -type f | sort -r | tail -n 1
+    fi
+
+    return $?
+}
+
+
+get_last_video()
+{
+    ## Find last created video
+    if [ -d /tmp/sd/RECORDED_VIDEOS ]
+    then
+        find /tmp/sd/RECORDED_VIDEOS/ -type f | sort -r | tail -n 1
+    fi
+
+    return $?
 }
 
 ##################################################################################
@@ -441,6 +467,30 @@ yellow_led()
     return "${RC}"
 }
 
+## control the ir led (used for restore-state)
+## Control the ir LED
+ir_led()
+{
+    INPUT="$1"
+
+    case "$INPUT" in
+        on)
+            /tmp/sd/firmware/bin/ir_led -e
+        ;;
+        off)
+            /tmp/sd/firmware/bin/ir_led -d
+        ;;
+        status)
+            /tmp/sd/firmware/bin/ir_led -s
+        ;;
+        *)
+            echo "Option $1 not supported"
+            RC="1"
+        ;;
+    esac
+
+    return 0
+}
 
 ##################################################################################
 ## MQTT Functions                                                               ##
@@ -493,32 +543,62 @@ mqtt_subscribe()
 ## Get the system status of the webcam / OS
 system_status()
 {
+    local ARGS="$1"
 
     UPTIME="$( busybox uptime )"
-
     SSID="$(    /sbin/iwconfig 2>/dev/null | grep ESSID | sed -e "s/.*ESSID:\"//" | sed -e "s/\".*//" )"
-    BITRATE="$( /sbin/iwconfig 2>/dev/null | grep "Bit R" | sed -e "s/   S.*//" | sed -e "s/.*\\://" )"
+    BITRATE="$( /sbin/iwconfig 2>/dev/null | grep "Bit R" | sed -e "s/   S.*//" | sed -e "s/.*\\://"  )"
     QUALITY="$( /sbin/iwconfig 2>/dev/null | grep "Quali" | sed -e "s/  *//" )"
 
     NOISE_LEVEL="$(  echo "$QUALITY" | awk '{ print $7}' | sed -e 's/.*=//' | sed -e 's/\/100/\%/' )"
     LINK_QUALITY="$( echo "$QUALITY" | awk '{ print $2}' | sed -e 's/.*=//' | sed -e 's/\/100/\%/' )"
     SIGNAL_LEVEL="$( echo "$QUALITY" | awk '{ print $4}' | sed -e 's/.*=//' | sed -e 's/\/100/\%/' )"
 
-    echo "{\"uptime\":\"$UPTIME\",\"ssid\":\"$SSID\",\"bitrate\":\"$BITRATE\",\"signal_level\":\"$SIGNAL_LEVEL\",\"link_quality\":\"$LINK_QUALITY\",\"noise_level\":\"$NOISE_LEVEL\"}"
-    RC="$?"
+    if [ "$ARGS" == "--json" ]
+    then
+        echo "{\"uptime\":\"$UPTIME\",\"ssid\":\"$SSID\",\"bitrate\":\"$BITRATE\",\"signal_level\":\"$SIGNAL_LEVEL\",\"link_quality\":\"$LINK_QUALITY\",\"noise_level\":\"$NOISE_LEVEL\"}"
+    elif [ "${ARGS}" == "--shell" ]
+    then
+        echo "UPTIME=\"${UPTIME}\""
+        echo "SSID=\"${SSID}\""
+        echo "BITRATE=\"${BITRATE}\""
+        echo "NOISE_LEVEL=\"${NOISE_LEVEL}\""
+        echo "LINK_QUALITY=\"${LINK_QUALITY}\""
+        echo "SIGNAL_LEVEL=\"${SIGNAL_LEVEL}\""
+    else
+        echo "Uptime      : ${UPTIME}"
+        echo "SSID        : ${SSID}"
+        echo "Bitrate     : ${BITRATE}"
+        echo "Noise Level : ${NOISE_LEVEL}"
+        echo "Link Quality: ${LINK_QUALITY}"
+        echo "Signal Level: ${SIGNAL_LEVEL}"
+    fi
 
-    return "$RC"
+    return 0
 }
 
 ## Get the state of all leds
 led_status()
 {
+    local ARGS="$1"
 
     BLUE="$(   get_nvram blue_led   )"
     YELLOW="$( get_nvram yellow_led )"
-    IR_LED="$( /tmp/sd/firmware/bin/ir_led -s | awk '{print $NF}' )"
+    IR_LED="$( /tmp/sd/firmware/bin/ir_led -s | last_f )"
 
-    echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
+    if [ "$ARGS" == "--json" ]
+    then
+        echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
+    elif [ "${ARGS}" == "--shell" ]
+    then
+        echo "IR_LED=\"$IR_LED\""
+        echo "BLUE_LED=\"$BLUE\""
+        echo "YELLOW_LED=\"$YELLOW\""
+    else
+        echo "IR Led    : ${IR_LED}"
+        echo "Blue Led  : ${BLUE}"
+        echo "Yellow Led: ${YELLOW}"
+    fi
 
     return 0
 }
@@ -526,11 +606,31 @@ led_status()
 ## Get the state of the camera modes
 mode_status()
 {
-    MIRROR="$( /tmp/sd/firmware/bin/mirrrormode -s | awk '{print $NF}' )"
-    FLIP="$(   /tmp/sd/firmware/bin/flipmode    -s | awk '{print $NF}' )"
-    NIGHT="$(  /tmp/sd/firmware/bin/nightmode   -s | awk '{print $NF}' )"
-    IR_CUT="$( /tmp/sd/firmware/bin/ir_cut      -s | awk '{print $NF}' )"
-    echo "{\"mirror_mode\":\"${MIRROR}\",\"flip_mode\":\"${FLIP}\",\"night_mode\":\"$NIGHT\",\"ir_cut\":\"$IR_CUT\"}"
+    local ARGS="$1"
+
+    NIGHT="$(  /tmp/sd/firmware/bin/nightmode  -s | last_f )"
+    IR_CUT="$( /tmp/sd/firmware/bin/ir_cut     -s | last_f )"
+    MIRROR="$( /tmp/sd/firmware/bin/mirrormode -s | last_f )"
+    FLIP="$(   /tmp/sd/firmware/bin/flipmode   -s | last_f )"
+
+    if [ "$ARGS" == "--json" ]
+    then
+        echo "{\"mirror_mode\":\"${MIRROR}\",\"flip_mode\":\"${FLIP}\",\"night_mode\":\"$NIGHT\",\"ir_cut\":\"$IR_CUT\"}"
+
+    elif [ "$ARGS" == "--shell" ]
+    then
+        echo "MIRROR_MODE=\"${MIRROR}\""
+        echo "FLIP_MODE=\"${FLIP}\""
+        echo "NIGHT_MODE=\"${NIGHT}\""
+        echo "IR_CUT=\"${IR_CUT}\""
+    else
+        echo "Mirror Mode: ${MIRROR}"
+        echo "Night Mode : ${NIGHT}"
+        echo "Flip Mode  : ${FLIP_MODE}"
+        echo "IR Cut     : ${IR_CUT}"
+    fi
+
+    return 0
 }
 
 
@@ -543,6 +643,7 @@ then
     mkdir -p /var/run
 fi
 
+export FUNCTIONS_SOURCED=1
 
 ##################################################################################
 ## EOF                                                                          ##

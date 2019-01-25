@@ -17,7 +17,6 @@ DESC="SSH server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
 DAEMON_OPTS="-R -p 22 $DROPBEAR_EXTRA_ARGS"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

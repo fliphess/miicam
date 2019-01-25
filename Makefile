@@ -56,7 +56,8 @@ UTILS :=                             \
 	$(BUILDDIR)/mirrormode           \
 	$(BUILDDIR)/nightmode            \
 	$(BUILDDIR)/flipmode             \
-	$(BUILDDIR)/camera_adjust
+	$(BUILDDIR)/camera_adjust        \
+	$(BUILDDIR)/auto_night_mode
 
 
 utils: $(UTILS)

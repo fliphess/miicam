@@ -19,7 +19,7 @@ class VideoRecording
         $content = @file_get_contents(self::$last_path);
         if ($content == FALSE) {
             throw new \Exception(
-                sprintf('Failed to retrieve the content of %s', self::$last_path)
+                sprintf('No video found yet! Please create one first! (Error: %s not found)', self::$last_path)
             );
         }
         return $content;
@@ -38,13 +38,14 @@ class VideoRecording
     public static function Create() {
         if (@file_put_contents(self::$request_path, "gimmeh", LOCK_EX) == FALSE) {
             throw new \Exception(
-                sprintf('Failed to create %s', self::$request_path)
+                sprintf('Failed to request a recording! (Error: cannot create %s)', self::$request_path)
             );
         }
 
         $count = 0;
         while (file_exists(self::$request_path) and ($count < 15))  {
-            usleep( 1000 );
+            // * KILL ALL PERFORMANCE WITH FIRE!
+            sleep(1);
             $count++;
         }
 
@@ -73,11 +74,21 @@ class Snapshot
 
     public function __construct() { }
 
+    public static function RequestImage() {
+        // * Request image file
+        if (@file_put_contents(self::$request_path, "gimmeh", LOCK_EX) == FALSE) {
+            throw new \Exception(
+                sprintf('Failed to request a snapshot! (Error: cannot create %s)', self::$request_path)
+            );
+        }
+        return true;
+    }
+
     public static function GetLast() {
         $content = @file_get_contents(self::$last_path);
         if ($content == FALSE) {
             throw new \Exception(
-                sprintf('Failed to retrieve the content of %s', self::$last_path)
+                sprintf('No snapshot found yet! Please create one first! (Error: %s not found)', self::$last_path)
             );
         }
         return $content;
@@ -93,12 +104,35 @@ class Snapshot
         return self::GetUrl($last);
     }
 
-    public static function Create() {
-        if (@file_put_contents(self::$request_path, "gimmeh", LOCK_EX) == FALSE) {
-            throw new \Exception(
-                sprintf('Failed to create %s', self::$request_path)
-            );
+    public static function GetImage() {
+        $last_image_path = self::GetLast();
+        $image_path      = self::GetLast();
+
+        self::RequestImage();
+
+        // * First loop: wait until image request file is removed
+        $count = 0;
+        while (file_exists(self::$request_path) and ($count < 150)) {
+            // * No really this is slowing down a lot.... But we're already sooooo slow...
+            sleep(1);
+            $count++;
         }
+
+        // * Second loop: wait until image path has changed
+        $count = 0;
+        while (($image_path == $last_image_path) and ($count < 150)) {
+            $image_path = self::GetLast();
+            sleep(1);
+            $count++;
+        }
+
+        passthru(sprintf('cat %s', self::GetLast()));
+
+        return;
+    }
+
+    public static function Create() {
+        self::RequestImage();
 
         $count = 0;
         while (file_exists(self::$request_path) and ($count < 15)) {

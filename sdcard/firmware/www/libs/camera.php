@@ -1,5 +1,6 @@
 <?php
 
+
 // **************************************************************
 // ** ISP 328 Functions                                        **
 // **************************************************************
@@ -9,39 +10,34 @@ class ISP328
     public function __construct() { }
 
     public static $all_isp_keys = [  // * All available options for the isp328 kernel module
-        "adjust_all",
-        "adjust_blc",
-        "adjust_ce",
-        "adjust_dpc",
-        "adjust_gamma",
-        "adjust_nr",
-        "ae_en",
-        "af_en",
-        "awb_en",
         "brightness",
         "contrast",
-        "daynight",
-        "denoise",
-        "dr_mode",
-        "drc_strength",
-        "flip",
-        "gen_bin",
-        "hue",
-        "mirror",
-        "mrnr_en",
-        "mrnr_y_str",
-        "reload_cfg",
         "saturation",
-        "sen_exp",
-        "sen_fps",
-        "sen_gain",
-        "sen_reg",
-        "sen_size",
         "sharpness",
-        "size",
-        "sp_en",
-        "tmnr_en",
-        "white_clip",
+        "denoise",
+        "hue",
+
+        "daynight",     // * Nightmode
+        "flip",         // * Flipmode
+        "mirror",       // * Mirrormode
+
+        "ae_en",        // * Auto exposure
+        "af_en",        // * Auto Focus
+        "awb_en",       // * Auto White Balance
+        "sp_en",        // * Auto Sharpen
+
+        "size",         // * Image size
+        "white_clip",   // * White Clip Protection
+
+        "adjust_blc",   // * Black level Correction
+        "adjust_ce",    // * Contrast Enhancement
+        "adjust_gamma", // * Adjust Gamma Curve Correction
+        "adjust_nr",    // * Adjust Noise Reduction
+
+        "sen_exp",      // * Sensor Exposure
+        "sen_fps",      // * Sensor FPS
+        "sen_gain",     // * Sensor Gain
+        "sen_size",     // * Sensor Size (HxW)
     ];
 
     private static function ReadValue() {
@@ -61,7 +57,7 @@ class ISP328
             );
         }
 
-        $command = sprintf("echo r %s > /proc/isp328/command", escapeshellarg($key));
+        $command = sprintf("echo r %s > /proc/isp328/command 2>&1", escapeshellarg($key));
 
         exec($command, $output, $return);
 
@@ -94,7 +90,7 @@ class ISP328
             );
         }
 
-        return self::ReadValue();
+        return self::Get($key);
     }
 }
 
@@ -105,32 +101,54 @@ class ISP328
 
 class IR_Cut extends ISP328
 {
+
+    public static function GetState() {
+        $command = sprintf("/tmp/sd/firmware/bin/ir_cut -s | awk '{print \$NF}' 2>&1");
+
+        exec($command, $output, $return);
+        if ($return != 0) {
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
+        }
+
+        return (implode("", $output) == "on") ? true : false;
+    }
+
     public static function IsOn() {
-        $state = GPIO::Get(14);
-        return ($state == "1") ? true : false;
+        $state = self::GetSTate();
+        return ($state) ? true : false;
     }
 
     public static function IsOff() {
-        $state = GPIO::Get(14);
-        return ($state == "0") ? true : false;
+        $state = self::GetSTate();
+        return (!$state) ? true : false;
     }
 
     public static function TurnOn() {
-        if (!self::IsOn()) {
-            GPIO::Set(14, 1);
-            GPIO::Set(15, 0);
-            return true;
+        $command = sprintf("/tmp/sd/firmware/bin/ir_cut -e 2>&1");
+
+        exec($command, $output, $return);
+        if ($return != 0) {
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
         }
-        else return false;
+
+        return true;
     }
 
     public static function TurnOff() {
-        if (self::IsOn()) {
-            GPIO::Set(14, 0);
-            GPIO::Set(15, 1);
-            return true;
+        $command = sprintf("/tmp/sd/firmware/bin/ir_cut -d 2>&1");
+
+        exec($command, $output, $return);
+        if ($return != 0) {
+            throw new \Exception(
+                sprintf('Error executing %s: %s', $command, implode(" ", $output))
+            );
         }
-        else return false;
+
+        return true;
     }
 }
 
@@ -254,13 +272,82 @@ class MirrorMode extends ISP328
 // ** Get Camera State                                         **
 // **************************************************************
 
+function state_to_bool($state) {
+    if ($state == "enable") {
+        return true;
+    }
+    else if ($state == "disable") {
+        return false;
+    } else {
+        return "unknown";
+    }
+}
+
+
 function CameraState() {
     $default = 'unknown';
 
     return array(
-        "ir_cut"      => IR_Cut::IsOn(),
-        "night_mode"  => NightMode::IsOn(),
-        "flip_mode"   => FlipMode::IsOn(),
-        "mirror_mode" => MirrorMode::IsOn(),
-    );
+        "ir_cut"                 => IR_Cut::IsOn(),
+        "night_mode"             => NightMode::IsOn(),
+        "flip_mode"              => FlipMode::IsOn(),
+        "mirror_mode"            => MirrorMode::IsOn(),
+
+        "brightness"             => (int)ISP328::Get('brightness'),
+        "contrast"               => (int)ISP328::Get('contrast'),
+        "hue"                    => (int)ISP328::Get('hue'),
+        "saturation"             => (int)ISP328::Get('saturation'),
+        "denoise"                => (int)ISP328::Get('denoise'),
+        "sharpness"              => (int)ISP328::Get('sharpness'),
+
+        "auto_exposure"          => state_to_bool(ISP328::Get("ae_en")),
+        "auto_focus"             => state_to_bool(ISP328::Get("af_en")),
+        "auto_white_balance"     => state_to_bool(ISP328::Get("awb_en")),
+        "auto_sharpen"           => state_to_bool(ISP328::Get("sp_en")),
+        "black_level_correction" => state_to_bool(ISP328::Get("adjust_blc")),
+        "contrast_enhancement"   => state_to_bool(ISP328::Get("adjust_ce")),
+        "gamma_curve_correction" => state_to_bool(ISP328::Get("adjust_gamma")),
+        "noise_reduction"        => state_to_bool(ISP328::Get("adjust_nr")),
+    ) + LED::LedState();
+}
+
+
+
+// **************************************************************
+// ** Reset Camera State                                       **
+// **************************************************************
+
+function CameraReset() {
+    ISP328::Set('brightness',   128);
+    ISP328::Set('contrast',     128);
+    ISP328::Set('hue',          128);
+    ISP328::Set('saturation',   128);
+    ISP328::Set('denoise',      128);
+    ISP328::Set('sharpness',    128);
+
+    ISP328::Set("ae_en",        1);
+    ISP328::Set("af_en",        1);
+    ISP328::Set("awb_en",       1);
+    ISP328::Set("sp_en",        1);
+
+    ISP328::Set("adjust_blc",   1);
+    ISP328::Set("adjust_ce",    1);
+    ISP328::Set("adjust_gamma", 1);
+    ISP328::Set("adjust_nr",    1);
+
+    return true;
+}
+
+
+
+function SaveState() {
+    $command = sprintf("/tmp/sd/firmware/etc/init/S99restore_state save 2>&1");
+    exec($command, $output, $return);
+
+    if ($return != 0) {
+        throw new \Exception(
+            sprintf('Error executing %s: %s', $command, implode(" ", $output))
+        );
+    }
+    return implode(" ", $output);
 }

@@ -17,7 +17,6 @@ DESC="MQTT Status Daemon"
 DAEMON="${SD_MOUNTDIR}/firmware/scripts/mqtt-control.sh"
 
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

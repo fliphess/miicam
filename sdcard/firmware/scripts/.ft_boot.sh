@@ -48,24 +48,17 @@ fi
 (
 cat << EOF
 
-Running Chuangmi 720P hack
+################################
+## Running Chuangmi 720P hack ##
+################################
 
-Chuangmi 720P hack configuration:
+Chuangmi 720P configuration:
 
   HOSTNAME       = ${HOSTNAME}
   WIFI_SSID      = ${WIFI_SSID}
-  WIFI_PASS      = ${WIFI_PASS}
   TIMEZONE       = ${TIMEZONE}
-  NTP_SERVER     = ${NTP_SERVER}
-  DISABLE_CLOUD  = ${DISABLE_CLOUD}
-  DISABLE_OTA    = ${DISABLE_OTA}
-  ENABLE_TELNETD = ${ENABLE_TELNETD}
-  ENABLE_SSHD    = ${ENABLE_SSHD}
-  ENABLE_HTTPD   = ${ENABLE_HTTPD}
-  ENABLE_FTPD    = ${ENABLE_FTPD}
-  ENABLE_LOGGING = ${ENABLE_LOGGING}
-  ENABLE_RTSP    = ${ENABLE_RTSP}
 
+################################
 EOF
 
 
@@ -117,6 +110,20 @@ then
     mount --rbind /tmp/root /root
 fi
 
+
+##################################################################################
+## WIFI                                                                         ##
+##################################################################################
+
+echo "*** Setting up WIFI configuration"
+
+if [ -s "${SD_MOUNTDIR}/firmware/scripts/configure_wifi" ]
+then
+    echo "*** Configuring WIFI... "
+    sh "${SD_MOUNTDIR}/firmware/scripts/configure_wifi"
+fi
+
+
 ##################################################################################
 ## Mount GMLIB configuration                                                    ##
 ##################################################################################
@@ -128,20 +135,17 @@ then
     mount --rbind /tmp/sd/firmware/etc/gmlib.cfg /gm/config/gmlib.cfg
 fi
 
+
 ##################################################################################
-## Prepare restartd.conf                                                        ##
+## Set root Password                                                            ##
 ##################################################################################
 
-echo "*** Replacing restartd startup script and config with our own version"
-if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
+if [ -n "${ROOT_PASSWORD}" ]
 then
-    mount --bind /etc/init/S99restartd /mnt/data/imi/imi_init/S99restartd
-fi
-
-if [ ! -f /tmp/etc/restartd.conf.org ] && mountpoint -q /etc
-then
-    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf.org
-    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf
+    echo "*** Setting root password... "
+    echo "root:${ROOT_PASSWORD}" | chpasswd
+else
+    echo "WARN: root password must be set for SSH and or Telnet"
 fi
 
 
@@ -184,29 +188,22 @@ then
     fi
 fi
 
-
 ##################################################################################
-## Set root Password                                                            ##
+## Prepare restartd.conf                                                        ##
 ##################################################################################
 
-if [ -n "${ROOT_PASSWORD}" ]
+echo "*** Replacing restartd startup script and config with our own version"
+if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
 then
-    echo "*** Setting root password... "
-    echo "root:${ROOT_PASSWORD}" | chpasswd
-else
-    echo "WARN: root password must be set for SSH and or Telnet"
+    mount --bind /etc/init/S99restartd /mnt/data/imi/imi_init/S99restartd
 fi
 
-
-##################################################################################
-## WIFI                                                                         ##
-##################################################################################
-
-if [ -s "${SD_MOUNTDIR}/firmware/scripts/configure_wifi" ]
+if [ ! -f /tmp/etc/restartd.conf.org ] && mountpoint -q /etc
 then
-    echo "*** Configuring WIFI... "
-    sh "${SD_MOUNTDIR}/firmware/scripts/configure_wifi"
+    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf.org
+    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf
 fi
+
 
 ##################################################################################
 ## Disable Cloud Services and OTA                                               ##

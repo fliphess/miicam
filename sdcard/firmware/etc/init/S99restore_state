@@ -1,0 +1,94 @@
+#!/bin/sh
+## purpose: Restore led and image state after reboot
+## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
+## author: Flip Hess, 2019
+
+SD_MOUNTDIR="/tmp/sd"
+if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+then
+    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+else
+    echo "Unable to load basic functions"
+    exit 1
+fi
+
+STATEFILE="$SD_MOUNTDIR/firmware/etc/restore_state.db"
+
+startup()
+{
+    echo "*** Restoring led and image settings from ${STATEFILE}"
+
+    if [ ! -f "$STATEFILE" ]
+    then
+        echo "*** ERROR: Statefile $STATEFILE not found!"
+        exit 1
+    fi
+
+    source "${STATEFILE}" || die "Failed to source ${STATEFILE}"
+
+    if [ "${STEALTH_MODE}" -eq 0 ]
+    then
+        blue_led   "${BLUE_LED}"
+        yellow_led "${YELLOW_LED}"
+    fi
+
+    if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
+    then
+        ir_led "${IR_LED}"
+        [ "${NIGHT_MODE}"  == "on"  ] && /tmp/sd/firmware/bin/nightmode -e
+        [ "${NIGHT_MODE}"  == "off" ] && /tmp/sd/firmware/bin/nightmode -d
+    fi
+
+    [ "${IR_CUT}" == "on"  ] && /tmp/sd/firmware/bin/ir_cut -e
+    [ "${IR_CUT}" == "off" ] && /tmp/sd/firmware/bin/ir_cut -e
+
+    if [ "${CEILING_MODE}" -eq 0 ]
+    then
+        [ "${FLIP_MODE}"   == "on"  ] && /tmp/sd/firmware/bin/flipmode -e
+        [ "${FLIP_MODE}"   == "off" ] && /tmp/sd/firmware/bin/flipmode -d
+
+        [ "${MIRROR_MODE}" == "on"  ] && /tmp/sd/firmware/bin/mirrormode -e
+        [ "${MIRROR_MODE}" == "off" ] && /tmp/sd/firmware/bin/mirrormode -d
+    fi
+
+    [ "${BRIGHTNESS}" ] && /tmp/sd/firmware/bin/camera_adjust -t brightness -s "${BRIGHTNESS}"
+    [ "${CONTRAST}"   ] && /tmp/sd/firmware/bin/camera_adjust -t contrast   -s "${CONTRAST}"
+    [ "${HUE}"        ] && /tmp/sd/firmware/bin/camera_adjust -t hue        -s "${HUE}"
+    [ "${SATURATION}" ] && /tmp/sd/firmware/bin/camera_adjust -t saturation -s "${SATURATION}"
+    [ "${DENOISE}"    ] && /tmp/sd/firmware/bin/camera_adjust -t denoise    -s "${DENOISE}"
+    [ "${SHARPNESS}"  ] && /tmp/sd/firmware/bin/camera_adjust -t sharpness  -s "${SHARPNESS}"
+
+}
+
+##
+## Save the state of the leds and the camera settings to file
+##
+
+save_state()
+{
+    echo "*** Saving settings for leds and image configuration"
+    /tmp/sd/firmware/bin/camera_adjust -k > /tmp/sd/firmware/etc/restore_state.db
+    mode_status --shell >> /tmp/sd/firmware/etc/restore_state.db
+    led_status  --shell >> /tmp/sd/firmware/etc/restore_state.db
+}
+
+
+##
+## Arbiter
+##
+
+case "$1" in
+    start)
+        startup
+    ;;
+    save)
+        save_state
+    ;;
+    *)
+      echo "Usage: $0 {start|save}"
+      exit 1
+    ;;
+esac
+
+exit $?
+

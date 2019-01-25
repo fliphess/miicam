@@ -14,10 +14,9 @@ fi
 
 NAME="auto_night_mode"
 DESC="Auto Night Mode"
-DAEMON="/usr/sbin/ir_sample"
-DAEMON_OPTS="200 5"
+DAEMON="/tmp/sd/firmware/bin/auto_night_mode"
+DAEMON_OPTS="${AUTO_NIGHT_MODE_ARGS}"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

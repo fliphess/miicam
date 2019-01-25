@@ -15,21 +15,35 @@ class Configuration
 
     public static $required_config = [
         "AUTO_NIGHT_MODE",
+        "CEILING_MODE",
         "DISABLE_CLOUD",
         "DISABLE_HACK",
         "DISABLE_OTA",
+        "DROPBEAR_EXTRA_ARGS",
         "ENABLE_CRON",
         "ENABLE_FTPD",
         "ENABLE_HTTPD",
+        "ENABLE_LOGGING",
         "ENABLE_MQTT",
+        "ENABLE_REMOTE_SYSLOG",
         "ENABLE_RESTARTD",
         "ENABLE_RTSP",
         "ENABLE_SSHD",
         "ENABLE_TELNETD",
+        "FTP_EXTRA_ARGS",
+        "FTP_ROOT",
         "HOSTNAME",
+        "HTTP_API_PASS",
+        "HTTP_API_USER",
         "MOSQUITTOOPTS",
         "MOSQUITTOPUBOPTS",
+        "MOTION_DETECTION",
+        "MOTION_RECORD",
+        "MOTION_TAKE_SNAPSHOT",
+        "MOTION_TOPIC",
         "MQTT_HOST",
+        "MQTT_OFF",
+        "MQTT_ON",
         "MQTT_PASS",
         "MQTT_PORT",
         "MQTT_STATUSINTERVAL",
@@ -40,7 +54,17 @@ class Configuration
         "PING_RETRIES",
         "PING_WAIT",
         "PURGE_LOGFILES_AT_BOOT",
+        "REMOTE_SYSLOG_HOST",
         "ROOT_PASSWORD",
+        "RTSP_BITRATE",
+        "RTSP_BITRATE_MODE",
+        "RTSP_EXTRA_ARGS",
+        "RTSP_FRAMERATE",
+        "RTSP_HEIGHT",
+        "RTSP_PASS",
+        "RTSP_USER",
+        "RTSP_WIDTH",
+        "STEALTH_MODE",
         "TIMEZONE",
         "WAIT_FOR_NETWORK",
         "WIFI_PASS",
@@ -175,47 +199,6 @@ class Configuration
         }
 
         return sprintf("Config %s restored to %s", $sourcefile, self::$config_path);
-    }
-}
-
-
-// **************************************************************
-// ** GPIO Functions                                           **
-// **************************************************************
-
-class GPIO
-{
-    public function __construct() {}
-
-    public static function Get(int $pin) {
-        $command = sprintf("cat '/sys/class/gpio/gpio%d/value' 2>&1", $pin);
-        exec($command, $output, $return);
-
-        if ($return != 0) {
-            throw new \Exception(
-                sprintf('Error retrieving GPIO value: %s', implode(" ", $output))
-            );
-        }
-
-        return trim(implode(" ", $output));
-    }
-
-    public static function Set(int $pin, int $value) {
-
-        $current = self::Get($pin);
-
-        if ($current == $value) return true;
-
-        $command = sprintf("echo %d > '/sys/class/gpio/gpio%d/value' 2>&1", $value, $pin);
-        exec($command, $output, $return);
-
-        if ($return != 0) {
-            throw new \Exception(
-                sprintf('Error setting GPIO value for pin %d: %s', $pin, implode(" ", $output))
-            );
-        }
-
-        return true;
     }
 }
 

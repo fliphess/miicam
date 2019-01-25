@@ -62,10 +62,18 @@ then
     wait_for_network_until "$PING_RETRIES" "$PING_WAIT" "$PING_IP"
 fi
 
-
 ##################################################################################
 ## Start enabled services                                                       ##
 ##################################################################################
+
+####################################
+## Restore settings               ##
+####################################
+
+if [ "${RESTORE_STATE}" -eq 1 ]
+then
+    sh ${SD_MOUNTDIR}/firmware/etc/init/S99restore_state start
+fi
 
 ####################################
 ## Telnetd                        ##
@@ -84,7 +92,7 @@ else
 fi
 
 ####################################
-## Dropbear SSHd                  ##
+## Dropbear SSH                   ##
 ####################################
 
 if [ "${ENABLE_SSHD}" -eq 1 ] || [ "${ENABLE_TELNETD}" -eq 0 ]
@@ -139,7 +147,7 @@ then
 fi
 
 ####################################
-## FTPd                           ##
+## FTP server                     ##
 ####################################
 
 if [ "${ENABLE_FTPD}" -eq 1 ]

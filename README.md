@@ -24,10 +24,19 @@ Screenshots of the web interface [can be found in the wiki](https://github.com/f
 
 ## Installation on the Chuangmi 720P camera
 
-The SD card must stay in the camera!
-If you remove it, the camera will start without using the hack.
+To use install the hack on your SD card, use the compiled sources.
+Copying the files in the repository to your sd card without building the binaries wil not work.
 
 You can use the pre-compiled firmware that is build with each release or build the firmware yourself using docker or a linux machine.
+
+
+### Prepare the camera
+
+When the camera is started for the first time, it is waiting for the MiiHome app to send the credentials.
+Setup the camera with the MiiHome app, and wait till the camera is connected to the wifi.
+
+If the firmware is too recent, the hack cannot always be activated.
+To work around this issue, you can downgrade the firmware to a working version [using the instructions on the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working)
 
 
 ### Prepare the SD card
@@ -39,7 +48,7 @@ Format a micro SD card in fat32 (vfat) format and copy the content of the **sdca
 
 To configure a wifi network to connect to, edit the file **config.cfg**.
 
-If you configured the wifi prior to this hack using the miihome app, the settings are stored in nvram, and not required to set in `config.cfg`.
+If you configured the wifi prior to this hack using the MiiHome app, the settings are stored in nvram, and not required to set in `config.cfg`.
 
 
 ## Start the camera
@@ -59,14 +68,6 @@ The led will indicate the current status:
 You can test is your camera is up and running this hack with your browser on url **http://your-camera-ip/**.
 
 
-## Resetting the firmware if the hack is not working
-
-If the hack is not working, there is a big chance your firmware has been upgraded using the miihome app.
-In newer firmware upgrades the boot from sdcard mechanism is blocked.
-
-Have a look in the wiki on [how to downgrade your firmware](https://github.com/fliphess/chuangmi-720p-hack/wiki/Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working) using the `tf_recovery.img` recovery image.
-
-
 ## Using the camera
 
 Using the web interface and over MQTT many settings and services can be enabled and disabled.
@@ -80,7 +81,7 @@ For controlling the camera over MQTT, have a look at the [MQTT wiki page](https:
 
 The short version: **DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNETZ!**
 
-The longer version can be read in the [wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki):
+The longer version can be read in the [wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Security-Considerations)
 
 
 ## Uninstall the hack
@@ -89,23 +90,29 @@ There are no files altered on the camera so simply remove the SD card to uninsta
 
 ## Build the binaries
 
-Have a look at the [instructions in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to build the binaries yourself.
+For new users it is recommended to use the precompiled binaries that are created with every release.
+You can download the release builds from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases).
 
-Alternatively you can download the prebuild releases from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases) that are build by travis on every release.
+
+If you prefer to build the binaries yourself, have a look at the [instructions in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
+
+
+## Following this repository
+
+As I'm an chaotic idiot that talks to himself a lot, I recommend not to watch this repository, as you will receive lots of very useless notifications.
+Choose the "Releases Only" flag to make yourself more zen :)
 
 
 ## Need help? Want to help? Ideas? suggestions?
+
+I've spend many hours documenting everything I ran into in the wiki. Please read the [troubleshooting guide](https://github.com/fliphess/chuangmi-720p-hack/wiki/Troubleshooting) prior to filing an issue.
+If something is not documented, please let me know so I can extend the wiki.
 
 Feel welcome to bring pull requests and feature requests on the table.
 
 If you're good at making a nice web interface, let me know! I'm quite tasteless when it comes to the web and layout, so I could use some help :)
 
-Please file issues and PR's if you notice something that could've been handled in a better way. I'm open to all suggestions and I would love to see some engagement of other nerds that bought this camera by accident or on purpose :)
-
-
-## More Info
-
-Have a look at the [wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki) to find some additional documentation.
-If you struggle setting up your camera using this hack, please file an issue so we can create some additional docs.
+Please file issues and PR's if you notice something that could've been handled in a better way.
+I'm open to all suggestions and I would love to see some engagement of other nerds that bought this camera by accident or on purpose :)
 
 

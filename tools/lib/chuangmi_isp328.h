@@ -120,6 +120,7 @@ int sharpness_get(void);
 int sharpness_print(void);
 
 int print_camera_info_json(void);
+int print_camera_info_shell(void);
 int print_camera_info(void);
 
 int reset_camera_adjustments(void);

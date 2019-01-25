@@ -102,7 +102,7 @@ function upload_utils() {
 
 function upload_rtsp() {
     cd /env
-    grep ROOT_PASS sdcard/config.cfg
+    get_password
     scp tools/bin/rtspd root@$CAMERA_HOSTNAME:/tmp/sd/firmware/bin/
 }
 

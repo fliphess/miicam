@@ -17,6 +17,7 @@ static void print_usage_and_exit(void)
         "  -t    type\n"
         "  -i    info\n"
         "  -j    info (in json)\n"
+        "  -k    info (shell)\n"
         "  -r    reset settings\n"
         "\n\n"
         "Description:\n"
@@ -39,12 +40,14 @@ int main(int argc, char *argv[])
 
     int info  = 0;
     int json  = 0;
+    int shell = 0;
+
     int reset = 0;
 
     char *setting;
     unsigned int value;
 
-    while ((opt = getopt(argc, argv, "gjirt:s:")) != -1) {
+    while ((opt = getopt(argc, argv, "gjikrt:s:")) != -1) {
         switch (opt)
         {
             case 'g':
@@ -64,6 +67,9 @@ int main(int argc, char *argv[])
             case 'j':
                 json = 1;
                 break;
+            case 'k':
+                shell = 1;
+                break;
             case 'r':
                 reset = 1;
                 break;
@@ -73,12 +79,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (get + set + info + json + reset == 0) {
+    if (get + set + info + json + shell + reset == 0) {
         print_usage_and_exit();
     }
 
-    if (get + set + json + info + reset > 1) {
-        fprintf(stderr, "Use either -j, -i, -r, -g or -s but not more then one!\n");
+    if (get + set + json + info + shell + reset > 1) {
+        fprintf(stderr, "Use either -j, -i, -k, -r, -g or -s but not more then one!\n");
         print_usage_and_exit();
     }
 
@@ -97,39 +103,42 @@ int main(int argc, char *argv[])
     if (json)
         return print_camera_info_json();
 
+    if (shell)
+        return print_camera_info_shell();
+
     int success;
     if (strcmp(setting, "brightness") == 0) {
-        if (set == 1) 
+        if (set == 1)
             success = brightness_set(value);
         else if (get == 1)
             success = brightness_print();
     }
     else if (strcmp(setting, "contrast") == 0) {
-        if (set == 1) 
+        if (set == 1)
             success = contrast_set(value);
         else if (get == 1)
             success = contrast_print();
     }
     else if (strcmp(setting, "hue") == 0) {
-        if (set == 1) 
+        if (set == 1)
             success = hue_set(value);
         else if (get == 1)
             success = hue_print();
     }
     else if (strcmp(setting, "saturation") == 0) {
-        if (set == 1) 
+        if (set == 1)
             success = saturation_set(value);
         else if (get == 1)
             success = saturation_print();
     }
     else if (strcmp(setting, "denoise") == 0) {
-        if (set == 1) 
+        if (set == 1)
             success = denoise_set(value);
         else if (get == 1)
             success = denoise_print();
     }
     else if (strcmp(setting, "sharpness") == 0) {
-        if (set == 1) 
+        if (set == 1)
             success = sharpness_set(value);
         else if (get == 1)
             success = sharpness_print();

@@ -13,7 +13,6 @@ DESC="Telnet Daemon"
 DAEMON="/usr/sbin/${NAME}"
 DAEMON_OPTS="-F"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

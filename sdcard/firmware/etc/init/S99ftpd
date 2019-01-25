@@ -16,7 +16,6 @@ DESC="FTP server"
 DAEMON="/usr/bin/tcpsvd"
 DAEMON_OPTS="-vE 0.0.0.0 21 ftpd $FTP_ROOT $FTP_EXTRA_ARGS"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

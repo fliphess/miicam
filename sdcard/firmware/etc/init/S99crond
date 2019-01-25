@@ -16,8 +16,6 @@ DESC="Cron Daemon"
 DAEMON="/usr/sbin/${NAME}"
 DAEMON_OPTS="-c /var/run/cron"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
-
 
 load_crontab() {
     if [ -s "$SD_MOUNTDIR/firmware/etc/crontab" ]

@@ -3,6 +3,10 @@
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
 ## author: Jan Sperling , 2017
 
+########################################
+## Load functions                     ##
+########################################
+
 SD_MOUNTDIR="/tmp/sd"
 if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
 then
@@ -12,28 +16,39 @@ else
     exit 1
 fi
 
+########################################
+## Print help if -h is issued         ##
+########################################
+
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 then
     cat << EOF
 Usage of ${0} [<WIFI_SSID> [<WIFI_PASS>]]
 Configure WiFi to connect to WIFI_SSID. WIFI_PASS is needed for WPA-PSK secured WiFis.
 If no argument is given the values from config.cfg are used.
-Otherwise the WiFi setup and config.cfg will be updated.
 EOF
     exit
 fi
 
+########################################
+## Set password if given as command line arguments
+########################################
+
 if [ "$#" -ne 0 ]
 then
-    WIFI_SSID="${1}"
-    WIFI_PASS="${2}"
+    export WIFI_SSID="${1}"
+    export WIFI_PASS="${2}"
 fi
+
+########################################
+## Save wifi configuration to nvram   ##
+########################################
 
 if [ -n "${WIFI_SSID}" ]
 then
-    echo "Configure WiFi"
-    nvram_change=0
+    echo "*** Updating WIFI settings based on config.cfg"
 
+    ## Set password or no password
     if [ -z "${WIFI_PASS}" ]
     then
         WIFI_KEY_MGMT="NONE"
@@ -41,22 +56,26 @@ then
         WIFI_KEY_MGMT="WPA"
     fi
 
-    if [ "$(get_nvram miio_ssid)" != "${WIFI_SSID}" ]
+    ## Save SSID to nvram if changed or not set
+    if [ "$( get_nvram miio_ssid )" != "${WIFI_SSID}" ]
     then
         set_nvram miio_ssid "${WIFI_SSID}"
     fi
 
-    if [ "$(get_nvram miio_key_mgmt)" != "${WIFI_KEY_MGMT}" ]
+    ## Set key mgmt if changed or not set
+    if [ "$( get_nvram miio_key_mgmt )" != "${WIFI_KEY_MGMT}" ]
     then
         set_nvram miio_key_mgmt "${WIFI_KEY_MGMT}"
     fi
 
-    if [ "$(get_nvram miio_passwd)" != "${WIFI_PASS}" ]
+    ## Set password if changed or not set
+    if [ "$(get_nvram miio_passwd )" != "${WIFI_PASS}" ]
     then
         set_nvram miio_passwd "${WIFI_PASS}"
     fi
 
-    if [ "$(get_nvram wifi_ready)" != "yes" ]
+    ## Change wifi_ready setting if not set
+    if [ "$(get_nvram wifi_ready )" != "yes" ]
     then
         set_nvram wifi_ready yes
 

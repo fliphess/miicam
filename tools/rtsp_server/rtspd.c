@@ -329,6 +329,19 @@ int stop_recording(void)
     return EXIT_SUCCESS;
 }
 
+int init_recording(void) {
+    // * Only create when it doesn't exist (we'll write it in init script)
+    if (access(LAST_VIDEO_PATH, F_OK ) == -1) {
+        FILE *last_video_path = fopen(LAST_VIDEO_PATH, "wb");
+        if (last_video_path == NULL) {
+            log_error("Failed to open file: %s", LAST_VIDEO_PATH);
+            return EXIT_FAILURE;
+        }
+        fputs("unknown", last_video_path);
+        fclose(last_video_path);
+    }
+    return EXIT_SUCCESS;
+}
 
 static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
 {
@@ -341,9 +354,9 @@ static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
     ret = gm_set_cap_motion(cap_vch, &cap_motion);
     if (ret < 0) {
         log_error("Failed to run gm_set_cap_motion");
-        return -1;
+        return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 
@@ -371,7 +384,7 @@ static int set_interesting_area(int ch)
     mdt_alg.mb_cell_en = (unsigned char *)malloc(sizeof(unsigned char) * mb_w_num * mb_h_num);
     if (mdt_alg.mb_cell_en == NULL) {
         log_error("Failed to allocate mb_cell_en");
-        ret = -1;
+        ret = EXIT_FAILURE;
         goto err_ext;
     }
 
@@ -399,7 +412,7 @@ static int set_interesting_area(int ch)
 
     if (ret != 0) {
         log_error("Failed to execute motion_detection_update");
-        ret = -1;
+        ret = EXIT_FAILURE;
         goto err_ext;
     }
 
@@ -409,6 +422,22 @@ err_ext:
     return ret;
 }
 
+
+int init_snapshot(void)
+{
+    // * Only create the file if it doesn't exist (it's filled it init script)
+    if (access(LAST_SNAPSHOT_PATH, F_OK ) == -1) {
+        FILE *fd = fopen(LAST_SNAPSHOT_PATH, "wb");
+        if (fd == NULL) {
+            log_error("Failed to open file %s", LAST_SNAPSHOT_PATH);
+            return EXIT_FAILURE;
+        }
+        fputs("unknown", fd);
+        fclose(fd);
+    }
+
+    return EXIT_SUCCESS;
+}
 
 void take_snapshot(void)
 {
@@ -1060,6 +1089,14 @@ static void *media_thread(void *arg)
     VideoRecorder.recording    = 0;
     VideoRecorder.file_path[0] = '\0';
     VideoRecorder.fh           = NULL;
+
+    // * Inititialize recording
+    if (init_recording() < 0)
+        log_error("Failed to initialize recording");
+
+    // * Inititialize snapshot
+    if (init_snapshot() < 0)
+        log_error("Failed to initialize snapshot");
 
     while (rtspd_sysinit) {
         // * Check for external snapshot trigger
@@ -2117,8 +2154,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if ((cliArgs.framerate < 1) || (cliArgs.framerate > 15)) {
-        log_error("A framerate below 1 or higher than 15 fps is not supported.");
+    if ((cliArgs.framerate < 1) || (cliArgs.framerate > 30)) {
+        log_error("A framerate below 1 or higher than 30 fps is not supported.");
         return 1;
     }
 

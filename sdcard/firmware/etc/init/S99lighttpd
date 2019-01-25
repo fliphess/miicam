@@ -17,7 +17,6 @@ DESC="web server"
 DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
 DAEMON_OPTS="-f /etc/lighttpd.conf"
 PIDFILE="/var/run/${NAME}.pid"
-LOGFILE="${LOGDIR}/${NAME}.log"
 
 check_daemon_bin "${DAEMON}" "${DESC}"
 

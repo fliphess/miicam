@@ -105,7 +105,7 @@ int wait_for_file_removal(const char * file_path)
         if (access(file_path, F_OK) < 0) {
             break;
         }
-        usleep(2000);
+        sleep(1);
     }
 
     if (access(file_path, F_OK ) < 0)
@@ -121,109 +121,111 @@ int wait_for_file_removal(const char * file_path)
 
 int gpio_export(int pin)
 {
-	char buffer[GPIO_BUFFER_MAX];
-	ssize_t bytes_written;
-	int fd;
+    char buffer[GPIO_BUFFER_MAX];
+    ssize_t bytes_written;
+    int fd;
 
-	fd = open("/sys/class/gpio/export", O_WRONLY);
-	if (-1 == fd) {
-		fprintf(stderr, "Failed to open export for writing!\n");
-		return(-1);
-	}
+    fd = open("/sys/class/gpio/export", O_WRONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open export for writing!\n");
+        return(EXIT_FAILURE);
+    }
 
-	bytes_written = snprintf(buffer, GPIO_BUFFER_MAX, "%d", pin);
-	write(fd, buffer, bytes_written);
-	close(fd);
-	return(0);
+    bytes_written = snprintf(buffer, GPIO_BUFFER_MAX, "%d", pin);
+    write(fd, buffer, bytes_written);
+    close(fd);
+
+    return(EXIT_SUCCESS);
 }
 
 
 int gpio_unexport(int pin)
 {
-	char buffer[GPIO_BUFFER_MAX];
-	ssize_t bytes_written;
-	int fd;
+    char buffer[GPIO_BUFFER_MAX];
+    ssize_t bytes_written;
+    int fd;
 
-	fd = open("/sys/class/gpio/unexport", O_WRONLY);
-	if (-1 == fd) {
-		fprintf(stderr, "Failed to open unexport for writing!\n");
-		return(-1);
-	}
+    fd = open("/sys/class/gpio/unexport", O_WRONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open unexport for writing!\n");
+        return(EXIT_FAILURE);
+    }
 
-	bytes_written = snprintf(buffer, GPIO_BUFFER_MAX, "%d", pin);
-	write(fd, buffer, bytes_written);
-	close(fd);
-	return(0);
+    bytes_written = snprintf(buffer, GPIO_BUFFER_MAX, "%d", pin);
+    write(fd, buffer, bytes_written);
+    close(fd);
+
+    return(EXIT_SUCCESS);
 }
 
 
 int gpio_direction(int pin, int dir)
 {
-	static const char s_directions_str[]  = "in\0out";
+    static const char s_directions_str[]  = "in\0out";
 
-	char path[GPIO_DIRECTION_MAX];
-	int fd;
+    char path[GPIO_DIRECTION_MAX];
+    int fd;
 
-	snprintf(path, GPIO_DIRECTION_MAX, "/sys/class/gpio/gpio%d/direction", pin);
-	fd = open(path, O_WRONLY);
-	if (-1 == fd) {
-		fprintf(stderr, "Failed to open gpio direction for writing!\n");
-		return(-1);
-	}
+    snprintf(path, GPIO_DIRECTION_MAX, "/sys/class/gpio/gpio%d/direction", pin);
+    fd = open(path, O_WRONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open gpio direction for writing!\n");
+        return(EXIT_FAILURE);
+    }
 
-	if (-1 == write(fd, &s_directions_str[IN == dir ? 0 : 3], IN == dir ? 2 : 3)) {
-		fprintf(stderr, "Failed to set direction!\n");
-		return(-1);
-	}
+    if (write(fd, &s_directions_str[IN == dir ? 0 : 3], IN == dir ? 2 : 3) == -1) {
+        fprintf(stderr, "Failed to set direction!\n");
+        return(EXIT_FAILURE);
+    }
 
-	close(fd);
-	return(0);
+    close(fd);
+    return(EXIT_SUCCESS);
 }
 
 
 int gpio_read(int pin)
 {
-	char path[GPIO_VALUE_MAX];
-	char value_str[3];
-	int fd;
+    char path[GPIO_VALUE_MAX];
+    char value_str[3];
+    int fd;
 
-	snprintf(path, GPIO_VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
-	fd = open(path, O_RDONLY);
-	if (fd == -1) {
-		fprintf(stderr, "Failed to open gpio value for reading!\n");
-		return(-1);
-	}
+    snprintf(path, GPIO_VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
+    fd = open(path, O_RDONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open gpio value for reading!\n");
+        return(-1);
+    }
 
-	if (read(fd, value_str, 3) == -1) {
-		fprintf(stderr, "Failed to read value!\n");
-		return(-1);
-	}
+    if (read(fd, value_str, 3) == -1) {
+        fprintf(stderr, "Failed to read value!\n");
+        return(-1);
+    }
 
-	close(fd);
+    close(fd);
 
-	return(atoi(value_str));
+    return(atoi(value_str));
 }
 
 
 int gpio_write(int pin, int value)
 {
-	static const char s_values_str[] = "01";
+    static const char s_values_str[] = "01";
 
-	char path[GPIO_VALUE_MAX];
-	int fd;
+    char path[GPIO_VALUE_MAX];
+    int fd;
 
-	snprintf(path, GPIO_VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
-	fd = open(path, O_WRONLY);
-	if (fd == -1) {
-		fprintf(stderr, "Failed to open gpio value for writing!\n");
-		return(EXIT_FAILURE);
-	}
+    snprintf(path, GPIO_VALUE_MAX, "/sys/class/gpio/gpio%d/value", pin);
+    fd = open(path, O_WRONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open gpio value for writing!\n");
+        return(EXIT_FAILURE);
+    }
 
-	if (write(fd, &s_values_str[LOW == value ? 0 : 1], 1) != 1) {
-		fprintf(stderr, "Failed to write value!\n");
-		return(EXIT_FAILURE);
-	}
+    if (write(fd, &s_values_str[LOW == value ? 0 : 1], 1) != 1) {
+        fprintf(stderr, "Failed to write value!\n");
+        return(EXIT_FAILURE);
+    }
 
-	close(fd);
-	return(EXIT_SUCCESS);
+    close(fd);
+    return(EXIT_SUCCESS);
 }
