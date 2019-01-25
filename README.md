@@ -27,8 +27,14 @@ Screenshots of the web interface [can be found in the wiki](https://github.com/f
 To use install the hack on your SD card, use the compiled sources.
 Copying the files in the repository to your sd card without building the binaries wil not work.
 
-You can use the pre-compiled firmware that is build with each release or build the firmware yourself using docker or a linux machine.
 
+For new users it is recommended to use the precompiled binaries that are created with every release.
+You can download the release builds from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases).
+
+
+## Build the binaries
+
+If you prefer to build the binaries yourself, have a look at the [instructions in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
 
 ### Prepare the camera
 
@@ -87,14 +93,6 @@ The longer version can be read in the [wiki](https://github.com/fliphess/chuangm
 ## Uninstall the hack
 
 There are no files altered on the camera so simply remove the SD card to uninstall the hack.
-
-## Build the binaries
-
-For new users it is recommended to use the precompiled binaries that are created with every release.
-You can download the release builds from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases).
-
-
-If you prefer to build the binaries yourself, have a look at the [instructions in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
 
 
 ## Following this repository
