@@ -104,8 +104,9 @@ class Configuration
         $lines_count = 0;
 
         foreach ($lines as $line) {
+
             $lines_count++;
-            if (!preg_match('/^#.+$|^$/', $line) and !preg_match('/^\w+=\"?([a-zA-Z0-9_\-\ \/\$\.]+)?\"?$/', $line)) {
+            if (!preg_match('/^#.+$|^$/', $line) and !preg_match('/^\w+=\"?([a-zA-Z0-9\)\(\{@\|+\:\[\]><\^%&_\-\ \/\$\.=]+)?\"?$/', $line)) {
                 throw new \Exception(
                     sprintf('Invalid input in configuration content: %s (line: %s)', $line, $lines_count)
                 );
