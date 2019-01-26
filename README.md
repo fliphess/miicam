@@ -27,7 +27,7 @@ Screenshots of the web interface [can be found in the wiki](https://github.com/f
 To use install the hack on your SD card, use the compiled sources.
 Copying the files in the repository to your sd card without building the binaries wil **Not** work.
 
-##  Get the binaries
+###  Get the binaries
 
 For new users it is recommended to use the precompiled binaries that are created with every release.
 You can download the release builds from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases).
