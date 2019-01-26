@@ -284,6 +284,7 @@ function CameraState() {
     $default = 'unknown';
 
     return array(
+        "ir_led"                 => IR_Led::IsOn(),
         "ir_cut"                 => IR_Cut::IsOn(),
         "night_mode"             => NightMode::IsOn(),
         "flip_mode"              => FlipMode::IsOn(),
