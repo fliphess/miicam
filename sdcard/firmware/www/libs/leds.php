@@ -9,7 +9,6 @@ class LED
     private static $leds = [
         "blue_led",
         "yellow_led",
-        "ir_led",
     ];
 
     private static $states = [
@@ -162,7 +161,7 @@ class IR_Led
 
         if (($output) && (rtrim($output[0]) == "on")) {
             return true;
-        } else { 
+        } else {
             return false;
         }
     }
@@ -175,7 +174,7 @@ class IR_Led
         if (!self::IsOn()) {
             $command = "/tmp/sd/firmware/bin/ir_led -e";
             exec($command, $output, $return);
-    
+
             if ($return != 0) {
                 throw new \Exception(
                     sprintf('Error executing %s: %s', $command, implode(" ", $output))
@@ -189,7 +188,7 @@ class IR_Led
         if (self::IsOn()) {
             $command = "/tmp/sd/firmware/bin/ir_led -d";
             exec($command, $output, $return);
-    
+
             if ($return != 0) {
                 throw new \Exception(
                     sprintf('Error executing %s: %s', $command, implode(" ", $output))
