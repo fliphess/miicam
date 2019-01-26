@@ -161,17 +161,15 @@ class NightMode extends ISP328
 {
     public static function IsOn() {
         $current = self::Get('daynight');
-        return (($_ENV['AUTO_NIGHT_MODE'] == 1) || ($current == 'NIGHT_MODE')) ? true : false;
+        return ($current == 'NIGHT_MODE') ? true : false;
     }
 
     public static function IsOff() {
         $current = self::Get('daynight');
-        return (($_ENV['AUTO_NIGHT_MODE'] == 0) && ($current == 'DAY_MODE')) ? true : false;
+        return ($current == 'DAY_MODE') ? true : false;
     }
 
     public static function TurnOn() {
-        if ($_ENV['AUTO_NIGHT_MODE'] == 1) return false;
-
         if (!self::IsOn()) {
             IR_Led::TurnOn();
             IR_Cut::TurnOff();
@@ -182,8 +180,6 @@ class NightMode extends ISP328
     }
 
     public static function TurnOff() {
-        if ($_ENV['AUTO_NIGHT_MODE'] == 1) return false;
-
         if (self::IsOn()) {
             IR_Led::TurnOff();
             IR_Cut::TurnOn();
