@@ -401,10 +401,10 @@
                           if (response.data.success) {
                               this.SetState(option, !state);
                               this.success_show = true;
-                              this.success_message = this.humanize(option) + " was turned off";
+                              this.success_message = this.humanize(option) + " was toggled";
                           } else {
                               this.error_show = true;
-                              this.error_message = "Turn on " + this.humanize(option) + " Failed"
+                              this.error_message = "Toggle state for " + this.humanize(option) + " failed"
                           }
                       })
                       .catch(error => {
