@@ -117,13 +117,13 @@ led_ir_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning ir led on"
-        ir_led on
+        /tmp/sd/firmware/bin/ir_led -e
         mqtt_send "${MQTT_TOPIC}/leds/ir" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning ir led off"
-        ir_led off
+        /tmp/sd/firmware/bin/ir_led -d
         mqtt_send "${MQTT_TOPIC}/leds/ir" "${MQTT_OFF}"
     fi
 }
