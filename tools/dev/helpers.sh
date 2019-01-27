@@ -9,6 +9,26 @@
 
 export CAMERA_HOSTNAME="camera3"
 
+export TOOLCHAINDIR="/usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin"
+export PATH="${TOOLCHAINDIR}:${PATH}:$HOME/.composer/vendor/mediamonks/composer-vendor-cleaner/bin"
+
+export TARGET="arm-unknown-linux-uclibcgnueabi"
+export AR="${TARGET}-ar"
+export AS="${TARGET}-as"
+export CC="${TARGET}-gcc"
+export CXX="${TARGET}-g++"
+export LD="${TARGET}-ld"
+export NM="${TARGET}-nm"
+export RANLIB="${TARGET}-ranlib"
+export STRIP="${TARGET}-strip"
+
+export TOPDIR="/env"
+export SOURCEDIR="${TOPDIR}/src"
+export PREFIXDIR="${TOPDIR}/prefix"
+export BUILDDIR="${TOPDIR}/build"
+export INSTALLDIR="${TOPDIR}/sdcard/firmware/bin"
+export WEBROOT="${TOPDIR}/sdcard/firmware/www"
+
 
 function log() {
     MESSAGE="$1"
