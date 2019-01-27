@@ -34,6 +34,7 @@ get_last_video > /dev/shm/rtspd_last_video_path
 ## Set max FPS to 30 if fps > 15
 if [ "$RTSP_FRAMERATE" -gt 15 ]
 then
+    echo "*** Setting sensor framerate to max 30 fps"
     echo w sen_fps 30 > /proc/isp328/command
 fi
 

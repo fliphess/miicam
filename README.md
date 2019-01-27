@@ -12,6 +12,11 @@ With this firmware an alternate method of using this webcam is created that does
 ![Alt text](https://github.com/fliphess/chuangmi-720p-hack/raw/master/sdcard/firmware/www/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
 
 
+## Help debugging
+
+Please debug any issues appearing while using the hack and file a pull request to get things fixed in this repo.
+As I'm losing too much time on solving issues that are in the wiki, I've decided to close all issues and start working with a feature tracking tool.
+
 ## Features
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
@@ -103,14 +108,10 @@ Choose the "Releases Only" flag to make yourself more zen :)
 
 ## Need help? Want to help? Ideas? suggestions?
 
-I've spend many hours documenting everything I ran into in the wiki. Please read the [troubleshooting guide](https://github.com/fliphess/chuangmi-720p-hack/wiki/Troubleshooting) prior to filing an issue.
+I've spend many hours documenting everything I ran into in the wiki. Please read the [troubleshooting guide](https://github.com/fliphess/chuangmi-720p-hack/wiki/Troubleshooting) for solving the most common issues.
 If something is not documented, please let me know so I can extend the wiki.
 
 Feel welcome to bring pull requests and feature requests on the table.
 
 If you're good at making a nice web interface, let me know! I'm quite tasteless when it comes to the web and layout, so I could use some help :)
-
-Please file issues and PR's if you notice something that could've been handled in a better way.
-I'm open to all suggestions and I would love to see some engagement of other nerds that bought this camera by accident or on purpose :)
-
 
