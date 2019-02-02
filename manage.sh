@@ -29,7 +29,7 @@ function usage()
       --gencert        - Create a self-signed certificate for use with lighttpd
 
     Download toolchain: https://fliphess.com/toolchain/
-    Repo: https://github.com/fliphess/chuangmi-720p-hack
+    Repo: https://github.com/MiiCam/MiiCam
 
 EOF
 

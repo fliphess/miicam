@@ -8,9 +8,9 @@ This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Cam
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
 With this firmware an alternate method of using this webcam is created that does not require an internet uplink.
 
-**Please read the [security considerations in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Security-Considerations).**
+**Please read the [security considerations in the wiki](https://miicam.github.io/Security-Considerations).**
 
-![Alt text](https://github.com/fliphess/chuangmi-720p-hack/raw/master/sdcard/firmware/www/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
+![Alt text](https://github.com/MiiCam/MiiCam/raw/master/sdcard/firmware/www/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
 
 
 ## Help debugging
@@ -21,11 +21,11 @@ As I'm losing too much time on solving issues that are in the wiki, I've decided
 ## Features
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
-Have a look in [the wiki for all the available options](https://github.com/fliphess/chuangmi-720p-hack/wiki).
+Have a look in [the wiki for all the available options](https://miicam.github.io).
 
 ## Screenshots
 
-Screenshots of the web interface [can be found in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Screenshots)
+Screenshots of the web interface [can be found in the wiki](https://miicam.github.io/Screenshots)
 
 
 ## Installation on the Chuangmi 720P camera
@@ -36,11 +36,11 @@ Copying the files in the repository to your sd card without building the binarie
 ###  Get the binaries
 
 For new users it is recommended to use the precompiled binaries that are created with every release.
-You can download the release builds from the [github releases page](https://github.com/fliphess/chuangmi-720p-hack/releases).
+You can download the release builds from the [github releases page](https://github.com/MiiCam/MiiCam/releases).
 
 ### Build the binaries
 
-If you prefer to build the binaries yourself, have a look at the [instructions in the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
+If you prefer to build the binaries yourself, have a look at the [instructions in the wiki](https://miicam.github.io/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
 
 ### Prepare the camera
 
@@ -48,7 +48,7 @@ When the camera is started for the first time, it is waiting for the MiiHome app
 Setup the camera with the MiiHome app, and wait till the camera is connected to the wifi.
 
 If the firmware is too recent, the hack cannot always be activated.
-To work around this issue, you can downgrade the firmware to a working version [using the instructions on the wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working)
+To work around this issue, you can downgrade the firmware to a working version [using the instructions on the wiki](https://miicam.github.io/Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working)
 
 
 ### Prepare the SD card
@@ -86,14 +86,14 @@ Using the web interface and over MQTT many settings and services can be enabled 
 
 Have a look at the api docs in the web interface for a list of all available http calls you can use to control the camera.
 
-For controlling the camera over MQTT, have a look at the [MQTT wiki page](https://github.com/fliphess/chuangmi-720p-hack/wiki/Configuring-MQTT)
+For controlling the camera over MQTT, have a look at the [MQTT wiki page](https://miicam.github.io/Configuring-MQTT)
 
 
 ## Security considerations
 
 The short version: **DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNETZ!**
 
-The longer version can be read in the [wiki](https://github.com/fliphess/chuangmi-720p-hack/wiki/Security-Considerations)
+The longer version can be read in the [wiki](https://miicam.github.io/Security-Considerations)
 
 
 ## Uninstall the hack
@@ -109,7 +109,7 @@ Choose the "Releases Only" flag to make yourself more zen :)
 
 ## Need help? Want to help? Ideas? suggestions?
 
-I've spend many hours documenting everything I ran into in the wiki. Please read the [troubleshooting guide](https://github.com/fliphess/chuangmi-720p-hack/wiki/Troubleshooting) for solving the most common issues.
+I've spend many hours documenting everything I ran into in the wiki. Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
 If something is not documented, please let me know so I can extend the wiki.
 
 Feel welcome to bring pull requests and feature requests on the table.
