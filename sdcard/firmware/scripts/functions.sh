@@ -116,7 +116,7 @@ create_disable_binary()
 
     if [ ! -x /tmp/disable-binary ]
     then
-        echo -e '#!/bin/sh\necho "$0 disabled with chuangmi-720p-hack"' > /tmp/disable-binary
+        echo -e '#!/bin/sh\necho "$0 disabled with MiiCam"' > /tmp/disable-binary
         chmod +x /tmp/disable-binary
     fi
 }

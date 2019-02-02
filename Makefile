@@ -901,16 +901,16 @@ install: all
 images: all website install
 	@cd $(TOPDIR) \
 	\
-	&& echo "*** Removing older version of chuangmi-720p-hack.tgz and chuangmi-720p-hack.zip" \
-	&& find $(TOPDIR) -maxdepth 1 -type f -name 'chuangmi-720p-hack.zip' -or -name 'chuangmi-720p-hack.tgz' -delete \
+	&& echo "*** Removing older version of MiiCam.tgz and MiiCam.zip" \
+	&& find $(TOPDIR) -maxdepth 1 -type f -name 'MiiCam.zip' -or -name 'MiiCam.tgz' -delete \
 	\
-	&& echo "*** Creating zip archive of sdcard/ to chuangmi-720p-hack.zip" \
-	&& zip -r --quiet chuangmi-720p-hack.zip README.md sdcard \
+	&& echo "*** Creating zip archive of sdcard/ to MiiCam.zip" \
+	&& zip -r --quiet MiiCam.zip README.md sdcard \
 	\
-	&& echo "*** Creating tar archive of sdcard/ to chuangmi-720p-hack.tgz" \
-	&& tar czf chuangmi-720p-hack.tgz -C $(TOPDIR) README.md sdcard \
+	&& echo "*** Creating tar archive of sdcard/ to MiiCam.tgz" \
+	&& tar czf MiiCam.tgz -C $(TOPDIR) README.md sdcard \
 	\
-	&& echo "*** chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz created"
+	&& echo "*** MiiCam.zip and MiiCam.tgz created"
 
 
 clean:

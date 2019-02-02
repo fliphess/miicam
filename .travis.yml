@@ -1,38 +1,36 @@
----
 sudo: required
 dist: xenial
-
 services:
-  - docker
-
+- docker
 before_install:
-  - docker ps -a
-  - docker pull quay.io/fliphess/chuangmi-720p-hack
-  - docker build --cache-from quay.io/fliphess/chuangmi-720p-hack -t fliphess/chuangmi-720p-hack .
-
+- docker ps -a
+- docker pull quay.io/MiiCam/MiiCam
+- docker build --cache-from quay.io/MiiCam/MiiCam -t MiiCam/MiiCam
+  .
 script:
-  - docker run -i -v "$(pwd):/result" --detach=false --tty=true fliphess/chuangmi-720p-hack /bin/bash -c 'make PROCS=2 images clean && mv /env/chuangmi-720p-hack.zip /env/chuangmi-720p-hack.tgz /result/'
-
+- docker run -i -v "$(pwd):/result" --detach=false --tty=true MiiCam/MiiCam
+  /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz
+  /result/'
 notifications:
   email: false
   webhooks:
     urls:
-      - $WEBHOOK_URL
+    - "$WEBHOOK_URL"
     on_success: change
     on_failure: always
     on_start: never
-
 before_deploy:
-  - git config --local user.name "Travis Releases Build Bot"
-  - git config --local user.email "spam@fliphess.com"
-  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+- git config --local user.name "Travis Releases Build Bot"
+- git config --local user.email "spam@fliphess.com"
+- git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+
 
 deploy:
   provider: releases
   api_key:
-    secure: Hwq2sDcKA3bB+gCsboWHg/9wZDRj0MUBaX2fs52BHDOuA+EPbde96cf+msYVeH3ttMU77qfGNbFmE2+0FGgxA+BGkFY1uQOC+UI8Nk5/aDyTHR6EXD4FCu+8tgaw1ZMHGLE1YqjaRe1DDiAB1ZcL9TZxH4FGoynzK7P1LdttaOstyD6foz7kpp0i+BZb6fIGl0ggizFCYP84TD+VkMPD1DaEVOVma3ikGNsQgWfrpBPQowp7nph+rcAgB0FXsx9XCMCaBc2691b1ntrr61Xc37MHf5BzZ2lcKaFK9RTcOuJSMtlQb3qMLAUQazACdwJBsU8p60ILFBa0z5ci5uYqUcJJTauQcWVnkCkdNSAuNvpnh7o3pB/kGNgxJ8jeNziDr/9AyrbUcNccxzIim09mdufwdtEGL8sSJJCPO5KZc1BxdATZSSyj3gNfLy1iC1O5XLHtdZoEqVWAUnfnFbWwriX6WvI36htYgh3RbBalRbVhCYV2gUZHafq5qOW0qVwh/wq8Xrlh0nRN1RcCzzXt+mBlfGvER13Mpve5Mxdhwbmp2diYBbGqevvzh2tTJmc/Q+o2Tze13w9MXshDvkbdwmSN4e9YYzdpX0hqKXSzbdHhICJB1iFF+96pV4KKM79gHfiUVd2C0W/F4EYzLQhpeQhtkf+vDt0j2JzkUZu1gaI=
+    secure: tQzN8M2tmdruwXiISw3rXMoz9ZNNOIabOC9MCxjihbQiQ5rXC3dqRlqtq3YC5PIg+FkfPuTH7OLH9QrC1N2O6sPD8VKsDkFMHyY3NG6AXfvpBVAP+u0RfH2hOxVQyMQ5DnvSFlGcYkef3X7OypRHcFSJSx5+IZHkPFkOpSxVQJu3PCGicO4qFRa2ALev/hosLO8zH8TN0cJi8353EXqH6f6mHoJTsLI0WpcZ0Bql4g1QqlEb6cs34rJB53ydboClv8E1fIG1E15k83kTa5J7hoGUVHfzWP0sode1vZbdr7gpMtAzL+kpuHTOZ+YsS63HxC+M7lw4UPKBDZ1v0nPPX1rW177kGOMBzCHlqXhgK3fhMpZ9BZ58gFklFa4tqrbJSLq2jNYm4EWK7JM5TycMhkl4EwqEe4UdxXgj28WeehsBUChGqAS6ofpvHCf/mVg3cF7Px/MVhChA4JVPl8UV0sY5jlQwGXuEaNh10+yq0faSH9kWwkdCX3aeq2CXi5h5eB+Lac4Wt0YlnEmqZAVv1N01TqD29naXEuzJ2P5xw9rc1nWV1wiRmu1TQ+kwmoEbjGscIMxFO1tUfa1lPm30Ik1yKmitA5oIZTYGyXW9lPegsMOHxpkuTAZzw6KhCKUrdrP2XdPFT7fjelZe5fB/U4aEb8Y+S5OPYyaQQq1wVkI=
   file_glob: true
-  file: chuangmi-720p-hack.*
+  file: MiiCam.*
   skip_cleanup: true
   on:
     tags: true

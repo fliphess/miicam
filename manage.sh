@@ -3,7 +3,7 @@ INPUT="$1" ; shift
 ARGUMENTS=$*
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-CONTAINER_IMAGE="chuangmi-720p-hack"
+CONTAINER_IMAGE="MiiCam"
 DOCKER_CLI="docker run -i -v ${SCRIPTPATH}:/result --detach=false --rm --tty=true"
 
 ## Print help output
@@ -19,7 +19,7 @@ function usage()
     Options:
 
       --build          - Runs a container build and then executes make images clean
-                         To create a chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz
+                         To create a MiiCam.zip and MiiCam.tgz
                          containing the binaries and other contents of the sdcard
 
       --build-docker   - Only (re)build the container environment
@@ -84,7 +84,7 @@ function build()
 {
     log "Building firmware image"
 
-    run 'make images clean && mv /env/chuangmi-720p-hack.zip /env/chuangmi-720p-hack.tgz /result/'
+    run 'make images clean && mv /env/MiiCam.zip /env/MiiCam.tgz /result/'
 
     return $?
 }

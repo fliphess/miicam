@@ -9,8 +9,7 @@ tools/lib/*.so
 tools/lib/*.o
 sdcard/firmware/root/.ssh
 sdcard/firmware/bin/*
-sdcard/firmware/www/vendor
-sdcard/firmware/www/composer.lock
+sdcard/firmware/www
 sdcard/firmware/etc/ssl/rootCA.key
 sdcard/firmware/etc/ssl/rootCA.pem
 sdcard/firmware/etc/ssl/rootCA.srl
@@ -24,8 +23,8 @@ src/*
 prefix/*
 tf_recovery.img
 tf_recovery.img.bak
-chuangmi-720p-hack.zip
-chuangmi-720p-hack.tgz
+MiiCam.zip
+MiiCam.tgz
 sdk/
 tmp/
 .idea
