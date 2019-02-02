@@ -1,8 +1,7 @@
-
-TOOLCHAINDIR = /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin
-PATH  := $(TOOLCHAINDIR):$(PATH)
-TARGET = arm-unknown-linux-uclibcgnueabi
-PROCS = 7
+TOOLCHAINDIR := /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin
+PATH         := $(TOOLCHAINDIR):$(PATH)
+TARGET       := arm-unknown-linux-uclibcgnueabi
+PROCS        := 7
 
 DOWNLOADCMD := wget -t 5 -T 10 -c -O
 
@@ -115,7 +114,8 @@ $(SOURCEDIR)/$(WEBSITEARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(WEBSITEURI) || rm -f $@
 
 
-$(WEBROOT):
+$(WEBROOT): $(SOURCEDIR)/$(WEBSITEARCHIVE)
+	@mkdir -p $(WEBROOT)
 	echo "Unpacking web content" && \
 	tar -xzf $(SOURCEDIR)/$(WEBSITEARCHIVE) -C $(WEBROOT)
 
