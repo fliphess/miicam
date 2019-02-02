@@ -797,7 +797,7 @@ $app->group('/config', function () use ($app) {
 
     $app->get('/backup/create', function ($request, $response) {
         $filename = Configuration::Backup();
-        $data  = ($filename) ? array("message" => sprintf("New backup created: %s", $filename), "success" => true) : array("success" => false, "message" => "Backup creation failed");
+        $data  = ($filename) ? array("message" => sprintf("New backup created: %s", $filename), "filename" => $filename, "success" => true) : array("success" => false, "message" => "Backup creation failed");
         return $response->withJson($data);
     })->setName('/config/backup/create');
 
