@@ -8,97 +8,44 @@ This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Cam
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
 With this firmware an alternate method of using this webcam is created that does not require an internet uplink.
 
-**Please read the [security considerations in the wiki](https://miicam.github.io/Security-Considerations).**
+**Please read the [security considerations in the documentation](https://miicam.github.io/Security-Considerations).**
 
 ![Alt text](https://github.com/MiiCam/MiiCamWeb/raw/master/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
 
 
-## Help debugging
-
-Please debug any issues appearing while using the hack and file a pull request to get things fixed in this repo.
-As I'm losing too much time on solving issues that are in the wiki, I've decided to close all issues and start working with a feature tracking tool.
-
 ## Features
 
 This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
-Have a look in [the wiki for all the available options](https://miicam.github.io).
+Have a look in [the documentation for all the available options](https://miicam.github.io).
 
 ## Screenshots
 
-Screenshots of the web interface [can be found in the wiki](https://miicam.github.io/Screenshots)
+Screenshots of the web interface [can be found in the documentation](https://miicam.github.io/Screenshots)
 
 
 ## Installation on the Chuangmi 720P camera
 
+Have a look in [the documentation](https://miicam.github.io/) for more info on how to [install the hack](https://miicam.github.io/Setting-Up-The-Camera/).
+
+
 To use install the hack on your SD card, use the compiled sources.
 Copying the files in the repository to your sd card without building the binaries wil **Not** work.
 
-###  Get the binaries
+### Download the firmware hack
 
 For new users it is recommended to use the precompiled binaries that are created with every release.
 You can download the release builds from the [github releases page](https://github.com/MiiCam/MiiCam/releases).
 
 ### Build the binaries
 
-If you prefer to build the binaries yourself, have a look at the [instructions in the wiki](https://miicam.github.io/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
-
-### Prepare the camera
-
-When the camera is started for the first time, it is waiting for the MiiHome app to send the credentials.
-Setup the camera with the MiiHome app, and wait till the camera is connected to the wifi.
-
-If the firmware is too recent, the hack cannot always be activated.
-To work around this issue, you can downgrade the firmware to a working version [using the instructions on the wiki](https://miicam.github.io/Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working)
-
-
-### Prepare the SD card
-
-Format a micro SD card in fat32 (vfat) format and copy the content of the **sdcard/** folder in the root of your SD card.
-
-
-### Configure the Chuangmi camera on the SD card
-
-To configure a wifi network to connect to, edit the file **config.cfg**.
-
-If you configured the wifi prior to this hack using the MiiHome app, the settings are stored in nvram, and not required to set in `config.cfg`.
-
-
-## Start the camera
-
-* If plugged, unplug the Chuangmi camera
-* Insert the SD card in the Chuangmi camera
-* Plug the Chuangmi camera
-
-If all is well, the camera will start.
-
-The led will indicate the current status:
-
-* yellow: camera startup
-* blue blinking: network configuration in progress (connec to wifi, set up the IP address)
-* blue: network configuration is OK. Camera is ready to use.
-
-You can test is your camera is up and running this hack with your browser on url **http://your-camera-ip/**.
-
-
-## Using the camera
-
-Using the web interface and over MQTT many settings and services can be enabled and disabled.
-
-Have a look at the api docs in the web interface for a list of all available http calls you can use to control the camera.
-
-For controlling the camera over MQTT, have a look at the [MQTT wiki page](https://miicam.github.io/Configuring-MQTT)
+If you prefer to build the binaries yourself, have a look at the [instructions in the documentation](https://miicam.github.io/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
 
 
 ## Security considerations
 
 The short version: **DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNETZ!**
 
-The longer version can be read in the [wiki](https://miicam.github.io/Security-Considerations)
-
-
-## Uninstall the hack
-
-There are no files altered on the camera so simply remove the SD card to uninstall the hack.
+The longer version can be read in the [documentation](https://miicam.github.io/Security-Considerations)
 
 
 ## Following this repository
@@ -109,8 +56,8 @@ Choose the "Releases Only" flag to make yourself more zen :)
 
 ## Need help? Want to help? Ideas? suggestions?
 
-I've spend many hours documenting everything I ran into in the wiki. Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
-If something is not documented, please let me know so I can extend the wiki.
+I've spend many hours documenting everything I ran into in the documentation. Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
+If something is not documented, please let me know so I can extend the documentation.
 
 Feel welcome to bring pull requests and feature requests on the table.
 
