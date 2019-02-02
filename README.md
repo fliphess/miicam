@@ -10,7 +10,7 @@ With this firmware an alternate method of using this webcam is created that does
 
 **Please read the [security considerations in the wiki](https://miicam.github.io/Security-Considerations).**
 
-![Alt text](https://github.com/MiiCam/MiiCam/raw/master/sdcard/firmware/www/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
+![Alt text](https://github.com/MiiCam/MiiCamWeb/raw/master/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
 
 
 ## Help debugging
