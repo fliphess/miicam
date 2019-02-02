@@ -18,19 +18,21 @@ function usage()
 
     Options:
 
-      --build        - Runs a container build and then executes make images clean
-                       To create a chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz
-                       containing the binaries and other contents of the sdcard
+      --build          - Runs a container build and then executes make images clean
+                         To create a chuangmi-720p-hack.zip and chuangmi-720p-hack.tgz
+                         containing the binaries and other contents of the sdcard
 
-      --build-docker - Only (re)build the container environment
+      --build-docker   - Only (re)build the container environment
 
-      --shell        - Opens a shell in the container build environment
+      --shell          - Opens a shell in the container build environment
 
-      --setup-web    - Create required files for running the webui locally
+      --setup-web      - Create required files for running the webui locally
 
-      --run-web      - Run the php inbuild web server in www/public
+      --run-web        - Run the php inbuild web server in www/public
 
-      --gencert      - Create a self-signed certificate for use with lighttpd
+      --run-http-tests - Run the testsuite to check all web endpoints
+
+      --gencert        - Create a self-signed certificate for use with lighttpd
 
     Download toolchain: https://fliphess.com/toolchain/
     Repo: https://github.com/fliphess/chuangmi-720p-hack
@@ -118,6 +120,25 @@ function run_web() {
     log "Starting local php webserver."
     cd sdcard/firmware/www
     php -S localhost:8080 -t ./public
+}
+
+## Run http testsuite
+function run_http_tests()
+{
+    if ! ( awk -F/ '$2 == "docker"' /proc/self/cgroup 2>/dev/null | read )
+    then
+        run '/env/manage.sh --run-http-tests'
+    else
+        if [ ! -x "$( command -v pyresttest )" ]
+        then
+            echo "Please install pyresttest or use inside the container"
+            exit 1
+        fi
+
+        cd /env/
+        source tools/dev/helpers.sh
+        pyresttest --url "http://${CAMERA_HOSTNAME}" tests/main.yaml --log=INFO
+    fi
 }
 
 
@@ -233,6 +254,9 @@ function main()
         ;;
         --run-web)
             run_web
+        ;;
+        --run-http-tests)
+            run_http_tests
         ;;
         --gencert)
             gencert
