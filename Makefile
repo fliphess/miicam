@@ -904,6 +904,9 @@ images: all website install
 	&& echo "*** Removing older version of MiiCam.tgz and MiiCam.zip" \
 	&& find $(TOPDIR) -maxdepth 1 -type f -name 'MiiCam.zip' -or -name 'MiiCam.tgz' -delete \
 	\
+	&& echo "*** Creating file listing before packing" \
+	&& find $(TOPDIR)/sdcard -type f -exec md5sum {} \; > sdcard/firmware/etc/files.db \
+	\
 	&& echo "*** Creating zip archive of sdcard/ to MiiCam.zip" \
 	&& zip -r --quiet MiiCam.zip README.md sdcard \
 	\
