@@ -26,12 +26,6 @@ function usage()
 
       --shell          - Opens a shell in the container build environment
 
-      --setup-web      - Create required files for running the webui locally
-
-      --run-web        - Run the php inbuild web server in www/public
-
-      --run-http-tests - Run the testsuite to check all web endpoints
-
       --gencert        - Create a self-signed certificate for use with lighttpd
 
     Download toolchain: https://fliphess.com/toolchain/
@@ -93,52 +87,6 @@ function build()
     run 'make images clean && mv /env/chuangmi-720p-hack.zip /env/chuangmi-720p-hack.tgz /result/'
 
     return $?
-}
-
-## Symlink config in /tmp/sd to prepare for running the web interface
-function setup_web() {
-    echo -ne "*** Creating directories"
-    mkdir -p /tmp/sd/log /tmp/sd/firmware/www/public
-    echo " [OK]"
-
-    echo -ne "*** Creating config file"
-    ln -sf "$(pwd)/sdcard/config.cfg"  "/tmp/sd/config.cfg"
-    echo " [OK]"
-
-    echo -ne "*** Creating logfiles   "
-    echo syslog >> /tmp/sd/log/syslog
-    echo webserver >> /tmp/sd/log/lighttpd.log
-    echo webapp >>  /tmp/sd/log/webapp.log
-    echo bootlog >> /tmp/sd/log/ft_boot.log
-    echo motion >> /tmp/sd/log/motion.log
-    echo " [OK]"
-}
-
-
-## Run the php inbuild webserver in our www directory
-function run_web() {
-    log "Starting local php webserver."
-    cd sdcard/firmware/www
-    php -S localhost:8080 -t ./public
-}
-
-## Run http testsuite
-function run_http_tests()
-{
-    if ! ( awk -F/ '$2 == "docker"' /proc/self/cgroup 2>/dev/null | read )
-    then
-        run '/env/manage.sh --run-http-tests'
-    else
-        if [ ! -x "$( command -v pyresttest )" ]
-        then
-            echo "Please install pyresttest or use inside the container"
-            exit 1
-        fi
-
-        cd /env/
-        source tools/dev/helpers.sh
-        pyresttest --url "http://${CAMERA_HOSTNAME}" tests/main.yaml --log=INFO
-    fi
 }
 
 
@@ -248,15 +196,6 @@ function main()
         --newshell)
             build_docker
             shell
-        ;;
-        --setup-web)
-            setup_web
-        ;;
-        --run-web)
-            run_web
-        ;;
-        --run-http-tests)
-            run_http_tests
         ;;
         --gencert)
             gencert

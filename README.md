@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/fliphess/chuangmi-720p-hack.svg?branch=master)](https://travis-ci.org/fliphess/chuangmi-720p-hack)
-[![Docker Repository on Quay](https://quay.io/repository/fliphess/chuangmi-720p-hack/status "Docker Repository on Quay")](https://quay.io/repository/fliphess/chuangmi-720p-hack)
+[![Build Status](https://travis-ci.org/miicam/MiiCam.svg?branch=master)](https://travis-ci.org/miicam/MiiCam)
+
+[![Docker Repository on Quay](https://quay.io/repository/MiiCam/MiiCam/status "Docker Repository on Quay")](https://quay.io/repository/MiiCam/MiiCam)
 
 # Chuangmi-720P-hack project
 

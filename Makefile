@@ -32,9 +32,8 @@ UTILSDIR     := $(TOOLSDIR)/utils
 
 BINARIESDIR  := $(TOPDIR)/sdcard/firmware/bin
 LIBRARIESDIR := $(TOPDIR)/sdcard/firmware/lib
-WEBROOT      := $(TOPDIR)/sdcard/firmware/www
-COMPOSER     := /usr/local/bin/composer
 
+WEBROOT      := $(TOPDIR)/sdcard/firmware/www
 
 include SOURCES.mk
 include OUTPUT.mk
@@ -62,9 +61,9 @@ UTILS :=                             \
 
 utils: $(UTILS)
 
-
 libs: $(LIBS)
 
+website: $(WEBROOT)
 
 all:                                 \
 	$(PREFIXDIR)/bin                 \
@@ -94,6 +93,7 @@ all:                                 \
 	$(BUILDDIR)/strace               \
 	$(BUILDDIR)/ffmpeg               \
 	$(BUILDDIR)/rtspd                \
+	website                          \
 	libs                             \
 	utils                            \
 	sdcard/manufacture.bin
@@ -105,6 +105,19 @@ all:                                 \
 
 $(PREFIXDIR)/bin:
 	@mkdir -p $(PREFIXDIR)/bin
+
+
+#################################################################
+## WEB INTERFACE                                               ##
+#################################################################
+
+$(SOURCEDIR)/$(WEBSITEARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(WEBSITEURI) || rm -f $@
+
+
+$(WEBROOT):
+	echo "Unpacking web content" && \
+	tar -xzf $(SOURCEDIR)/$(WEBSITEARCHIVE) -C $(WEBROOT)
 
 
 #################################################################
@@ -864,25 +877,9 @@ sdcard/manufacture.bin:
 ##                                                             ##
 #################################################################
 
-.PHONY: website install images uninstall clean
+.PHONY: install images uninstall clean
 
-website:
-	@cd $(WEBROOT) \
-	\
-	&& echo '*** Running composer install in $(WEBROOT)' \
-	&& $(COMPOSER) install --no-dev --ignore-platform-reqs --no-interaction --prefer-source \
-	\
-	&& echo "***Removing all unneeded crap from the vendor dir" \
-	&& php $(HOME)/.composer/vendor/mediamonks/composer-vendor-cleaner/bin/clean --dir vendor/ \
-	\
-	&& echo "*** Recreating class mappings" \
-	&& $(COMPOSER) dump-autoload --classmap-authoritative \
-	\
-	&& echo '*** Removing symlinks from $(WEBROOT)/vendor to prevent fat32 symlink issues' \
-	&& find $(WEBROOT)/vendor -type l -delete
-
-
-install: all website
+install: all
 	@mkdir -p $(BINARIESDIR) \
 	\
 	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \

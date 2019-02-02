@@ -25,11 +25,6 @@ RUN echo "*** Install required packages" \
       make                  \
       ncurses-dev           \
       openssl               \
-      php-cli               \
-      php-curl              \
-      php-mbstring          \
-      python3-dev           \
-      python3-pip           \
       unrar                 \
       unzip                 \
       vim                   \
@@ -42,25 +37,6 @@ RUN echo "*** Install required packages" \
 ####################################################
 
 RUN locale-gen en_US.UTF-8
-
-
-####################################################
-## Install composer                               ##
-####################################################
-
-RUN echo "*** Installing composer"       \
- && mkdir -p /usr/local/bin              \
- && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
- && composer global require hirak/prestissimo mediamonks/composer-vendor-cleaner
-
-
-####################################################
-## Install test framework                         ##
-####################################################
-
-RUN pip3 install        \
-        requests        \
-        pyresttest
 
 
 ####################################################
