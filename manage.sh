@@ -3,7 +3,7 @@ INPUT="$1" ; shift
 ARGUMENTS=$*
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-CONTAINER_IMAGE="MiiCam"
+CONTAINER_IMAGE="miicam"
 DOCKER_CLI="docker run -i -v ${SCRIPTPATH}:/result --detach=false --rm --tty=true"
 
 ## Print help output
