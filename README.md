@@ -2,7 +2,7 @@
 
 [![Docker Repository on Quay](https://quay.io/repository/miicam/miicam/status "Docker Repository on Quay")](https://quay.io/repository/miicam/miicam)
 
-# Chuangmi-720P-hack project
+# MiiCam hack project
 
 This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
