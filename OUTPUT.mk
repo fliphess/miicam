@@ -1,5 +1,5 @@
 ## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
-THIRD_PARTY_SBINS =                        \
+THIRD_PARTY_SBINS :=                       \
 	dropbear                               \
 	logrotate                              \
 	lighttpd                               \
@@ -8,7 +8,7 @@ THIRD_PARTY_SBINS =                        \
 
 
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
-THIRD_PARTY_BINS =                         \
+THIRD_PARTY_BINS :=                        \
 	scp dbclient dropbearkey               \
 	sftp-server                            \
 	arm-php arm-php-cgi                    \
@@ -24,7 +24,7 @@ THIRD_PARTY_BINS =                         \
 
 
 ## Extra tools and symlinks that should not be stripped but copied too
-THIRD_PARTY_BIN_EXTRAS =                   \
+THIRD_PARTY_BIN_EXTRAS :=                  \
 	rview                                  \
 	vimdiff                                \
 	ex                                     \
@@ -33,7 +33,7 @@ THIRD_PARTY_BIN_EXTRAS =                   \
 
 
 ## Third party library files that should be stripped and copied to firmware/lib
-THIRD_PARTY_LIBS =                         \
+THIRD_PARTY_LIBS :=                        \
 	libavcodec.so.58.18.100                \
 	libavdevice.so.58.3.100                \
 	libavfilter.so.7.16.100                \
@@ -103,7 +103,7 @@ THIRD_PARTY_LIBS =                         \
 
 
 ## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
-THIRD_PARTY_LIB_EXTRAS =                   \
+THIRD_PARTY_LIB_EXTRAS :=                  \
 	libavcodec.so                          \
 	libavcodec.so.58                       \
 	libavdevice.so                         \
