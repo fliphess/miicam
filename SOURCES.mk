@@ -1,7 +1,4 @@
 
-WEBSITEARCHIVE := website.tgz
-WEBSITEURI      = $(shell curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest  | grep browser_download_url | grep tgz | awk '{print $$NF}' | tr -d '"' )
-
 LIBGDARCHIVE = libgd-$(LIBGDVERSION).tar.gz
 LIBGDURI = https://github.com/libgd/libgd/releases/download/gd-$(LIBGDVERSION)/$(LIBGDARCHIVE)
 curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest  | grep browser_download_url | tr -d '"' | awk '{print $NF}'

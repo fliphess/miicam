@@ -32,7 +32,10 @@ UTILSDIR     := $(TOOLSDIR)/utils
 BINARIESDIR  := $(TOPDIR)/sdcard/firmware/bin
 LIBRARIESDIR := $(TOPDIR)/sdcard/firmware/lib
 
-WEBROOT      := $(TOPDIR)/sdcard/firmware/www
+WEBROOT        := $(TOPDIR)/sdcard/firmware/www
+WEBSITEARCHIVE := website.tgz
+WEBSITEURI     := $(shell curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | grep browser_download_url | grep tgz | awk '{print $$NF}' | tr -d '"' )
+
 
 include SOURCES.mk
 include OUTPUT.mk
@@ -109,6 +112,7 @@ $(PREFIXDIR)/bin:
 #################################################################
 ## WEB INTERFACE                                               ##
 #################################################################
+
 
 $(SOURCEDIR)/$(WEBSITEARCHIVE):
 	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(WEBSITEURI) || rm -f $@
