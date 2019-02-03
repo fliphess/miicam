@@ -5,12 +5,11 @@ services:
 before_install:
 - docker ps -a
 - docker pull quay.io/miicam/miicam
-- docker build --cache-from quay.io/miicam/miicam -t miicam/miicam
-  .
+- docker build --cache-from quay.io/miicam/miicam -t miicam/miicam .
+
 script:
-- docker run -i -v "$(pwd):/result" --detach=false --tty=true miicam/miicam
-  /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz
-  /result/'
+- docker run -i -v "$(pwd):/result" --detach=false --tty=true miicam/miicam /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz /result/'
+
 notifications:
   email: false
   webhooks:
@@ -19,6 +18,7 @@ notifications:
     on_success: change
     on_failure: always
     on_start: never
+
 before_deploy:
 - git config --local user.name "Travis Releases Build Bot"
 - git config --local user.email "spam@fliphess.com"
