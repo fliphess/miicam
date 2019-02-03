@@ -18,19 +18,19 @@ BUILDENV :=                 \
 	CPPFLAGS="-I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib" \
 	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
 
-TOPDIR       := $(CURDIR)
-SOURCEDIR    := $(TOPDIR)/src
-PREFIXDIR    := $(TOPDIR)/prefix
-BUILDDIR     := $(TOPDIR)/build
-TOOLSDIR     := $(TOPDIR)/tools
+TOPDIR         := $(CURDIR)
+SOURCEDIR      := $(TOPDIR)/src
+PREFIXDIR      := $(TOPDIR)/prefix
+BUILDDIR       := $(TOPDIR)/build
+TOOLSDIR       := $(TOPDIR)/tools
 
-PATCHESDIR   := $(TOOLSDIR)/patches
-GMLIBDIR     := $(TOOLSDIR)/gm_lib
-RTSPDDIR     := $(TOOLSDIR)/rtsp_server
-UTILSDIR     := $(TOOLSDIR)/utils
+PATCHESDIR     := $(TOOLSDIR)/patches
+GMLIBDIR       := $(TOOLSDIR)/gm_lib
+RTSPDDIR       := $(TOOLSDIR)/rtsp_server
+UTILSDIR       := $(TOOLSDIR)/utils
 
-BINARIESDIR  := $(TOPDIR)/sdcard/firmware/bin
-LIBRARIESDIR := $(TOPDIR)/sdcard/firmware/lib
+BINARIESDIR    := $(TOPDIR)/sdcard/firmware/bin
+LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
 
 WEBROOT        := $(TOPDIR)/sdcard/firmware/www
 WEBSITEARCHIVE := website.tgz
