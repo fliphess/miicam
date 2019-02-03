@@ -117,7 +117,7 @@ $(SOURCEDIR)/$(WEBSITEARCHIVE):
 $(WEBROOT): $(SOURCEDIR)/$(WEBSITEARCHIVE)
 	@mkdir -p $(WEBROOT)
 	echo "Unpacking web content" && \
-	tar -xzf $(SOURCEDIR)/$(WEBSITEARCHIVE) -C $(WEBROOT)
+	tar xzf $(SOURCEDIR)/$(WEBSITEARCHIVE) -C $(WEBROOT)
 
 
 #################################################################
