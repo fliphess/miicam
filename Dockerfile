@@ -40,9 +40,11 @@ RUN echo "*** Install required packages" \
       ca-certificates       \
       bison                 \
       build-essential       \
+      cpio                  \
       curl                  \
       flex                  \
       gawk                  \
+      gettext               \
       git                   \
       lib32z1-dev           \
       libcurl4-openssl-dev  \
@@ -51,6 +53,12 @@ RUN echo "*** Install required packages" \
       make                  \
       ncurses-dev           \
       openssl               \
+      python                \
+      python-dev            \
+      python-pip            \
+      rsync                 \
+      texi2html             \
+      texinfo               \
       unrar                 \
       unzip                 \
       vim                   \
