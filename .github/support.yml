@@ -1,0 +1,24 @@
+################################################################################
+# support-requests - https://github.com/dessant/support-requests               #
+################################################################################
+
+# Label used to mark issues as support requests
+supportLabel: Question
+
+supportComment: >
+  :wave: @{issue-author}, we use the issue tracker exclusively for bug reports
+  and feature requests. However, this issue appears to be a support request.
+  Have a look at [the documentation](http://miicam.github.io) to find out how to get around with the project.
+
+# Close issues marked as support requests
+close: true
+
+# Lock issues marked as support requests
+lock: false
+
+# Assign `off-topic` as the reason for locking. Set to `false` to disable
+setLockReason: true
+
+# Repository to extend settings from
+# _extends: repo
+
