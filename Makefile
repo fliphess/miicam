@@ -31,8 +31,8 @@ UTILSDIR       := $(TOOLSDIR)/utils
 
 BINARIESDIR    := $(TOPDIR)/sdcard/firmware/bin
 LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
-
 WEBROOT        := $(TOPDIR)/sdcard/firmware/www
+
 WEBSITEARCHIVE := website.tgz
 WEBSITEURI     := $(shell curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | grep browser_download_url | grep tgz | awk '{print $$NF}' | tr -d '"' )
 
@@ -98,6 +98,7 @@ all:                                 \
 	website                          \
 	libs                             \
 	utils                            \
+	sdcard/config.cfg                \
 	sdcard/manufacture.bin
 
 
@@ -870,6 +871,13 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS)
 		-lchuangmi_isp328 \
 		-lchuangmi_pwm && \
 	touch $(BUILDDIR)/$(@F)
+
+#################################################################
+##                                                             ##
+#################################################################
+
+sdcard/config.cfg:
+	$(TOPDIR)/sdcard/firmware/scripts/update/configupdate $(TOPDIR)/sdcard/config.cfg
 
 
 sdcard/manufacture.bin:

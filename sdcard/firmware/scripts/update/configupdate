@@ -1,31 +1,74 @@
+#!/bin/sh
+FILENAME="${1}"
+
+## Set scriptname
+SCRIPTPATH="$( basename ${0} )"
+
+## Set mountdir
+SD_MOUNTDIR="/tmp/sd"
+
+## Set the backup location for the config
+CONFIG_BACKUP="${SD_MOUNTDIR}/config.old"
+
+########################################
+## Arguments
+########################################
+
+if [ "${#}" != 1 ] || [ -z "${FILENAME}" ]
+then
+    echo "Writes a new configuration file with the old settings"
+    echo "Use /dev/stdout if you want to verify the output"
+    echo "Usage: $0 <filename>"
+    exit 0
+fi
+
+
+########################################
+## Backup current config if existent
+########################################
+
+[ -f "${SD_MOUNTDIR}/config.cfg" ] && cp "${SD_MOUNTDIR}/config.cfg" "${CONFIG_BACKUP}"
+
+
+########################################
+## Load variables from old config if present
+########################################
+
+[ -f "${CONFIG_BACKUP}" ] && . /tmp/config.old
+
+
+########################################
+## Update
+########################################
+
+cat > "${FILENAME}" <<EOF
 ############################################################
 ##                                                        ##
-## Chuangmi 720p Firmware Configuration                   ##
+##    MiiCam Configuration                                ##
 ##                                                        ##
 ############################################################
 
 ## See: https://miicam.github.io/Configuration-file-options
 
 ## Disable the execution of the hack scripts (0/1)
-DISABLE_HACK=0
+DISABLE_HACK="${DISABLE_HACK:-0}"
 
 ## Fully Disconnect from Xioami servers, including disabling streaming and OTA updater (0/1)
-DISABLE_CLOUD=1
+DISABLE_CLOUD="${DISABLE_CLOUD:-1}"
 
 ## Manage the camera via cloud but prevent online updates (0/1)
 ## This option is superseded by DISABLE_CLOUD=1
-DISABLE_OTA=1
-
+DISABLE_OTA="${DISABLE_OTA:-1}"
 
 ############################################################
 ## System Settings                                        ##
 ############################################################
 
 ## The hostname of the webcam
-HOSTNAME="camera01"
+HOSTNAME="${HOSTNAME:-"camera"}"
 
 ## Password for root user, needed for SSH server and telnet (careful when using special chars, never use !;#)
-ROOT_PASSWORD='Chuangmi720pCam123'
+ROOT_PASSWORD="${ROOT_PASSWORD:-"Chuangmi720pCam123"}"
 
 
 ############################################################
@@ -33,16 +76,16 @@ ROOT_PASSWORD='Chuangmi720pCam123'
 ############################################################
 
 ## Wait with boot until network comes up
-WAIT_FOR_NETWORK=1
+WAIT_FOR_NETWORK="${WAIT_FOR_NETWORK:-1}"
 
 ## The IP to ping to verify if network is up
-PING_IP="8.8.8.8"
+PING_IP="${PING_IP:-"8.8.8.8"}"
 
 ## Ping Max retries
-PING_RETRIES=10
+PING_RETRIES="${PING_RETRIES:-10}"
 
 ## Wait time in seconds
-PING_WAIT=2
+PING_WAIT="${PING_WAIT:-2}"
 
 
 ############################################################
@@ -52,16 +95,16 @@ PING_WAIT=2
 ## See: https://miicam.github.io/System-Logging-and-Logfiles
 
 ## Enable klogd and syslogging
-ENABLE_LOGGING=1
+ENABLE_LOGGING="${ENABLE_LOGGING:-1}"
 
 ## Enable remote syslogging
-ENABLE_REMOTE_SYSLOG=0
+ENABLE_REMOTE_SYSLOG="${ENABLE_REMOTE_SYSLOG:-0}"
 
 ## The remote syslog host (use host:port to set a non-default syslog port)
-REMOTE_SYSLOG_HOST=""
+REMOTE_SYSLOG_HOST="${REMOTE_SYSLOG_HOST:-""}"
 
 ## Remove all logs from log directory
-PURGE_LOGFILES_AT_BOOT=1
+PURGE_LOGFILES_AT_BOOT="${PURGE_LOGFILES_AT_BOOT:-1}"
 
 
 ############################################################
@@ -69,10 +112,10 @@ PURGE_LOGFILES_AT_BOOT=1
 ############################################################
 
 ## Set WIFI STA SSID, when empty no configuration is done
-WIFI_SSID=""
+WIFI_SSID="${WIFI_SSID:-""}"
 
 ## Set WIFI STA password
-WIFI_PASS=""
+WIFI_PASS="${WIFI_PASS:-""}"
 
 
 ############################################################
@@ -82,7 +125,7 @@ WIFI_PASS=""
 ## See: https://miicam.github.io/Using-cronjobs
 
 ## Enable cron by setting 0 to 1
-ENABLE_CRON=1
+ENABLE_CRON="${ENABLE_CRON:-1}"
 
 
 ############################################################
@@ -92,10 +135,10 @@ ENABLE_CRON=1
 ## See: https://miicam.github.io/Time-settings
 
 ## Set timezone
-TIMEZONE="UTC"
+TIMEZONE="${TIMEZONE:-"UTC"}"
 
 ## Prefered NTP server
-NTP_SERVER="pool.ntp.org"
+NTP_SERVER="${NTP_SERVER:-"pool.ntp.org"}"
 
 
 ############################################################
@@ -105,12 +148,12 @@ NTP_SERVER="pool.ntp.org"
 ## See: https://miicam.github.io/Configuring-the-HTTP-service
 
 ## Start web server at system boot (0/1)
-ENABLE_HTTPD=1
+ENABLE_HTTPD="${ENABLE_HTTPD:-1}"
 
 ## HTTP Only user: To avoid using the root password of the camera in your ha setup
 ## We'll create another username and password combo for making api calls
-HTTP_API_USER="admin"
-HTTP_API_PASS="drgsrethsfdghs"
+HTTP_API_USER="${HTTP_API_USER:-"admin"}"
+HTTP_API_PASS="${HTTP_API_PASS:-"drgsrethsfdghs"}"
 
 ## To enable SSL on the camera, use the instructions in the wiki: https://miicam.github.io/Creating-an-SSL-certificate-for-use-on-this-camera
 
@@ -122,31 +165,31 @@ HTTP_API_PASS="drgsrethsfdghs"
 ## See: https://miicam.github.io/Configuring-MQTT
 
 ## Enable or disable MQTT service
-ENABLE_MQTT=0
+ENABLE_MQTT="${ENABLE_MQTT:-0}"
 
 ## Connection options for broker server
-MQTT_USER=mqtt-user
-MQTT_PASS=mqtt-password
-MQTT_HOST=mqtt-host
-MQTT_PORT=1883
+MQTT_USER="${MQTT_USER:-"mqtt-user"}"
+MQTT_PASS="${MQTT_PASS:-"mqtt-password"}"
+MQTT_HOST="${MQTT_HOST:-"mqtt-host"}"
+MQTT_PORT="${MQTT_PORT:-1883}"
 
 ## Define the base topic used by the camera
-MQTT_TOPIC="home/$HOSTNAME"
+MQTT_TOPIC="${MQTT_TOPIC:-"home/\$HOSTNAME"}"
 
 ## Define additional options for Mosquitto here.
 ## IE: --cafile /tmp/sd/firmware/etc/cacert.pem --tls-version tlsv1
-MOSQUITTOOPTS=""
+MOSQUITTOOPTS="${MOSQUITTOOPTS:-""}"
 
 ## Add options for mosquitto_pub (IE: -r for retaining messages)
-MOSQUITTOPUBOPTS="-r "
+MOSQUITTOPUBOPTS="${MOSQUITTOPUBOPTS:-"-r "}"
 
 ## Send a mqtt statusupdate every n seconds
-MQTT_STATUSINTERVAL=30
+MQTT_STATUSINTERVAL="${MQTT_STATUSINTERVAL:-30}"
 
 ## What to publish over MQTT For on/off values (used for motion and mqtt control)
 ## Set ENABLE_MQTT=1 to enable
-MQTT_ON="ON"
-MQTT_OFF="OFF"
+MQTT_ON="${MQTT_ON:-"ON"}"
+MQTT_OFF="${MQTT_OFF:-"OFF"}"
 
 
 ############################################################
@@ -156,34 +199,34 @@ MQTT_OFF="OFF"
 ## See: https://miicam.github.io/Configuring-RTSP
 
 ## Start local streaming server at system boot (0/1)
-ENABLE_RTSP=1
+ENABLE_RTSP="${ENABLE_RTSP:-1}"
 
 ## The username to connect to the rtsp stream
-RTSP_USER="stream"
+RTSP_USER="${RTSP_USER:-"stream"}"
 
 ## The password to connect to the rtsp stream
-RTSP_PASS="bJ2xnahtCgninraelmI"
+RTSP_PASS="${RTSP_PASS:-"bJ2xnahtCgninraelmI"}"
 
 ## The image width of the rtsp stream
 ## Only downscaling is possible.
-RTSP_WIDTH=1280
+RTSP_WIDTH="${RTSP_WIDTH:-1280}"
 
 ## The image height of the rtsp stream
 ## Only downscaling is possible
-RTSP_HEIGHT=720
+RTSP_HEIGHT="${RTSP_HEIGHT:-720}"
 
 ## Set the max framerate of the rtsp daemon.
 ## A framerate of 15 fps is the max supported by the camera
-RTSP_FRAMERATE=15
+RTSP_FRAMERATE="${RTSP_FRAMERATE:-15}"
 
 ## Configure the maximum bitrate to use
-RTSP_BITRATE=4096
+RTSP_BITRATE="${RTSP_BITRATE:-4096}"
 
 ## The bitrate mode (see wiki)
-RTSP_BITRATE_MODE=4
+RTSP_BITRATE_MODE="${RTSP_BITRATE_MODE:-4}"
 
 ## Extra command line arguments for the RTSP daemon
-RTSP_EXTRA_ARGS=""
+RTSP_EXTRA_ARGS="${RTSP_EXTRA_ARGS:-""}"
 
 
 ############################################################
@@ -193,16 +236,16 @@ RTSP_EXTRA_ARGS=""
 ## See: https://miicam.github.io/Setting-up-motion-detection
 
 ## Enable motion detection
-MOTION_DETECTION=0
+MOTION_DETECTION="${MOTION_DETECTION:-0}"
 
 ## Enable snapshot on motion detection
-MOTION_TAKE_SNAPSHOT=0
+MOTION_TAKE_SNAPSHOT="${MOTION_TAKE_SNAPSHOT:-0}"
 
 ## Enable video recording on motion detection (Not used yet)
-MOTION_RECORD=0
+MOTION_RECORD="${MOTION_RECORD:-0}"
 
 ## Which topic to publish to
-MOTION_TOPIC="$MQTT_TOPIC/motion"
+MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 
 
 ############################################################
@@ -212,13 +255,13 @@ MOTION_TOPIC="$MQTT_TOPIC/motion"
 ## See: https://miicam.github.io/Accessing-the-camera
 
 ## Start SSH server at system boot (0/1)
-ENABLE_SSHD=1
+ENABLE_SSHD="${ENABLE_SSHD:-1}"
 
 ## Additional commandline arguments for the dropbear SSH daemon
-DROPBEAR_EXTRA_ARGS=""
+DROPBEAR_EXTRA_ARGS="${DROPBEAR_EXTRA_ARGS:-""}"
 
 ## Start telnet server at system boot (0/1)
-ENABLE_TELNETD=0
+ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
 
 
 ############################################################
@@ -228,13 +271,13 @@ ENABLE_TELNETD=0
 ## See: https://miicam.github.io/Configuring-FTP
 
 ## Start FTP server at system boot (0/1)
-ENABLE_FTPD=0
+ENABLE_FTPD="${ENABLE_FTPD:-0}"
 
 ## The FTP Root directory
-FTP_ROOT="/tmp/sd/RECORDED_IMAGES"
+FTP_ROOT="${FTP_ROOT:-"/tmp/sd/RECORDED_IMAGES"}"
 
 ## Additional commandline arguments for the ftp daemon (-w allows (write) uploads)
-FTP_EXTRA_ARGS=""
+FTP_EXTRA_ARGS="${FTP_EXTRA_ARGS:-""}"
 
 
 ############################################################
@@ -244,7 +287,7 @@ FTP_EXTRA_ARGS=""
 ## See: https://miicam.github.io/Configuring-Restartd
 
 ## Start restartd services watchdog at system boot (0/1)
-ENABLE_RESTARTD=0
+ENABLE_RESTARTD="${ENABLE_RESTARTD:-0}"
 
 
 ############################################################
@@ -254,21 +297,22 @@ ENABLE_RESTARTD=0
 ## See: https://miicam.github.io/Using-Auto-Night-Mode
 
 ## Turn auto night mode on or off (0/1)
-AUTO_NIGHT_MODE=0
+AUTO_NIGHT_MODE="${AUTO_NIGHT_MODE:-0}"
 
 ## Command line arguments for the auto night mode and irled switcher
-AUTO_NIGHT_MODE_ARGS="-d 120 -e 200 -i 5 -l -n -v"
+AUTO_NIGHT_MODE_ARGS="${AUTO_NIGHT_MODE_ARGS:-"-d 120 -e 200 -i 5 -l -n -v"}"
 
 ############################################################
 ## Camera options                                         ##
 ############################################################
 
 ## Stealth mode (Disable leds after boot)
-STEALTH_MODE=0
+STEALTH_MODE="${STEALTH_MODE:-0}"
 
 ## Ceiling camera mode when the image is flipped and mirrored (0/1)
-CEILING_MODE=0
+CEILING_MODE="${CEILING_MODE:-0}"
 
 ## Restore the state of the image corrections, leds and camera modes after reboot
-RESTORE_STATE=1
+RESTORE_STATE="${RESTORE_STATE:-1}"
 
+EOF
