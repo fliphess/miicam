@@ -59,6 +59,7 @@ RUN echo "*** Install required packages" \
       rsync                 \
       texi2html             \
       texinfo               \
+      tofrodos              \
       unrar                 \
       unzip                 \
       vim                   \

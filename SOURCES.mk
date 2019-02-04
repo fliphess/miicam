@@ -99,3 +99,7 @@ LOGROTATEVERSION := 3.15.0
 LOGROTATEARCHIVE := logrotate-$(LOGROTATEVERSION).tar.gz
 LOGROTATEURI     := https://github.com/logrotate/logrotate/releases/download/$(LOGROTATEVERSION)/$(LOGROTATEARCHIVE)
 
+FROMDOSVERSION := 1713
+FROMDOSARCHIVE := tofrodos-$(FROMDOSVERSION).zip
+FROMDOSURI     := http://tofrodos.sourceforge.net/download/tfd1713.zip
+

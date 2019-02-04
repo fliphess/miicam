@@ -782,6 +782,26 @@ $(BUILDDIR)/lsof: $(PREFIXDIR)/bin $(SOURCEDIR)/$(LSOFARCHIVE)
 
 
 #################################################################
+## TOFROMDOS                                                   ##
+#################################################################
+
+$(SOURCEDIR)/$(FROMDOSARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(FROMDOSURI) || rm -f $@
+
+
+$(BUILDDIR)/fromdos: $(PREFIXDIR)/bin $(SOURCEDIR)/$(FROMDOSARCHIVE)
+	@mkdir -p $(BUILDDIR) && rm -rf $@-$(FROMDOSVERSION)
+	@unzip -q $(SOURCEDIR)/$(FROMDOSARCHIVE) -d $@-$(FROMDOSVERSION)
+	cd $@-$(FROMDOSVERSION)/src                               && \
+	fromdos Makefile                                          && \
+	patch -p2 < /env/tools/patches/tofrodos.patch             && \
+		$(BUILDENV)                                              \
+		make -j$(PROCS) all                                   && \
+		cp fromdos todos $(PREFIXDIR)/bin/
+	@touch $@
+
+
+#################################################################
 ## FFMPEG                                                      ##
 #################################################################
 
