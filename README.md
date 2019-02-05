@@ -55,7 +55,7 @@ Choose the "Releases Only" flag to make yourself more zen :)
 
 ## Need help? Want to help? Ideas? suggestions?
 
-I've spend many hours documenting everything I ran into in the documentation. Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
+I've spend many hours documenting anything I ran into. Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
 If something is not documented, please let me know so I can extend the documentation.
 
 Feel welcome to bring pull requests and feature requests on the table.
