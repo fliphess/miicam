@@ -17,12 +17,11 @@ THIRD_PARTY_BINS :=                        \
 	procan socat filan                     \
 	pcregrep pcretest                      \
 	lsof                                   \
-	fromdos                                \
+	fromdos todos                          \
 	nano                                   \
 	rsync                                  \
 	strace                                 \
 	vim xxd
-
 
 ## Extra tools and symlinks that should not be stripped but copied too
 THIRD_PARTY_BIN_EXTRAS :=                  \
@@ -30,8 +29,7 @@ THIRD_PARTY_BIN_EXTRAS :=                  \
 	vimdiff                                \
 	ex                                     \
 	rvim                                   \
-	view                                   \
-	todos
+	view
 
 
 ## Third party library files that should be stripped and copied to firmware/lib
