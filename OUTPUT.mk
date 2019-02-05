@@ -16,6 +16,7 @@ THIRD_PARTY_BINS :=                        \
 	openssl                                \
 	procan socat filan                     \
 	pcregrep pcretest                      \
+	jq                                     \
 	lsof                                   \
 	fromdos todos                          \
 	nano                                   \
@@ -65,6 +66,10 @@ THIRD_PARTY_LIBS :=                        \
 	libxml2.so.2.9.8                       \
 	libz.a                                 \
 	libz.so.1.2.11                         \
+	libjq.a                                \
+	libjq.so.1.0.4                         \
+	libonig.a                              \
+	libonig.so.4.0.0                       \
 	mod_access.so                          \
 	mod_accesslog.so                       \
 	mod_alias.so                           \
@@ -104,6 +109,10 @@ THIRD_PARTY_LIBS :=                        \
 
 ## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
 THIRD_PARTY_LIB_EXTRAS :=                  \
+    libjq.so                               \
+	libjq.so.1                             \
+	libonig.so                             \
+	libonig.so.4	                       \
 	libavcodec.so                          \
 	libavcodec.so.58                       \
 	libavdevice.so                         \

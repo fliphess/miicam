@@ -103,3 +103,7 @@ FROMDOSVERSION := 1713
 FROMDOSARCHIVE := tofrodos-$(FROMDOSVERSION).zip
 FROMDOSURI     := http://tofrodos.sourceforge.net/download/tfd1713.zip
 
+JQVERSION := 1.6
+JQARCHIVE := jq-$(JQVERSION).tar.gz
+JQURI     := https://github.com/stedolan/jq/releases/download/jq-$(JQVERSION)/$(JQARCHIVE)
+

@@ -84,6 +84,8 @@ all:                                 \
 	$(BUILDDIR)/tcpdump              \
 	$(BUILDDIR)/openssl              \
 	$(BUILDDIR)/socat                \
+	$(BUILDDIR)/fromdos              \
+	$(BUILDDIR)/jq                   \
 	$(BUILDDIR)/logrotate            \
 	$(BUILDDIR)/sftp                 \
 	$(BUILDDIR)/dropbear             \
@@ -800,6 +802,32 @@ $(BUILDDIR)/fromdos: $(PREFIXDIR)/bin $(SOURCEDIR)/$(FROMDOSARCHIVE)
 		make -j$(PROCS) all                                   && \
 		cp fromdos todos $(PREFIXDIR)/bin/
 	@rm -rf $@-$(FROMDOSVERSION)
+	@touch $@
+
+
+#################################################################
+## JQ                                                          ##
+#################################################################
+
+$(SOURCEDIR)/$(JQARCHIVE):
+	mkdir -p $(SOURCEDIR) && $(DOWNLOADCMD) $@ $(JQURI) || rm -f $@
+
+
+$(BUILDDIR)/jq: $(SOURCEDIR)/$(JQARCHIVE)
+	mkdir -p $(BUILDDIR) && rm -rf $@-$(JQVERSION)
+	tar -xzf $(SOURCEDIR)/$(JQARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(JQVERSION)                                       && \
+	autoreconf -fi && \
+	$(BUILDENV)                                                  \
+		./configure                                              \
+			--with-oniguruma=builtin                             \
+			--disable-maintainer-mode                            \
+			--disable-valgrind                                   \
+			--prefix=$(PREFIXDIR)                                \
+			--host=$(TARGET)                                  && \
+		make -j$(PROCS)                                       && \
+		make -j$(PROCS) install
+	rm -rf $@-$(JQVERSION)
 	@touch $@
 
 

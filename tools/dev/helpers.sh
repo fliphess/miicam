@@ -72,6 +72,8 @@ function rebuild_binary() {
     make $MAKEME
 }
 
+alias rb="rebuild_binary"
+
 function upload_binary() {
     local FILENAME="$1"
     cd /env/
