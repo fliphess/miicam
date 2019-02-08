@@ -26,46 +26,52 @@ ENV BUILDDIR="${TOPDIR}/build"
 ENV INSTALLDIR="${TOPDIR}/sdcard/firmware/bin"
 ENV WEBROOT="${TOPDIR}/sdcard/firmware/www"
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+####################################################
+## Source utils in profile                        ##
+####################################################
+
+RUN echo "source /env/tools/dev/helpers.sh" >> /root/.bashrc
+
 
 ####################################################
 ## Install dependencies and requirements          ##
 ####################################################
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 RUN echo "*** Install required packages" \
- && apt-get -qq update      \
- && apt-get -qq install -y  \
-      autoconf              \
-      ca-certificates       \
-      bison                 \
-      build-essential       \
-      cpio                  \
-      curl                  \
-      flex                  \
-      gawk                  \
-      gettext               \
-      git                   \
-      libtool               \
-      lib32z1-dev           \
-      libcurl4-openssl-dev  \
-      libssl-dev            \
-      locales               \
-      make                  \
-      ncurses-dev           \
-      openssl               \
-      python                \
-      python-dev            \
-      python-pip            \
-      rsync                 \
-      texi2html             \
-      texinfo               \
-      tofrodos              \
-      unrar                 \
-      unzip                 \
-      vim                   \
-      wget                  \
-      zip                   \
+ && apt-get -qq update       \
+ && apt-get -qq install -y   \
+      autoconf               \
+      ca-certificates        \
+      bison                  \
+      build-essential        \
+      cpio                   \
+      curl                   \
+      flex                   \
+      gawk                   \
+      gettext                \
+      git                    \
+      libtool                \
+      lib32z1-dev            \
+      libcurl4-openssl-dev   \
+      libssl-dev             \
+      locales                \
+      make                   \
+      ncurses-dev            \
+      openssl                \
+      python3     python     \
+      python3-pip python-pip \
+      python3-dev python-dev \
+      rsync                  \
+      texi2html              \
+      texinfo                \
+      tofrodos               \
+      unrar                  \
+      unzip                  \
+      vim                    \
+      wget                   \
+      zip                    \
  && apt-get clean
 
 ####################################################
@@ -86,14 +92,6 @@ RUN echo "*** Downloading toolchain"     \
 RUN echo "*** Unpacking Toolchain"       \
  && cd /usr/src/arm-linux-3.3            \
  && tar xzf /tmp/toolchain.tgz
-
-
-####################################################
-## Source utils in profile                        ##
-####################################################
-
-RUN echo "*** Configuring bashrc" \
- && echo "source /env/tools/dev/helpers.sh" >> /root/.bashrc
 
 
 ####################################################
