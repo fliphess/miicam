@@ -1,0 +1,137 @@
+{
+    "zlib": {
+        "version": "1.2.11",
+        "archive": "zlib-{version}.tar.gz",
+        "uri": "https://www.zlib.net/{archive}"
+    },
+    "libxml": {
+        "version": "2.9.8",
+        "archive": "libxml2-{version}.tar.gz",
+        "uri": "http://xmlsoft.org/sources/{archive}"
+    },
+    "libjpeg": {
+        "version": "1.5.3",
+        "archive": "libjpeg-turbo-{version}.tar.gz",
+        "uri": "http://prdownloads.sourceforge.net/libjpeg-turbo/{archive}"
+    },
+    "libpng": {
+        "version": "1.6.36",
+        "archive": "libpng-{version}.tar.gz",
+        "uri": "https://prdownloads.sourceforge.net/libpng/{archive}"
+    },
+    "libgd": {
+        "version": "2.2.5",
+        "archive": "libgd-{version}.tar.gz",
+        "uri": "https://github.com/libgd/libgd/releases/download/gd-{version}/{archive}"
+    },
+    "pcre": {
+        "version": "8.42",
+        "archive": "pcre-{version}.zip",
+        "uri": "https://ftp.pcre.org/pub/pcre/{archive}"
+    },
+    "libopt": {
+        "version": "1.16",
+        "archive": "popt-{version}.tar.gz",
+        "uri": "http://rpm5.org/files/popt/popt-{version}.tar.gz"
+    },
+    "ncurses": {
+        "version": "6.1",
+        "archive": "ncurses-{version}.tar.gz",
+        "uri": "https://ftp.gnu.org/pub/gnu/ncurses/{archive}"
+    },
+    "readline": {
+        "version": "7.0",
+        "archive": "readline-{version}.tar.gz",
+        "uri": "https://ftp.gnu.org/gnu/readline/{archive}"
+    },
+    "openssl": {
+        "version": "1.0.2q",
+        "archive": "openssl-{version}.tar.gz",
+        "uri": "https://www.openssl.org/source/{archive}"
+    },
+    "libpcap": {
+        "version": "1.9.0",
+        "archive": "libpcap-{version}.tar.gz",
+        "uri": "http://www.tcpdump.org/release/{archive}"
+    },
+    "tcpdump": {
+        "version": "4.9.2",
+        "archive": "tcpdump-{version}.tar.gz",
+        "uri": "http://www.tcpdump.org/release/{archive}"
+    },
+    "socat": {
+        "version": "1.7.3.2",
+        "archive": "socat-{version}.tar.gz",
+        "uri": "http://www.dest-unreach.org/socat/download/{archive}"
+    },
+    "sftp": {
+        "version": "7.9p1",
+        "archive": "openssh-{version}.tar.gz",
+        "uri": "https://ftp.nluug.nl/pub/OpenBSD/OpenSSH/portable/{archive}"
+    },
+    "dropbear": {
+        "version": "2018.76",
+        "archive": "dropbear-{version}.tar.bz2",
+        "uri": "https://matt.ucc.asn.au/dropbear/releases/{archive}"
+    },
+    "lighttpd": {
+        "version": "1.4.52",
+        "archive": "lighttpd-{version}.tar.gz",
+        "uri": "https://download.lighttpd.net/lighttpd/releases-1.4.x/{archive}"
+    },
+    "php": {
+        "version": "7.2.12",
+        "archive": "php-{version}.tar.bz2",
+        "uri": "http://php.net/get/{archive}/from/this/mirror"
+    },
+    "nano": {
+        "version": "2.9.8",
+        "archive": "nano-{version}.tar.gz",
+        "uri": "https://www.nano-editor.org/dist/v2.9/{archive}"
+    },
+    "vim": {
+        "version": "8.1.0629",
+        "archive": "vim-{version}",
+        "uri": "https://github.com/vim/vim/archive/v{version}.tar.gz"
+    },
+    "rsync": {
+        "version": "3.1.3",
+        "archive": "rsync-{version}.tar.gz",
+        "uri": "https://download.samba.org/pub/rsync/src/{archive}"
+    },
+    "x264": {
+        "version": "snapshot-20181028-2245-stable",
+        "archive": "x264-{version}.tar.bz2",
+        "uri": "https://download.videolan.org/pub/x264/snapshots/{archive}"
+    },
+    "ffmpeg": {
+        "version": "4.0.2",
+        "archive": "ffmpeg-{version}",
+        "uri": "https://ffmpeg.org/releases/{archive}"
+    },
+    "strace": {
+        "version": "4.10",
+        "archive": "strace-{version}.tar.xz",
+        "uri": "https://downloads.sourceforge.net/project/strace/strace/{version}/{archive}"
+    },
+    "lsof": {
+        "version": "master",
+        "archive": "{version}.tar.gz",
+        "uri": "https://github.com/Distrotech/lsof/archive/{archive}"
+    },
+    "logrotate": {
+        "version": "3.15.0",
+        "archive": "logrotate-{version}.tar.gz",
+        "uri": "https://github.com/logrotate/logrotate/releases/download/{version}/{archive}"
+    },
+    "fromdos": {
+        "version": "1713",
+        "archive": "tofrodos-{version}.zip",
+        "uri": "http://tofrodos.sourceforge.net/download/tfd1713.zip"
+    },
+    "jq": {
+        "version": "1.6",
+        "archive": "jq-{version}.tar.gz",
+        "uri": "https://github.com/stedolan/jq/releases/download/jq-{version}/{archive}"
+    }
+}
