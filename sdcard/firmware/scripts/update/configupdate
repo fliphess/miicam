@@ -48,7 +48,7 @@ cat > "${FILENAME}" <<EOF
 ##                                                        ##
 ############################################################
 
-## See: https://miicam.github.io/Configuration-file-options
+## See: https://miicam.github.io/configuration/Configuration-file-options
 
 ## Disable the execution of the hack scripts (0/1)
 DISABLE_HACK="${DISABLE_HACK:-0}"
@@ -92,7 +92,7 @@ PING_WAIT="${PING_WAIT:-2}"
 ## Log settings                                           ##
 ############################################################
 
-## See: https://miicam.github.io/System-Logging-and-Logfiles
+## See: https://miicam.github.io/configuration/System-Logging-and-Logfiles
 
 ## Enable klogd and syslogging
 ENABLE_LOGGING="${ENABLE_LOGGING:-1}"
@@ -122,7 +122,7 @@ WIFI_PASS="${WIFI_PASS:-""}"
 ## Cron Settings                                          ##
 ############################################################
 
-## See: https://miicam.github.io/Using-cronjobs
+## See: https://miicam.github.io/configuration/Using-cronjobs
 
 ## Enable cron by setting 0 to 1
 ENABLE_CRON="${ENABLE_CRON:-1}"
@@ -132,7 +132,7 @@ ENABLE_CRON="${ENABLE_CRON:-1}"
 ## Time Settings                                          ##
 ############################################################
 
-## See: https://miicam.github.io/Time-settings
+## See: https://miicam.github.io/configuration/Time-settings
 
 ## Set timezone
 TIMEZONE="${TIMEZONE:-"UTC"}"
@@ -145,7 +145,7 @@ NTP_SERVER="${NTP_SERVER:-"pool.ntp.org"}"
 ## Web service                                            ##
 ############################################################
 
-## See: https://miicam.github.io/Configuring-the-HTTP-service
+## See: https://miicam.github.io/configuration/Configuring-the-HTTP-service
 
 ## Start web server at system boot (0/1)
 ENABLE_HTTPD="${ENABLE_HTTPD:-1}"
@@ -155,14 +155,14 @@ ENABLE_HTTPD="${ENABLE_HTTPD:-1}"
 HTTP_API_USER="${HTTP_API_USER:-"admin"}"
 HTTP_API_PASS="${HTTP_API_PASS:-"drgsrethsfdghs"}"
 
-## To enable SSL on the camera, use the instructions in the wiki: https://miicam.github.io/Creating-an-SSL-certificate-for-use-on-this-camera
+## To enable SSL on the camera, use the instructions in the wiki: https://miicam.github.io/configuration/Creating-an-SSL-certificate-for-use-on-this-camera
 
 
 ############################################################
 ## MQTT Settings                                          ##
 ############################################################
 
-## See: https://miicam.github.io/Configuring-MQTT
+## See: https://miicam.github.io/configuration/Configuring-MQTT
 
 ## Enable or disable MQTT service
 ENABLE_MQTT="${ENABLE_MQTT:-0}"
@@ -196,7 +196,7 @@ MQTT_OFF="${MQTT_OFF:-"OFF"}"
 ## RTSP Settings                                          ##
 ############################################################
 
-## See: https://miicam.github.io/Configuring-RTSP
+## See: https://miicam.github.io/configuration/Configuring-RTSP
 
 ## Start local streaming server at system boot (0/1)
 ENABLE_RTSP="${ENABLE_RTSP:-1}"
@@ -233,7 +233,7 @@ RTSP_EXTRA_ARGS="${RTSP_EXTRA_ARGS:-""}"
 ## Motion Settings                                        ##
 ############################################################
 
-## See: https://miicam.github.io/Setting-up-motion-detection
+## See: https://miicam.github.io/configuration/Setting-up-motion-detection
 
 ## Enable motion detection
 MOTION_DETECTION="${MOTION_DETECTION:-0}"
@@ -252,7 +252,7 @@ MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 ## Camera Access                                          ##
 ############################################################
 
-## See: https://miicam.github.io/Accessing-the-camera
+## See: https://miicam.github.io/configuration/Accessing-the-camera
 
 ## Start SSH server at system boot (0/1)
 ENABLE_SSHD="${ENABLE_SSHD:-1}"
@@ -268,7 +268,7 @@ ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
 ## FTP Configuration                                      ##
 ############################################################
 
-## See: https://miicam.github.io/Configuring-FTP
+## See: https://miicam.github.io/configuration/Configuring-FTP
 
 ## Start FTP server at system boot (0/1)
 ENABLE_FTPD="${ENABLE_FTPD:-0}"
@@ -284,7 +284,7 @@ FTP_EXTRA_ARGS="${FTP_EXTRA_ARGS:-""}"
 ## Configure Restart daemon                               ##
 ############################################################
 
-## See: https://miicam.github.io/Configuring-Restartd
+## See: https://miicam.github.io/configuration/Configuring-Restartd
 
 ## Start restartd services watchdog at system boot (0/1)
 ENABLE_RESTARTD="${ENABLE_RESTARTD:-0}"
@@ -294,7 +294,7 @@ ENABLE_RESTARTD="${ENABLE_RESTARTD:-0}"
 ## Auto night mode                                        ##
 ############################################################
 
-## See: https://miicam.github.io/Using-Auto-Night-Mode
+## See: https://miicam.github.io/configuration/Using-Auto-Night-Mode
 
 ## Turn auto night mode on or off (0/1)
 AUTO_NIGHT_MODE="${AUTO_NIGHT_MODE:-0}"
