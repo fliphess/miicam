@@ -2,7 +2,7 @@
 
 WEBSITE_URL="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | grep browser_download_url | grep tgz | awk '{print $NF}' | tr -d '"' )"
 
-if [ -z "$WEBSITE_URL" ]
+if [ "x$WEBSITE_URL" == "x" ]
 then
     echo "Website url not found! Exiting build"
     exit 1
