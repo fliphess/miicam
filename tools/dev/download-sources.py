@@ -97,5 +97,6 @@ def main():
     print("Waiting for all checks to be completed")
     runner.wait()
 
+
 if __name__ == "__main__":
     main()
