@@ -9,7 +9,7 @@ With this firmware an alternate method of using this webcam is created that does
 
 **Please read the [security considerations in the documentation](https://miicam.github.io/Security-Considerations).**
 
-![Alt text](https://github.com/MiiCam/MiiCamWeb/raw/master/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
+![Camera image](https://github.com/MiiCam/MiiCamWeb/raw/master/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
 
 
 ## Features
@@ -19,12 +19,12 @@ Have a look in [the documentation for all the available options](https://miicam.
 
 ## Screenshots
 
-Screenshots of the web interface [can be found in the documentation](https://miicam.github.io/Screenshots)
+Screenshots of the web interface can be found [in the documentation](https://miicam.github.io/Screenshots)
 
 
 ## Installation on the Chuangmi 720P camera
 
-Have a look in [the documentation](https://miicam.github.io/) for more info on how to [install the hack](https://miicam.github.io/Setting-Up-The-Camera/).
+Have a look in [the documentation](https://miicam.github.io/) for more info on how to [install the hack](https://miicam.github.io/getting-started).
 
 
 To use install the hack on your SD card, use the compiled sources.
@@ -37,7 +37,7 @@ You can download the release builds from the [github releases page](https://gith
 
 ### Build the binaries
 
-If you prefer to build the binaries yourself, have a look at the [instructions in the documentation](https://miicam.github.io/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
+If you prefer to build the binaries yourself, have a look at the [instructions in the documentation](https://miicam.github.io/development/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
 
 
 ## Security considerations
