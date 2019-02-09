@@ -1,14 +1,33 @@
 #!/bin/sh
+WEBSITE_URL=""
 
-WEBSITE_URL="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | grep browser_download_url | grep tgz | awk '{print $NF}' | tr -d '"' )"
+RETRIES=10
+SLEEP=1
 
-if [ "x$WEBSITE_URL" = "x" ]
+TRIES=0
+until [ "$TRIES" -ge "$RETRIES" ]
+do
+    WEBSITE_URL="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | grep browser_download_url | grep tgz | awk '{print $NF}' | tr -d '"' )"
+
+    if ! ( echo "$WEBSITE_URL" | grep -qE "https://github.com/miicam/MiiCamWeb/releases/download/[0-9+]/website.tgz" )
+    then
+        break
+    fi
+
+    TRIES=$(( $TRIES+1 ))
+    sleep "$SLEEP"
+done
+
+if [ $TRIES -ge $RETRIES ] || [ "x$WEBSITE_URL" == "x" ]
 then
-    echo "Website url not found! Exiting build"
-    exit 1
+   echo " FAIL"
+   echo "*** No download url found! Sad panda :("
+   exit 1
+else
+    test -d src || mkdir -p src
+
+    echo "Getting ${WEBSITE_URL} ..."
+    wget -q -t 5 -T 10 -c -O src/website.tgz "$WEBSITE_URL"
+    exit $?
 fi
 
-test -d src || mkdir -p src
-
-echo "Getting ${WEBSITE_URL} ..."
-wget -q -t 5 -T 10 -c -O src/website.tgz "$WEBSITE_URL"
