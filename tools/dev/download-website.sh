@@ -18,7 +18,7 @@ do
     sleep "$SLEEP"
 done
 
-if [ $TRIES -ge $RETRIES ] || [ "x$WEBSITE_URL" == "x" ]
+if [ "$TRIES" -ge "$RETRIES" ] || [ "x$WEBSITE_URL" = "x" ]
 then
    echo " FAIL"
    echo "*** No download url found! Sad panda :("
