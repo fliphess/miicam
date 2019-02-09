@@ -1,0 +1,58 @@
+#!/bin/sh
+INPUT="$1"
+
+alias remove_spaces="tr -d '\"'"
+
+current()
+{
+    ## Get version for web ui
+    if [ -f /tmp/sd/firmware/www/public/static/version.json ]
+    then
+        WEBVERSION="$( cat /tmp/sd/firmware/www/public/static/version.json  |  | jq .tag | remove_spaces )"
+    else
+        echo "ERROR: Failed to retrieve current version for web ui"
+        exit 1
+    fi
+
+    echo $WEBVERSION
+    exit 0
+}
+
+
+latest()
+{
+    TAG="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq .name | remove_spaces )"
+
+    if [ "x$TAG" == "x" ]
+    then
+        echo "Tag not found!"
+        exit 1
+    else
+        echo "$TAG"
+        exit 0
+    fi
+}
+
+
+usage()
+{
+    echo "Retrieve the latest or current version tag of the web ui"
+    echo "Usage: $0 [--latest|--current]"
+    exit 0
+}
+
+
+main()
+{
+    if [ "$INPUT" == "--current" ]
+    then
+        current
+    elif [ "$INPUT" == "--latest" ]
+    then
+        latest
+    else
+        usage
+    fi
+}
+
+main
