@@ -501,7 +501,7 @@ mqtt_send()
     TOPIC="$1"; shift
     MESSAGE="$*"
 
-    OPTIONS="-i ${HOSTNAME}.mqtt_send -h ${MQTT_HOST} -p ${MQTT_PORT}"
+    OPTIONS="-i ${CAMERA_HOSTNAME}.mqtt_send -h ${MQTT_HOST} -p ${MQTT_PORT}"
 
     ## If username and password are set: Add them to options
     if [ "x${MQTT_USER}" != "x" ] && [ "x${MQTT_PASS}" != "x" ]
@@ -521,7 +521,7 @@ mqtt_subscribe()
     ID="$2"
 
     ## Set the host and port in options
-    OPTIONS="-i ${HOSTNAME}.subscribe.${ID} -h $MQTT_HOST -p $MQTT_PORT"
+    OPTIONS="-i ${CAMERA_HOSTNAME}.subscribe.${ID} -h $MQTT_HOST -p $MQTT_PORT"
 
     ## If username and password are set: Add them to options
     if [ "x${MQTT_USER}" != "x" ] && [ "x${MQTT_PASS}" != "x" ]

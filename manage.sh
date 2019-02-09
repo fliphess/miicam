@@ -97,7 +97,7 @@ function gencert() {
     then
         run '/env/manage.sh --gencert'
     else
-        USE_NAME="$( grep ^HOSTNAME sdcard/config.cfg  | cut -d= -f2 | sed -e 's/"//g' )"
+        USE_NAME="$( grep ^CAMERA_HOSTNAME sdcard/config.cfg  | cut -d= -f2 | sed -e 's/"//g' )"
         SSLDIR="/result/sdcard/firmware/etc/ssl"
 
         [ -d "${SSLDIR}" ] || mkdir -p "$SSLDIR"

@@ -54,7 +54,7 @@ cat << EOF
 
 Chuangmi 720P configuration:
 
-  HOSTNAME       = ${HOSTNAME}
+  HOSTNAME       = ${CAMERA_HOSTNAME}
   WIFI_SSID      = ${WIFI_SSID}
   TIMEZONE       = ${TIMEZONE}
 
@@ -172,14 +172,14 @@ fi
 ## Set hostname and format /etc/hosts                                           ##
 ##################################################################################
 
-if [ -n "${HOSTNAME}" ]
+if [ -n "${CAMERA_HOSTNAME}" ]
 then
     echo "*** Setting hostname... "
-    echo "${HOSTNAME}" > /etc/hostname
-    hostname "${HOSTNAME}"
+    echo "${CAMERA_HOSTNAME}" > /etc/hostname
+    hostname "${CAMERA_HOSTNAME}"
 
     echo "*** Configuring new /etc/hosts file... "
-    echo -e "127.0.0.1 \tlocalhost\n127.0.1.1 \t$HOSTNAME\n\n" > /etc/hosts
+    echo -e "127.0.0.1 \tlocalhost\n127.0.1.1 \t$CAMERA_HOSTNAME\n\n" > /etc/hosts
 
     if [ -f "${SD_MOUNTDIR}/firmware/etc/hosts" ]
     then

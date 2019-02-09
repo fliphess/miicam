@@ -65,7 +65,7 @@ DISABLE_OTA="${DISABLE_OTA:-1}"
 ############################################################
 
 ## The hostname of the webcam
-HOSTNAME="${HOSTNAME:-"camera"}"
+CAMERA_HOSTNAME="${CAMERA_HOSTNAME:-"camera"}"
 
 ## Password for root user, needed for SSH server and telnet (careful when using special chars, never use !;#)
 ROOT_PASSWORD="${ROOT_PASSWORD:-"Chuangmi720pCam123"}"
@@ -174,7 +174,7 @@ MQTT_HOST="${MQTT_HOST:-"mqtt-host"}"
 MQTT_PORT="${MQTT_PORT:-1883}"
 
 ## Define the base topic used by the camera
-MQTT_TOPIC="${MQTT_TOPIC:-"home/\$HOSTNAME"}"
+MQTT_TOPIC="${MQTT_TOPIC:-"home/\$CAMERA_HOSTNAME"}"
 
 ## Define additional options for Mosquitto here.
 ## IE: --cafile /tmp/sd/firmware/etc/cacert.pem --tls-version tlsv1
