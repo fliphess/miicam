@@ -37,7 +37,7 @@ WEBCONTENTDIR  := $(TOPDIR)/sdcard/firmware/www
 
 WEBSITEARCHIVE := website.tgz
 
-include OUTPUT.mk
+include tools/make/OUTPUT.mk
 
 
 LIBS :=                              \
