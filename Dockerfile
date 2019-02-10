@@ -52,6 +52,7 @@ RUN echo "*** Install required packages" \
       gawk                   \
       gettext                \
       git                    \
+      jq                     \
       libtool                \
       lib32z1-dev            \
       libcurl4-openssl-dev   \
