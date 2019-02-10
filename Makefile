@@ -82,6 +82,7 @@ all:                                 \
 	$(BUILDDIR)/x264                 \
 	$(BUILDDIR)/ncurses              \
 	$(BUILDDIR)/readline             \
+	$(BUILDDIR)/dosfstools           \
 	$(BUILDDIR)/libpcap              \
 	$(BUILDDIR)/tcpdump              \
 	$(BUILDDIR)/openssl              \
@@ -220,6 +221,7 @@ include tools/make/libpopt.mk
 include tools/make/h264.mk
 include tools/make/ncurses.mk
 include tools/make/readline.mk
+include tools/make/dosfstools.mk
 include tools/make/tcpdump.mk
 include tools/make/openssl.mk
 include tools/make/socat.mk
@@ -240,9 +242,6 @@ include tools/make/ffmpeg.mk
 #################################################################
 ##                                                             ##
 #################################################################
-
-sources:
-	$(TOPDIR)/tools/dev/download-sources.py
 
 
 .PHONY: install images clean

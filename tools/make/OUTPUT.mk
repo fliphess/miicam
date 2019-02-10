@@ -1,6 +1,9 @@
 
 ## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
 THIRD_PARTY_SBINS :=			\
+	fatlabel					\
+	fsck.fat					\
+	mkfs.fat					\
 	dropbear					\
 	logrotate					\
 	lighttpd					\
