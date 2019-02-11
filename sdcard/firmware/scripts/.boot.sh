@@ -34,26 +34,6 @@ fi
 
 
 ##################################################################################
-## Configure NVRAM                                                              ##
-##################################################################################
-
-echo "*** Configuring NVRAM"
-for setting in blue_led yellow_led; do
-    /usr/sbin/nvram set "${setting}=off"
-done
-
-echo "*** Configuring Stealth mode"
-if [ "${STEALTH_MODE}" -eq 1 ]
-then
-    /usr/sbin/nvram set "light=off"
-else
-    /usr/sbin/nvram set "light=on"
-fi
-
-nvram commit
-
-
-##################################################################################
 ## Wait for network with booting                                                ##
 ##################################################################################
 

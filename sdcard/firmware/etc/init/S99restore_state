@@ -26,11 +26,8 @@ startup()
 
     source "${STATEFILE}" || die "Failed to source ${STATEFILE}"
 
-    if [ "${STEALTH_MODE}" -eq 0 ]
-    then
-        blue_led   "${BLUE_LED}"
-        yellow_led "${YELLOW_LED}"
-    fi
+    blue_led   "${BLUE_LED}"
+    yellow_led "${YELLOW_LED}"
 
     if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
     then

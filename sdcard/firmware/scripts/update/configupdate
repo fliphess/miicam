@@ -306,9 +306,6 @@ AUTO_NIGHT_MODE_ARGS="${AUTO_NIGHT_MODE_ARGS:-"-d 120 -e 200 -i 5 -l -n -v"}"
 ## Camera options                                         ##
 ############################################################
 
-## Stealth mode (Disable leds after boot)
-STEALTH_MODE="${STEALTH_MODE:-0}"
-
 ## Ceiling camera mode when the image is flipped and mirrored (0/1)
 CEILING_MODE="${CEILING_MODE:-0}"
 
