@@ -20,5 +20,9 @@ then
     mqtt_send "${MOTION_TOPIC}" "$MQTT_ON"
 fi
 
-## Set blue led to blink
-blue_led blink
+
+## Set blue led to blink on motion
+if [ "$MOTION_LED" -eq 1 ]
+then
+    blue_led blink
+fi
