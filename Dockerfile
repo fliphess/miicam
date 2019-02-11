@@ -61,6 +61,7 @@ RUN echo "*** Install required packages" \
       make                   \
       ncurses-dev            \
       openssl                \
+      pkg-config             \
       python3     python     \
       python3-pip python-pip \
       python3-dev python-dev \
