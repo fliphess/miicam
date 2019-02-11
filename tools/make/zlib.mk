@@ -19,7 +19,7 @@ $(SOURCEDIR)/$(ZLIBARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/zlib: $(BUILDDIR) $(SOURCEDIR)/$(ZLIBARCHIVE)
+$(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(ZLIBVERSION)
 	tar -xzf $(SOURCEDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(ZLIBVERSION)			&& \

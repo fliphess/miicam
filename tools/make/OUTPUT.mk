@@ -26,7 +26,8 @@ THIRD_PARTY_BINS :=				\
 	nano						\
 	rsync						\
 	strace						\
-	vim	xxd
+	vim	xxd						\
+	wget
 
 ## Extra tools and symlinks that should not be stripped but copied too
 THIRD_PARTY_BIN_EXTRAS :=		\

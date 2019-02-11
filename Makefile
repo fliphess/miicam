@@ -82,6 +82,7 @@ all:                                 \
 	$(BUILDDIR)/x264                 \
 	$(BUILDDIR)/ncurses              \
 	$(BUILDDIR)/readline             \
+	$(BUILDDIR)/wget                 \
 	$(BUILDDIR)/dosfstools           \
 	$(BUILDDIR)/libpcap              \
 	$(BUILDDIR)/tcpdump              \
@@ -217,6 +218,7 @@ include tools/make/libjpeg.mk
 include tools/make/libpng.mk
 include tools/make/libgd.mk
 include tools/make/pcre.mk
+include tools/make/wget.mk
 include tools/make/libpopt.mk
 include tools/make/h264.mk
 include tools/make/ncurses.mk
