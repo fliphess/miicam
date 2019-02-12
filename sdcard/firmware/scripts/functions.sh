@@ -335,67 +335,6 @@ set_nvram()
 
 
 ##################################################################################
-##  ISP328 Functions                                                            ##
-##################################################################################
-
-## Get ISP328 values
-get_isp328()
-{
-    VARIABLE="$1"
-
-    [ "x$VARIABLE" == "x" ] && return 1
-
-    echo r ${VARIABLE} > /proc/isp328/command
-
-    echo "$( cat /proc/isp328/command )"
-    RC="$?"
-
-    return "${RC}"
-}
-
-# Set ISP328 values
-set_isp328()
-{
-    VARIABLE="$1"
-    VALUE="$2"
-
-    [ "x$VARIABLE" == "x" ] || [ "x$VALUE" == "x" ] &&  return 1
-
-    echo w ${VARIABLE} ${VALUE} > /proc/isp328/command
-    RC="$?"
-
-    return "${RC}"
-}
-
-
-##################################################################################
-## GPIO Functions                                                               ##
-##################################################################################
-
-## Read a value from a GPIO pin
-get_gpio()
-{
-    PIN="$1"
-    echo $( cat /sys/class/gpio/gpio${PIN}/value )
-    RC="$?"
-
-    return "${RC}"
-}
-
-## Write a value to GPIO pin
-set_gpio()
-{
-    PIN="$1"
-    VALUE="$2"
-
-    echo "${VALUE}" > /sys/class/gpio/gpio${PIN}/value;
-    RC="$?"
-
-    return "${RC}"
-}
-
-
-##################################################################################
 ## MQTT Functions                                                               ##
 ##################################################################################
 
