@@ -6,7 +6,7 @@ current()
     ## Get version for web ui
     if [ -f /tmp/sd/firmware/www/public/static/version.json ]
     then
-        WEBVERSION="$( cat /tmp/sd/firmware/www/public/static/version.json  | jq .tag | tr -d "\'"  )"
+        WEBVERSION="$( cat /tmp/sd/firmware/www/public/static/version.json  | jq -r '.tag' )"
     else
         echo "ERROR: Failed to retrieve current version for web ui"
         exit 1
@@ -19,7 +19,7 @@ current()
 
 latest()
 {
-    TAG="$( curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq .tag_name | tr -d "\'" )"
+    TAG="$( curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.tag_name' )"
 
     if [ "x$TAG" == "x" ]
     then
