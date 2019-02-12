@@ -406,31 +406,26 @@ blue_led()
 
     case "$INPUT" in
         on)
-            ${CTRL} LEDSTATUS 0 0 > /dev/null
-            RC="$?"
-            set_nvram blue_led on
+            /tmp/sd/firmware/bin/blue_led -e
         ;;
         off)
-            ${CTRL} LEDSTATUS 0 1 > /dev/null
-            RC="$?"
-            set_nvram blue_led off
+            /tmp/sd/firmware/bin/blue_led -d
         ;;
         blink)
-            ${CTRL} LEDSTATUS 0 2 > /dev/null
-            RC="$?"
-            set_nvram blue_led blink
+            /tmp/sd/firmware/bin/blue_led -b
         ;;
         status)
-            echo $( get_nvram blue_led )
-            RC="$?"
+            /tmp/sd/firmware/bin/blue_led -s
+        ;;
+        json)
+            /tmp/sd/firmware/bin/blue_led -j
         ;;
         *)
             echo "Option $1 not supported"
-            RC="1"
         ;;
     esac
 
-    return "${RC}"
+    return 0
 }
 
 ## Control the yellow LED
@@ -440,23 +435,19 @@ yellow_led()
 
     case "$INPUT" in
         on)
-            ${CTRL} LEDSTATUS 1 0 > /dev/null
-            RC="$?"
-            set_nvram yellow_led on
+            /tmp/sd/firmware/bin/yellow_led -e
         ;;
         off)
-            ${CTRL} LEDSTATUS 1 1 > /dev/null
-            RC="$?"
-            set_nvram yellow_led off
+            /tmp/sd/firmware/bin/yellow_led -d
         ;;
         blink)
-            ${CTRL} LEDSTATUS 1 2 > /dev/null
-            RC="$?"
-            set_nvram yellow_led blink
+            /tmp/sd/firmware/bin/yellow_led -b
         ;;
         status)
-            echo "$( get_nvram yellow_led )"
-            RC="$?"
+            /tmp/sd/firmware/bin/yellow_led -s
+        ;;
+        json)
+            /tmp/sd/firmware/bin/yellow_led -j
         ;;
         *)
             echo "Option $1 not supported"
@@ -464,7 +455,7 @@ yellow_led()
         ;;
     esac
 
-    return "${RC}"
+    return 0
 }
 
 ## control the ir led (used for restore-state)
@@ -582,9 +573,9 @@ led_status()
 {
     local ARGS="$1"
 
-    BLUE="$(   get_nvram blue_led   )"
-    YELLOW="$( get_nvram yellow_led )"
-    IR_LED="$( /tmp/sd/firmware/bin/ir_led -s | last_f )"
+    BLUE="$(   /tmp/sd/firmware/bin/blue_led -s   | last_f )"
+    YELLOW="$( /tmp/sd/firmware/bin/yellow_led -s | last_f )"
+    IR_LED="$( /tmp/sd/firmware/bin/ir_led -s     | last_f )"
 
     if [ "$ARGS" == "--json" ]
     then

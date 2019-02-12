@@ -14,6 +14,42 @@
 
 #include "chuangmi_utils.h"
 
+int read_int(const char *filename)
+{
+    int fd;
+    fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        fprintf(stderr, "Failed to open %s for reading!\n", filename);
+        return(EXIT_FAILURE);
+    }
+
+    char value_str[6];
+    if (read(fd, value_str, 3) == -1) {
+        fprintf(stderr, "Failed to read value from %s!\n", filename);
+        return(EXIT_FAILURE);
+    }
+
+    close(fd);
+    return(atoi(value_str));
+}
+
+int write_file(const char *file_path, char *content)
+{
+    FILE *fd;
+
+    fd = fopen(file_path, "w");
+    if (!fd) {
+        fprintf(stderr, "*** Error: Failed to open: %s\n", file_path);
+        return EXIT_FAILURE;
+    }
+
+    fprintf(fd, content);
+    fclose(fd);
+
+    return EXIT_SUCCESS;
+}
+
+
 int get_last_file(const char * file_path)
 {
     char * buffer = 0;

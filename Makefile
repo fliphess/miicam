@@ -44,6 +44,7 @@ LIBS :=                              \
 	$(BUILDDIR)/chuangmi_ircut       \
 	$(BUILDDIR)/chuangmi_isp328      \
 	$(BUILDDIR)/chuangmi_pwm         \
+	$(BUILDDIR)/chuangmi_led         \
 	$(BUILDDIR)/chuangmi_utils
 
 
@@ -53,6 +54,8 @@ UTILS :=                             \
 	$(BUILDDIR)/take_video           \
 	$(BUILDDIR)/ir_cut               \
 	$(BUILDDIR)/ir_led               \
+	$(BUILDDIR)/blue_led             \
+	$(BUILDDIR)/yellow_led           \
 	$(BUILDDIR)/mirrormode           \
 	$(BUILDDIR)/nightmode            \
 	$(BUILDDIR)/flipmode             \
@@ -166,6 +169,13 @@ $(BUILDDIR)/chuangmi_pwm: $(BUILDDIR)/chuangmi_utils
 	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_pwm.so -fPIC $(TOOLSDIR)/lib/chuangmi_pwm.c && \
 	touch $@
 
+$(BUILDDIR)/chuangmi_led: $(BUILDDIR)/chuangmi_utils
+	@mkdir -p $(BUILDDIR)
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c && \
+	touch $@
+
 $(UTILS): $(PREFIXDIR)/bin $(LIBS)
 	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
@@ -177,6 +187,7 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS)
 		-lchuangmi_ircut  \
 		-lchuangmi_utils  \
 		-lchuangmi_isp328 \
+		-lchuangmi_led    \
 		-lchuangmi_pwm && \
 	touch $(BUILDDIR)/$(@F)
 

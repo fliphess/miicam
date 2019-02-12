@@ -20,8 +20,3 @@ then
     mqtt_send "${MOTION_TOPIC}" "$MQTT_OFF"
 fi
 
-## Disable led when no motion is detected
-if [ "$MOTION_LED" -eq 1 ]
-then
-    blue_led off
-fi

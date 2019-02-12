@@ -50,7 +50,7 @@ get_topic() {
 
 led_blue_status()
 {
-    mqtt_send "${MQTT_TOPIC}/leds/blue" "$( blue_led status )"
+    mqtt_send "${MQTT_TOPIC}/leds/blue" "$( /tmp/sd/firmware/bin/blue_led -s | last_f )"
 }
 
 led_blue_set()
@@ -60,13 +60,13 @@ led_blue_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning blue led on"
-        blue_led on
+        /tmp/sd/firmware/bin/blue_led -e
         mqtt_send "${MQTT_TOPIC}/leds/blue" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning blue led off"
-        blue_led off
+        /tmp/sd/firmware/bin/blue_led -d
         mqtt_send "${MQTT_TOPIC}/leds/blue" "${MQTT_OFF}"
     fi
 }
@@ -78,7 +78,7 @@ led_blue_set()
 
 led_yellow_status()
 {
-     mqtt_send "${MQTT_TOPIC}/leds/yellow" "$( yellow_led status )"
+     mqtt_send "${MQTT_TOPIC}/leds/yellow" "$( /tmp/sd/firmware/bin/yellow_led -s | last_f )"
 }
 
 led_yellow_set()
@@ -88,13 +88,13 @@ led_yellow_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning yellow led on"
-        yellow_led on
+        /tmp/sd/firmware/bin/yellow_led -e
         mqtt_send "${MQTT_TOPIC}/leds/yellow" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning yellow led off"
-        yellow_led off
+        /tmp/sd/firmware/bin/yellow_led -d
         mqtt_send "${MQTT_TOPIC}/leds/yellow" "${MQTT_OFF}"
     fi
 }

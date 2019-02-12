@@ -26,18 +26,23 @@ startup()
 
     source "${STATEFILE}" || die "Failed to source ${STATEFILE}"
 
-    blue_led   "${BLUE_LED}"
-    yellow_led "${YELLOW_LED}"
+    [ "${BLUE_LED}" == "on"  ] && /tmp/sd/firmware/bin/blue_led -e
+    [ "${BLUE_LED}" == "off" ] && /tmp/sd/firmware/bin/blue_led -d
+
+    [ "${YELLOW_LED}" == "on"  ] && /tmp/sd/firmware/bin/yellow_led -e
+    [ "${YELLOW_LED}" == "off" ] && /tmp/sd/firmware/bin/yellow_led -d
+
+    [ "${IR_CUT}" == "on"  ] && /tmp/sd/firmware/bin/ir_cut -e
+    [ "${IR_CUT}" == "off" ] && /tmp/sd/firmware/bin/ir_cut -d
 
     if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
     then
-        ir_led "${IR_LED}"
+        [ "${IR_LED}" == "on"  ] && /tmp/sd/firmware/bin/ir_led -e
+        [ "${IR_LED}" == "off" ] && /tmp/sd/firmware/bin/ir_led -d
+
         [ "${NIGHT_MODE}"  == "on"  ] && /tmp/sd/firmware/bin/nightmode -e
         [ "${NIGHT_MODE}"  == "off" ] && /tmp/sd/firmware/bin/nightmode -d
     fi
-
-    [ "${IR_CUT}" == "on"  ] && /tmp/sd/firmware/bin/ir_cut -e
-    [ "${IR_CUT}" == "off" ] && /tmp/sd/firmware/bin/ir_cut -e
 
     if [ "${CEILING_MODE}" -eq 0 ]
     then

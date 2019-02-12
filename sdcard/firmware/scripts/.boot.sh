@@ -170,14 +170,16 @@ fi
 ## Status LED                     ##
 ####################################
 
-if [ "$( /usr/sbin/nvram get light )" = "on" ]
+LIGHTSTATE="$( /usr/sbin/nvram get light )"
+
+if [ "${LIGHTSTATE}" == "on" ]
 then
-    blue_led on
+    /tmp/sd/firmware/bin/blue_led -e
 else
-    blue_led off
+    /tmp/sd/firmware/bin/blue_led -d
 fi
 
-yellow_led off
+/tmp/sd/firmware/bin/yellow_led -d
 
 
 ####################################
