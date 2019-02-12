@@ -244,9 +244,6 @@ MOTION_TAKE_SNAPSHOT="${MOTION_TAKE_SNAPSHOT:-0}"
 ## Enable video recording on motion detection
 MOTION_RECORD="${MOTION_RECORD:-0}"
 
-## Enable motion detection led blink
-MOTION_LED="${MOTION_LED:-0}"
-
 ## Which topic to publish to
 MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 
