@@ -7,7 +7,7 @@ SLEEP=1
 TRIES=0
 until [ "$TRIES" -ge "$RETRIES" ]
 do
-    WEBSITE_URL="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | grep browser_download_url | grep tgz | awk '{print $NF}' | tr -d '"' )"
+    WEBSITE_URL="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.assets | to_entries[] | .value.browser_download_url' )"
 
     if ( echo "$WEBSITE_URL" | grep -qE "https://github.com/miicam/MiiCamWeb/releases/download/([0-9]+)/website.tgz" )
     then
