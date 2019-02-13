@@ -1,7 +1,9 @@
 #!/bin/sh
 
 PATH="/tmp/sd/firmware/scripts/update:$PATH"
-WEBSITETGZ="/tmp/website.tgz"
+
+WEBSITETGZ="/tmp/sd/website.tgz"
+WEBSITESUM="/tmp/sd/website.md5sum"
 WEBSITEDIR="/tmp/sd/firmware/www"
 
 
@@ -12,17 +14,41 @@ die() { log "${*}"; exit 1; }
 
 download()
 {
-    local WEBSITE_URL="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq '.assets | to_entries[] | .value.browser_download_url' )"
+    local WEBSITE_URLS="$( curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq '.assets | to_entries[] | .value.browser_download_url' )"
 
-    if [ "x$WEBSITE_URL" == "x" ]
+    [ "x${WEBSITE_URLS}" == "x" ] || die "Website content urls not found! Exiting upgrade"
+
+    [ -f "${WEBSITETGZ}" ] && rm "${WEBSITETGZ}"
+    [ -f "${WEBSITESUM}" ] && rm "${WEBSITESUM}"
+
+    cd /tmp/sd
+
+    for URL in ${WEBSITE_URLS}
+    do
+        /tmp/sd/firmare/bin/wget -q -t 5 -T 10 -c "$URL" || die "Failed to download from $URL"
+    done
+
+    [ -f "${WEBSITETGZ}" ] || die "Failed to download ${WEBSITETGZ}"
+    [ -f "${WEBSITESUM}" ] || die "Failed to download ${WEBSITESUM}"
+
+    return 0
+}
+
+
+checksum()
+{
+    [ -f "${WEBSITESUM}" ] || die "File ${WEBSITESUM} not found!"
+
+    if md5sum -s -c "${WEBSITESUM}"
     then
-        echo "Website url not found! Exiting build"
+        echo "Sums OK: $( cat ${WEBSITESUM} )"
+        return 0
+    else
+        echo "An error appeared during download: The sums don't match!"
+        echo "Sum in file: $(cat ${WEBSITESUM} )"
+        echo "Actual Sum: $( md5sum ${WEBSITESUM} )"
         return 1
     fi
-
-    wget -q -t 5 -T 10 -c -O "$WEBSITETGZ" "$WEBSITE_URL"
-
-    return $?
 }
 
 
@@ -32,11 +58,18 @@ main()
     local LATEST_VERSION="$(  webversion --latest  )" || die "Failed to retrieve the tag of the latest version"
     local CURRENT_VERSION="$( webversion --current )" || die "Failed to retrieve the tag of the current version"
 
+    echo "*** Current version is: $CURRENT_VERSION"
+    echo "*** Latest version is:  $LATEST_VERSION"
+
     ## Download if a newer version is available
     if [ "$LATEST_VERSION" -gt "$CURRENT_VERSION" ] ;
     then
-        echo "*** Downloading latest webui release"
+        echo "*** Downloading the latest webui release"
         download || die "Failed to download the latest web ui"
+        checksum || die "Failed to match the md5sum"
+    else
+        echo "*** You are using the latest available version"
+        exit 0
     fi
 
     ## Create the new webdir
@@ -50,16 +83,18 @@ main()
     then
         echo "*** Unpacking $WEBSITETGZ"
         tar xzf "$WEBSITETGZ" -C "/tmp/sd/${WEBSITEDIR}.new" || die "Failed to unpack $WEBSITETGZ"
+        NEWVERSION="$( webversion --file "/tmp/sd/${WEBSITEDIR}.new/public/static/version.json" )"
     fi
 
-   if [ -f "${WEBSITEDIR}.new/public/api/index.php" ]
-   then
-       echo "*** Swapping newer web ui version with the current one"
-       mv "${WEBSITEDIR}" "${WEBSITEDIR}.old" && \
-       mv "${WEBSITEDIR}.new" "${WEBSITEDIR}" && \
-       echo "*** Update completed"
-
-   fi
+    if [ -n "$NEWVERSION" ] && [ "$NEWVERSION" == "$LATEST_VERSION" ]
+    then
+        echo "*** Swapping newer web ui version with the current one"
+        mv "${WEBSITEDIR}" "${WEBSITEDIR}.old" && \
+        mv "${WEBSITEDIR}.new" "${WEBSITEDIR}" && \
+        echo "*** Update completed"
+    else
+        die "Versions do not match: new: \"$NEWVERSION\", expected: \"$LATEST_VERSION\""
+    fi
 }
 
 main
