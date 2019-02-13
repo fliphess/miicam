@@ -7,56 +7,56 @@ This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Cam
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
 With this firmware an alternate method of using this webcam is created that does not require an internet uplink.
 
-**Please read the [security considerations in the documentation](https://miicam.github.io/Security-Considerations).**
+**Please read the [security considerations](https://miicam.github.io/Security-Considerations).**
 
 ![Camera image](https://github.com/MiiCam/MiiCamWeb/raw/master/public/static/images/chuangmi.jpg "Chuangmi 720P camera")
 
 
-## Features
+## Documentation
 
-This project is a collection of scripts and binaries file to hack your Xiaomi Chuangmi 720P camera.
-Have a look in [the documentation for all the available options](https://miicam.github.io).
-
-## Screenshots
-
-Screenshots of the web interface can be found [in the documentation](https://miicam.github.io/Screenshots)
+Tave a look in the documentation for [all the available options and features](https://miicam.github.io).
 
 
 ## Installation on the Chuangmi 720P camera
 
-Have a look in [the documentation](https://miicam.github.io/) for more info on how to [install the hack](https://miicam.github.io/getting-started).
-
-
 To use install the hack on your SD card, use the compiled sources.
 Copying the files in the repository to your sd card without building the binaries wil **Not** work.
+
+In the docs you can find [instructions on how to install the hack](https://miicam.github.io/getting-started).
+
 
 ### Download the firmware hack
 
 For new users it is recommended to use the precompiled binaries that are created with every release.
 You can download the release builds from the [github releases page](https://github.com/MiiCam/MiiCam/releases).
 
+
 ### Build the binaries
 
-If you prefer to build the binaries yourself, have a look at the [instructions in the documentation](https://miicam.github.io/development/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
+If you prefer to build the binaries yourself, [have a look at the instructions using docker](https://miicam.github.io/development/How-to-build-the-binaries-for-the-webcam-hack).
 
 
 ## Security considerations
 
 The short version: **DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNETZ!**
 
-The longer version can be read in the [documentation](https://miicam.github.io/Security-Considerations)
+The longer version [can be read on its own page](https://miicam.github.io/Security-Considerations).
 
 
-## Following this repository
+## Issues and bugs
 
-As I'm an chaotic idiot that talks to himself a lot, I recommend not to watch this repository, as you will receive lots of very useless notifications.
-Choose the "Releases Only" flag to make yourself more zen :)
+If you discover bugs, please [create an issue](https://github.com/miicam/MiiCam/issues), so we can look for a fix :)
+If you can fix it yourself, feel very welcome to create pull requests.
+
+If there is a bug in the documentation, [create an issue in the docs repo](https://github.com/miicam/MiiCamDocs/issues).
+And for the web interface, [create an issue in the repo for the web interface](https://github.com/miicam/MiiCamWeb/).
 
 
 ## Need help? Want to help? Ideas? suggestions?
 
-I've spend many hours documenting anything I ran into. Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
-If something is not documented, please let me know so I can extend the documentation.
+I've spend many hours documenting anything I ran into.
+Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
+If something is not documented, [please let me know](https://github.com/miicam/MiiCam/issues) so I can extend the documentation.
 
 Feel welcome to bring pull requests and feature requests on the table.
 
