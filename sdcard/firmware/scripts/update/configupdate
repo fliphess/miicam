@@ -34,7 +34,7 @@ fi
 ## Load variables from old config if present
 ########################################
 
-[ -f "${CONFIG_BACKUP}" ] && . /tmp/config.old
+[ -f "${CONFIG_BACKUP}" ] && . /tmp/sd/config.old
 
 
 ########################################
@@ -102,10 +102,6 @@ ENABLE_REMOTE_SYSLOG="${ENABLE_REMOTE_SYSLOG:-0}"
 
 ## The remote syslog host (use host:port to set a non-default syslog port)
 REMOTE_SYSLOG_HOST="${REMOTE_SYSLOG_HOST:-""}"
-
-## Remove all logs from log directory
-PURGE_LOGFILES_AT_BOOT="${PURGE_LOGFILES_AT_BOOT:-1}"
-
 
 ############################################################
 ## Wifi Settings                                          ##

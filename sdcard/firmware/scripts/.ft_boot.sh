@@ -16,7 +16,7 @@ fi
 ##################################################################################
 
 export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
-export SD_MOUNTDIR="/tmp/sd"
+export SD_MOUNTDIR=/tmp/sd
 
 if [ -f "${SD_MOUNTDIR}/config.cfg" ]
 then
@@ -36,18 +36,8 @@ then
     exit
 fi
 
-if [ "${PURGE_LOGFILES_AT_BOOT}" -eq 1 ]
-then
-    if [ -d "${SD_MOUNTDIR}/log" ]
-    then
-        echo "*** Purging old log files... "
-        rm ${SD_MOUNTDIR}/log/*
-    fi
-fi
-
 (
 cat << EOF
-
 ################################
 ## Running Chuangmi 720P hack ##
 ################################
@@ -55,12 +45,10 @@ cat << EOF
 Chuangmi 720P configuration:
 
   HOSTNAME       = ${CAMERA_HOSTNAME}
-  WIFI_SSID      = ${WIFI_SSID}
   TIMEZONE       = ${TIMEZONE}
 
 ################################
 EOF
-
 
 ##################################################################################
 ## Syslog                                                                       ##
@@ -192,9 +180,9 @@ fi
 ## Prepare restartd.conf                                                        ##
 ##################################################################################
 
-echo "*** Replacing restartd startup script and config with our own version"
 if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
 then
+    echo "*** Replacing restartd startup script and config with our own version"
     mount --bind /etc/init/S99restartd /mnt/data/imi/imi_init/S99restartd
 fi
 

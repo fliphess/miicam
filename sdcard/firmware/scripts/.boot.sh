@@ -47,6 +47,18 @@ fi
 ##################################################################################
 
 ####################################
+## Status LED                     ##
+####################################
+
+## Blue on
+/tmp/sd/firmware/bin/blue_led -e
+
+## Disable the others (will be changed using restore state if required)
+${SD_MOUNTDIR}/firmware/bin/yellow_led -d
+${SD_MOUNTDIR}/firmware/bin/ir_led -d
+${SD_MOUNTDIR}/firmware/bin/ir_led -d
+
+####################################
 ## Restore settings               ##
 ####################################
 
@@ -163,24 +175,8 @@ fi
 if [ "${ENABLE_MQTT}" -eq 1 ]
 then
     sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-interval start
-    sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-control start
+    sh ${SD_MOUNTDIR}/firmware/etc/init/S99mqtt-control  start
 fi
-
-####################################
-## Status LED                     ##
-####################################
-
-LIGHTSTATE="$( /usr/sbin/nvram get light )"
-
-if [ "${LIGHTSTATE}" == "on" ]
-then
-    /tmp/sd/firmware/bin/blue_led -e
-else
-    /tmp/sd/firmware/bin/blue_led -d
-fi
-
-/tmp/sd/firmware/bin/yellow_led -d
-
 
 ####################################
 ## RestartD                       ##
@@ -214,3 +210,4 @@ fi
 
 
 ) >> "${LOGFILE}" 2>&1
+
