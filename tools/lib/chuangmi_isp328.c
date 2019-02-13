@@ -313,11 +313,11 @@ int flipmode_status(void)
 int brightness_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set brightness to %d: Use: (0-255)\n", value);
-        return(-1);
+        return -1;
     }
 
     fprintf(stderr, "*** Setting brightness to %d\n", value);
@@ -325,10 +325,10 @@ int brightness_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_BRIGHTNESS, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for brightness!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int brightness_reset(void)
@@ -347,11 +347,11 @@ int brightness_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_BRIGHTNESS, &value);
     if (ret < 0)
-        return(-1);
+        return -1;
 
     return value;
 }
@@ -365,7 +365,7 @@ int brightness_print(void)
     }
 
     fprintf(stdout, "*** Value for brightness is %d\n", value);
-    return(0);
+    return 0;
 }
 
 
@@ -376,11 +376,11 @@ int brightness_print(void)
 int contrast_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set contrast to %d: Use: (0-255)\n", value);
-        return(-1);
+        return -1;
     }
 
     fprintf(stderr, "*** Setting contrast to %d\n", value);
@@ -388,10 +388,10 @@ int contrast_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_CONTRAST, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for contrast!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int contrast_reset(void)
@@ -410,12 +410,12 @@ int contrast_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_CONTRAST, &value);
 
     if (ret < 0)
-        return(-1);
+        return -1;
 
     return value;
 }
@@ -430,7 +430,7 @@ int contrast_print(void)
     }
 
     fprintf(stdout, "*** Value for contrast is %d\n", value);
-    return(0);
+    return 0;
 }
 
 // ************************************************************************** //
@@ -440,11 +440,11 @@ int contrast_print(void)
 int hue_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set hue to %d: Use: (0-255)\n", value);
-        return(-1);
+        return -1;
     }
 
     fprintf(stderr, "*** Setting hue to %d\n", value);
@@ -452,10 +452,10 @@ int hue_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_HUE, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for hue!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int hue_reset(void)
@@ -474,11 +474,11 @@ int hue_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_HUE, &value);
     if (ret < 0) {
-        return(-1);
+        return -1;
     }
     return value;
 }
@@ -494,7 +494,7 @@ int hue_print(void)
     }
 
     fprintf(stdout, "*** Value for hue is %d\n", value);
-    return(0);
+    return 0;
 }
 
 
@@ -505,11 +505,11 @@ int hue_print(void)
 int saturation_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set saturation to %d: Use: (0-255)\n", value);
-        return(-1);
+        return -1;
     }
 
     fprintf(stderr, "*** Setting saturation to %d\n", value);
@@ -517,10 +517,10 @@ int saturation_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_SATURATION, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for saturation!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int saturation_reset(void)
@@ -539,11 +539,11 @@ int saturation_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_SATURATION, &value);
     if (ret < 0)
-        return(-1);
+        return -1;
 
     return value;
 }
@@ -558,7 +558,7 @@ int saturation_print(void)
     }
 
     fprintf(stdout, "*** Value for saturation is %d\n", value);
-    return(0);
+    return 0;
 }
 
 
@@ -569,11 +569,11 @@ int saturation_print(void)
 int denoise_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set denoise to %d: Use: (0-255)\n", value);
-        return(-1);
+        return -1;
     }
 
     fprintf(stderr, "*** Setting denoise to %d\n", value);
@@ -581,10 +581,10 @@ int denoise_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_DENOISE, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for denoise!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int denoise_reset(void)
@@ -603,11 +603,11 @@ int denoise_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_DENOISE, &value);
     if (ret < 0)
-        return(-1);
+        return -1;
 
     return value;
 }
@@ -621,7 +621,7 @@ int denoise_print(void)
     }
 
     fprintf(stdout, "*** Value for denoise is %d\n", value);
-    return(0);
+    return 0;
 }
 
 // ************************************************************************** //
@@ -631,11 +631,11 @@ int denoise_print(void)
 int sharpness_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set sharpness to %d: Use: (0-255)\n", value);
-        return(-1);
+        return -1;
     }
 
     fprintf(stderr, "*** Setting sharpness to %d\n", value);
@@ -643,10 +643,10 @@ int sharpness_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_SHARPNESS, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for sharpness!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int sharpness_reset(void)
@@ -665,11 +665,11 @@ int sharpness_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(-1);
+        return -1;
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_SHARPNESS, &value);
     if (ret < 0) {
-        return(-1);
+        return -1;
     }
 
     return value;
@@ -685,7 +685,7 @@ int sharpness_print(void)
     }
 
     fprintf(stdout, "* Value for sharpness is %d\n", value);
-    return(0);
+    return 0;
 }
 
 

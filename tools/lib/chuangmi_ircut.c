@@ -83,7 +83,7 @@ int ircut_status(void)
         return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -108,7 +108,7 @@ int ircut_status_json(void)
         return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -119,10 +119,10 @@ int ircut_on(void)
 {
     if (gpio_write(GPIO_PIN_14, 1) < 0 || gpio_write(GPIO_PIN_15, 0) < 0) {
         fprintf(stderr, "*** Error: Failed write to gpio pins!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 /*
@@ -132,8 +132,8 @@ int ircut_off(void)
 {
     if (gpio_write(GPIO_PIN_14, 0) < 0 || gpio_write(GPIO_PIN_15, 1) < 0) {
         fprintf(stderr, "*** Error: Failed write to gpio pins!\n");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }

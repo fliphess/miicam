@@ -22,7 +22,7 @@ int blue_led_get_brightness(void)
 {
     int brightness = read_int(BLUE_LED_BRIGHTNESS);
     if (brightness < 0) {
-        return(-1);
+        return -1;
     }
     return brightness;
 }
@@ -147,7 +147,7 @@ int yellow_led_get_brightness(void)
 {
     int brightness = read_int(YELLOW_LED_BRIGHTNESS);
     if (brightness < 0) {
-        return(-1);
+        return -1;
     }
     return brightness;
 }
