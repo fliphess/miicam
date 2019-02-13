@@ -28,16 +28,16 @@ int isp328_init(void)
     // * Check if nightmode device can be accessed
     if (access(ISP_DEV_NAME, F_OK) < 0) {
         fprintf(stderr, "*** Error: Failed to access %s\n", ISP_DEV_NAME);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     // * Open ISP328 file descriptor
     if ((isp_fd = open(ISP_DEV_NAME, O_RDWR)) < 0) {
         fprintf(stderr, "*** Error: Failed to open %s\n", ISP_DEV_NAME);
-        return EXIT_FAILURE;
+        return -1;
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -48,9 +48,9 @@ int isp328_is_initialized(void)
 {
     if (fcntl(isp_fd, F_GETFD) == -1) {
         fprintf(stderr, "*** Error: ISP328 Library is uninitialized.\n");
-        return EXIT_FAILURE;
+        return -1;
     }
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -60,9 +60,9 @@ int isp328_is_initialized(void)
 int isp328_end(void)
 {
     if (close(isp_fd) > 0)
-        return EXIT_SUCCESS;
+        return 0;
     else
-        return EXIT_FAILURE;
+        return -1;
 }
 
 
@@ -76,15 +76,15 @@ int isp328_end(void)
 int mirrormode_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return EXIT_FAILURE;
+        return -1;
 
     if (value <= 1) {
         fprintf(stderr, "*** Setting mirror to %d\n", value);
         ioctl(isp_fd, ISP_IOC_SET_SENSOR_MIRROR, &value);
-        return EXIT_SUCCESS;
+        return 0;
     } else {
         fprintf(stderr, "*** Can't set mirror to %d\n", value);
-        return EXIT_FAILURE;
+        return -1;
     }
 }
 
@@ -117,12 +117,12 @@ int mirrormode_status(void)
     int ret = ioctl(isp_fd, ISP_IOC_GET_SENSOR_MIRROR, &mode);
     if (ret < 0) {
         fprintf(stdout, "*** Errror: Retrieving mirror mode values failed");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Mirror mode is: %s\n", (mode == 1) ? "on" : "off");
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -136,14 +136,14 @@ int mirrormode_status(void)
 int nightmode_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return EXIT_FAILURE;
+        return -1;
 
     if ( value <= 1 ) {
         fprintf(stderr, "*** Setting nightmode to %d\n", value);
         ioctl(isp_fd, _IOW(0x6d, 0x0a, int), &value);
-        return EXIT_SUCCESS;
+        return 0;
     } else
-        return EXIT_FAILURE;
+        return -1;
 }
 
 
@@ -156,7 +156,7 @@ int nightmode_update_values(void)
     unsigned int awb_sta[10];
 
     if (isp328_is_initialized() < 0)
-        return EXIT_FAILURE;
+        return -1;
 
     while (converge < 4) {
         ioctl(isp_fd, _IOR(0x65, 0x23, int), &converge);
@@ -175,7 +175,7 @@ int nightmode_update_values(void)
     light_info.ev = ev;
     light_info.ir = awb_sta[4] / 230400;
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -203,13 +203,13 @@ int nightmode_off(void)
 int nightmode_status(void)
 {
     if (isp328_is_initialized() < 0)
-        return EXIT_FAILURE;
+        return -1;
 
     int mode;
     ioctl(isp_fd, _IOR(0x6d, 0x0a, int), &mode);
     fprintf(stdout, "*** Night mode is: %s\n", (mode == 1) ? "on" : "off");
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -220,13 +220,13 @@ int nightmode_info(void)
 {
     if (nightmode_update_values() < 0) {
         fprintf(stderr, "*** Failed to retrieve EV and IR values!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "EV Value: %d\n", light_info.ev);
     fprintf(stdout, "IR Value: %d\n", light_info.ir);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -237,12 +237,12 @@ int nightmode_info_json(void)
 {
     if (nightmode_update_values() < 0) {
         fprintf(stderr, "*** Failed to retrieve EV and IR values!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     printf("{\"ev\":%d,\"ir\":%d}", light_info.ev, light_info.ir);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -256,15 +256,15 @@ int nightmode_info_json(void)
 int flipmode_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return EXIT_FAILURE;
+        return -1;
 
     if (value <= 1) {
         fprintf(stderr, "*** Setting flip to %d\n", value);
         ioctl(isp_fd, ISP_IOC_SET_SENSOR_FLIP, &value);
-        return EXIT_SUCCESS;
+        return 0;
     } else {
         fprintf(stderr, "*** Error: Cannot set flip to %d\n", value);
-        return EXIT_FAILURE;
+        return -1;
     }
 }
 
@@ -297,12 +297,12 @@ int flipmode_status(void)
     int ret = ioctl(isp_fd, ISP_IOC_GET_SENSOR_FLIP, &mode);
     if (ret < 0) {
         fprintf(stdout, "*** Errror: Retrieving flip mode values failed");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Flip mode is: %s\n", (mode == 1) ? "on" : "off");
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -313,11 +313,11 @@ int flipmode_status(void)
 int brightness_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set brightness to %d: Use: (0-255)\n", value);
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     fprintf(stderr, "*** Setting brightness to %d\n", value);
@@ -325,20 +325,20 @@ int brightness_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_BRIGHTNESS, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for brightness!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 int brightness_reset(void)
 {
     if (brightness_set(128) < 0 ) {
         fprintf(stderr, "*** Error: Failed to reset brightness to it's default value!\n");
-        return EXIT_FAILURE;
+        return -1;
     } else {
         fprintf(stderr, "*** Setting brightness has been reset to it's default value (128)\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
 }
 
@@ -347,11 +347,11 @@ int brightness_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_BRIGHTNESS, &value);
     if (ret < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     return value;
 }
@@ -361,11 +361,11 @@ int brightness_print(void)
     int value = brightness_get();
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for brightness!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Value for brightness is %d\n", value);
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 
@@ -376,11 +376,11 @@ int brightness_print(void)
 int contrast_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set contrast to %d: Use: (0-255)\n", value);
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     fprintf(stderr, "*** Setting contrast to %d\n", value);
@@ -388,20 +388,20 @@ int contrast_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_CONTRAST, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for contrast!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 int contrast_reset(void)
 {
     if (contrast_set(128) < 0 ) {
         fprintf(stderr, "*** Error: Failed to reset contrast to it's default value!\n");
-        return EXIT_FAILURE;
+        return -1;
     } else {
         fprintf(stderr, "*** Setting contrast has been reset to it's default value (128)\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
 }
 
@@ -410,12 +410,12 @@ int contrast_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_CONTRAST, &value);
 
     if (ret < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     return value;
 }
@@ -426,11 +426,11 @@ int contrast_print(void)
 
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for contrast!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Value for contrast is %d\n", value);
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 // ************************************************************************** //
@@ -440,11 +440,11 @@ int contrast_print(void)
 int hue_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set hue to %d: Use: (0-255)\n", value);
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     fprintf(stderr, "*** Setting hue to %d\n", value);
@@ -452,20 +452,20 @@ int hue_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_HUE, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for hue!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 int hue_reset(void)
 {
     if (hue_set(128) < 0 ) {
         fprintf(stderr, "*** Error: Failed to reset hue to it's default value!\n");
-        return EXIT_FAILURE;
+        return -1;
     } else {
         fprintf(stderr, "*** Setting hue has been reset to it's default value (128)\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
 }
 
@@ -474,11 +474,11 @@ int hue_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_HUE, &value);
     if (ret < 0) {
-        return(EXIT_FAILURE);
+        return(-1);
     }
     return value;
 }
@@ -490,11 +490,11 @@ int hue_print(void)
 
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for hue!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Value for hue is %d\n", value);
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 
@@ -505,11 +505,11 @@ int hue_print(void)
 int saturation_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set saturation to %d: Use: (0-255)\n", value);
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     fprintf(stderr, "*** Setting saturation to %d\n", value);
@@ -517,20 +517,20 @@ int saturation_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_SATURATION, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for saturation!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 int saturation_reset(void)
 {
     if (saturation_set(128) < 0 ) {
         fprintf(stderr, "*** Error: Failed to reset saturation to it's default value!\n");
-        return EXIT_FAILURE;
+        return -1;
     } else {
         fprintf(stderr, "*** Setting saturation has been reset to it's default value (128)\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
 }
 
@@ -539,11 +539,11 @@ int saturation_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_SATURATION, &value);
     if (ret < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     return value;
 }
@@ -554,11 +554,11 @@ int saturation_print(void)
 
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for saturation!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Value for saturation is %d\n", value);
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 
@@ -569,11 +569,11 @@ int saturation_print(void)
 int denoise_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set denoise to %d: Use: (0-255)\n", value);
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     fprintf(stderr, "*** Setting denoise to %d\n", value);
@@ -581,20 +581,20 @@ int denoise_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_DENOISE, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for denoise!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 int denoise_reset(void)
 {
     if (denoise_set(128) < 0 ) {
         fprintf(stderr, "*** Error: Failed to reset denoise to it's default value!\n");
-        return EXIT_FAILURE;
+        return -1;
     } else {
         fprintf(stderr, "*** Setting denoise has been reset to it's default value (128)\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
 }
 
@@ -603,11 +603,11 @@ int denoise_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_DENOISE, &value);
     if (ret < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     return value;
 }
@@ -617,11 +617,11 @@ int denoise_print(void)
     int value = denoise_get();
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for denoise!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "*** Value for denoise is %d\n", value);
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 // ************************************************************************** //
@@ -631,11 +631,11 @@ int denoise_print(void)
 int sharpness_set(int value)
 {
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     if (value < 0 && value > 255) {
         fprintf(stderr, "*** Error: Cannot set sharpness to %d: Use: (0-255)\n", value);
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     fprintf(stderr, "*** Setting sharpness to %d\n", value);
@@ -643,20 +643,20 @@ int sharpness_set(int value)
     int ret = ioctl(isp_fd, ISP_IOC_SET_SHARPNESS, &value);
     if (ret < 0) {
         fprintf(stderr, "*** Error: Cannot set value for sharpness!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 int sharpness_reset(void)
 {
     if (sharpness_set(128) < 0 ) {
         fprintf(stderr, "*** Error: Failed to reset sharpness to it's default value!\n");
-        return EXIT_FAILURE;
+        return -1;
     } else {
         fprintf(stderr, "*** Setting sharpness has been reset to it's default value (128)\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
 }
 
@@ -665,11 +665,11 @@ int sharpness_get(void)
     int value;
 
     if (isp328_is_initialized() < 0)
-        return(EXIT_FAILURE);
+        return(-1);
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_SHARPNESS, &value);
     if (ret < 0) {
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
     return value;
@@ -681,11 +681,11 @@ int sharpness_print(void)
 
     if (value < 0) {
         fprintf(stderr, "*** Error: Cannot get value for sharpness!\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fprintf(stdout, "* Value for sharpness is %d\n", value);
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 
@@ -704,7 +704,7 @@ int print_camera_info_json(void)
         fprintf(stdout, "\"sharpness\":%d", sharpness_get());
         fprintf(stdout, "}");
 
-        return EXIT_SUCCESS;
+        return 0;
 }
 
 
@@ -716,7 +716,7 @@ int print_camera_info_shell(void)
         fprintf(stdout, "SATURATION=\"%d\"\n", saturation_get());
         fprintf(stdout, "DENOISE=\"%d\"\n",    denoise_get());
         fprintf(stdout, "SHARPNESS=\"%d\"\n",   sharpness_get());
-        return EXIT_SUCCESS;
+        return 0;
 }
 
 
@@ -731,7 +731,7 @@ int print_camera_info(void)
         fprintf(stdout, "- Sharpness:  %d\n", sharpness_get());
         fprintf(stdout, "\n");
 
-        return EXIT_SUCCESS;
+        return 0;
 }
 
 // ************************************************************************** //
@@ -748,7 +748,7 @@ int reset_camera_adjustments(void)
         saturation_set(128) < 0 ||
         denoise_set(128)    < 0 ||
         sharpness_set(128)  < 0)
-            return EXIT_FAILURE;
+            return -1;
 
-    return EXIT_SUCCESS;
+    return 0;
 }

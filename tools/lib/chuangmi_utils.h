@@ -22,7 +22,6 @@ int read_int(const char *filename);
 
 int wait_for_file_removal(const char * file_path);
 int get_last_file(const char * file_path);
-int request_media(const char * file_path);
 
 int get_last_snapshot(void);
 int get_last_video(void);
@@ -33,6 +32,7 @@ int request_video(void);
 int gpio_export(int pin);
 int gpio_unexport(int pin);
 int gpio_direction(int pin, int dir);
+int gpio_active(int pin);
 int gpio_read(int pin);
 int gpio_write(int pin, int value);
 

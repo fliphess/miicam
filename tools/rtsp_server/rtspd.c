@@ -289,14 +289,14 @@ int start_recording(void)
     VideoRecorder.fh = fopen(VideoRecorder.file_path, "wb");
     if (VideoRecorder.fh == NULL) {
         log_error("Failed to open file %s", VideoRecorder.file_path);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     // * Write filename of last video to file
     FILE *last_video_path = fopen(LAST_VIDEO_PATH, "wb");
     if (last_video_path == NULL) {
         log_error("Failed to open file: %s", LAST_VIDEO_PATH);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     fputs(VideoRecorder.file_path, last_video_path);
@@ -306,7 +306,7 @@ int start_recording(void)
     VideoRecorder.recording = 1;
     VideoRecorder.waiting_for_keyframe = 1;
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -326,7 +326,7 @@ int stop_recording(void)
     VideoRecorder.recording = 0;
     VideoRecorder.file_path[0] = '\0';
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 int init_recording(void) {
@@ -335,12 +335,12 @@ int init_recording(void) {
         FILE *last_video_path = fopen(LAST_VIDEO_PATH, "wb");
         if (last_video_path == NULL) {
             log_error("Failed to open file: %s", LAST_VIDEO_PATH);
-            return EXIT_FAILURE;
+            return -1;
         }
         fputs("unknown", last_video_path);
         fclose(last_video_path);
     }
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
@@ -354,9 +354,9 @@ static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
     ret = gm_set_cap_motion(cap_vch, &cap_motion);
     if (ret < 0) {
         log_error("Failed to run gm_set_cap_motion");
-        return EXIT_FAILURE;
+        return -1;
     }
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -384,7 +384,7 @@ static int set_interesting_area(int ch)
     mdt_alg.mb_cell_en = (unsigned char *)malloc(sizeof(unsigned char) * mb_w_num * mb_h_num);
     if (mdt_alg.mb_cell_en == NULL) {
         log_error("Failed to allocate mb_cell_en");
-        ret = EXIT_FAILURE;
+        ret = -1;
         goto err_ext;
     }
 
@@ -412,7 +412,7 @@ static int set_interesting_area(int ch)
 
     if (ret != 0) {
         log_error("Failed to execute motion_detection_update");
-        ret = EXIT_FAILURE;
+        ret = -1;
         goto err_ext;
     }
 
@@ -430,13 +430,13 @@ int init_snapshot(void)
         FILE *fd = fopen(LAST_SNAPSHOT_PATH, "wb");
         if (fd == NULL) {
             log_error("Failed to open file %s", LAST_SNAPSHOT_PATH);
-            return EXIT_FAILURE;
+            return -1;
         }
         fputs("unknown", fd);
         fclose(fd);
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 void take_snapshot(void)

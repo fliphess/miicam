@@ -18,23 +18,31 @@
  */
 int ircut_init(void)
 {
-    /*
-     * Enable GPIO pins
-     */
-    if (gpio_export(GPIO_PIN_14) == EXIT_FAILURE || gpio_export(GPIO_PIN_15) == EXIT_FAILURE) {
-        fprintf(stderr, "*** Error: Failed to export ir cut gpio pins!\n");
-        return EXIT_FAILURE;
+    if (gpio_active(GPIO_PIN_14) < 0) {
+        if (gpio_export(GPIO_PIN_14) < 0) {
+            fprintf(stderr, "*** Error: Failed to export gpio pin 14!\n");
+            return -1;
+        }
+
+        if (gpio_direction(GPIO_PIN_14, OUT) < 0) {
+            fprintf(stderr, "*** Error: Failed to set directions for gpio pin 14!\n");
+            return -1;
+        }
     }
 
-    /*
-     * Set gpio_ directions
-     */
-    if (gpio_direction(GPIO_PIN_14, OUT) == EXIT_FAILURE || gpio_direction(GPIO_PIN_15, OUT) == EXIT_FAILURE) {
-        fprintf(stderr, "*** Error: Failed to set directions for ir cut gpio pins!\n");
-        return EXIT_FAILURE;
+    if (gpio_active(GPIO_PIN_15) < 0) {
+        if (gpio_export(GPIO_PIN_15) < 0) {
+            fprintf(stderr, "*** Error: Failed to export gpio pin 15!\n");
+            return -1;
+        }
+
+        if (gpio_direction(GPIO_PIN_15, OUT) < 0) {
+            fprintf(stderr, "*** Error: Failed to set directions for gpio pin 14!\n");
+            return -1;
+        }
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -43,17 +51,17 @@ int ircut_init(void)
  */
 int ircut_end(void)
 {
-    if (gpio_unexport(GPIO_PIN_14) == EXIT_FAILURE) {
+    if (gpio_unexport(GPIO_PIN_14) < 0) {
         fprintf(stderr, "*** Error: Failed to unexport %s", GPIO_PIN_14);
-        return EXIT_FAILURE;
+        return -1;
     }
 
-    if (gpio_unexport(GPIO_PIN_15) == EXIT_FAILURE) {
+    if (gpio_unexport(GPIO_PIN_15) < 0) {
         fprintf(stderr, "*** Error: Failed to unexport %s", GPIO_PIN_15);
-        return EXIT_FAILURE;
+        return -1;
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -62,19 +70,20 @@ int ircut_end(void)
  */
 int ircut_status(void)
 {
-    int pin_0_status = gpio_read(GPIO_PIN_14);
-    int pin_1_status = gpio_read(GPIO_PIN_15);
+    int pin_14_status = gpio_read(GPIO_PIN_14);
+    int pin_15_status = gpio_read(GPIO_PIN_15);
 
-    if (pin_0_status == 1 && pin_1_status == 0) {
+    if (pin_14_status == 1 && pin_15_status == 0) {
         fprintf(stdout, "*** IR Cut is on\n");
     }
-    else if (pin_0_status == 0 && pin_1_status == 1) {
+    else if (pin_14_status == 0 && pin_15_status == 1) {
         fprintf(stdout, "*** IR Cut is off\n");
     } else {
-        fprintf(stdout, "*** IR Cut is UNKNOWN: pin 0: %d, ping 1: %d\n", pin_0_status, pin_1_status);
+        fprintf(stdout, "*** IR Cut is UNKNOWN: pin14: %d, pin15: %d\n", pin_14_status, pin_15_status);
+        return -1;
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 
@@ -83,22 +92,23 @@ int ircut_status(void)
  */
 int ircut_status_json(void)
 {
-    int pin_0_status = gpio_read(GPIO_PIN_14);
-    int pin_1_status = gpio_read(GPIO_PIN_15);
+    int pin_14_status = gpio_read(GPIO_PIN_14);
+    int pin_15_status = gpio_read(GPIO_PIN_15);
 
-    if (pin_0_status == 1 && pin_1_status == 0) {
-        fprintf(stdout, "{\"ir_cut\":1,\"pin0\":%d,\"pin1\":%d}", pin_0_status, pin_1_status);
+    if (pin_14_status == 1 && pin_15_status == 0) {
+        fprintf(stdout, "{\"ir_cut\":1,\"pin14\":%d,\"pin15\":%d}", pin_14_status, pin_15_status);
     }
 
-    else if (pin_0_status == 0 && pin_1_status == 1) {
-        fprintf(stdout, "{\"ir_cut\":0,\"pin0\":%d,\"pin1\":%d}", pin_0_status, pin_1_status);
+    else if (pin_14_status == 0 && pin_15_status == 1) {
+        fprintf(stdout, "{\"ir_cut\":0,\"pin14\":%d,\"pin15\":%d}", pin_14_status, pin_15_status);
     }
 
     else {
-        fprintf(stdout, "{\"error\":1,\"pin0\":%d,\"pin1\":%d}", pin_0_status, pin_1_status);
+        fprintf(stdout, "{\"error\":1,\"pin14\":%d,\"pin15\":%d}", pin_14_status, pin_15_status);
+        return -1;
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 
@@ -107,12 +117,12 @@ int ircut_status_json(void)
  */
 int ircut_on(void)
 {
-    if (gpio_write(GPIO_PIN_14, 1) == EXIT_FAILURE || gpio_write(GPIO_PIN_15, 0) == EXIT_FAILURE) {
+    if (gpio_write(GPIO_PIN_14, 1) < 0 || gpio_write(GPIO_PIN_15, 0) < 0) {
         fprintf(stderr, "*** Error: Failed write to gpio pins!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }
 
 /*
@@ -120,10 +130,10 @@ int ircut_on(void)
  */
 int ircut_off(void)
 {
-    if (gpio_write(GPIO_PIN_14, 0) == EXIT_FAILURE || gpio_write(GPIO_PIN_15, 1) == EXIT_FAILURE) {
+    if (gpio_write(GPIO_PIN_14, 0) < 0 || gpio_write(GPIO_PIN_15, 1) < 0) {
         fprintf(stderr, "*** Error: Failed write to gpio pins!\n");
-        return(EXIT_FAILURE);
+        return(-1);
     }
 
-    return(EXIT_SUCCESS);
+    return(0);
 }

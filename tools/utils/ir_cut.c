@@ -71,17 +71,15 @@ int main(int argc, char *argv[])
 
     if (enable)
         success = ircut_on();
-
     else if (disable)
         success = ircut_off();
     else if (status)
         success = ircut_status();
     else if (json)
         success = ircut_status_json();
-    else 
+    else
         print_usage();
 
-    ircut_end();
     return success;
 }
 

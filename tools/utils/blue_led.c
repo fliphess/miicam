@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    int success = EXIT_SUCCESS;
+    int success = 0;
 
     if (enable)
         success = blue_led_on();

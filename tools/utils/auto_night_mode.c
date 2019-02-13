@@ -83,7 +83,7 @@ void signal_handler(int sig)
 
     isp328_end();
 
-    exit(EXIT_SUCCESS);
+    exit(0);
 }
 
 int main(int argc, char *argv[])
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
     if (!lowest_ev_value && !lowest_ir_value && !switch_led && !switch_nm) {
         print_usage();
-        return EXIT_FAILURE;
+        return -1;
     }
 
     // * Don't allow a delay below 3
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
     if (isp328_init() < 0) {
         fprintf(stderr, "*** Error: ISP328 initialization failed");
-        return EXIT_FAILURE;
+        return -1;
     }
 
     // * Catch all signals
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
         last_ev_value = light_info.ev;
         last_ir_value = light_info.ir;
 
-        // * Check EV values and switch on night mode 
+        // * Check EV values and switch on night mode
         if (light_info.ev < lowest_ev_value) {
             if (!nightmode_is_on) {
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
             if (nightmode_is_on) {
                 if (verbose == 1)
                     fprintf(stderr, "*** Disable night mode triggered: ev=(%d,%d)\n", light_info.ev, lowest_ev_value);
-                
+
                 if (switch_nm)
                     disable_nightmode();
             }
@@ -199,5 +199,5 @@ int main(int argc, char *argv[])
         sleep(delay);
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }

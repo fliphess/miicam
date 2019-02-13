@@ -27,7 +27,7 @@ int pwm_init(void)
 
     if ((pwm_fd = open(PWM_DEVICE_NAME, O_RDWR)) < 0) {
         fprintf(stderr, "*** Error: Failed to open %s\n", PWM_DEVICE_NAME);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     memset(&pwm[0], 0, sizeof(pwm_info_t));
@@ -59,7 +59,7 @@ int pwm_init(void)
     ioctl(pwm_fd, PWM_IOCTL_UPDATE,   &pwm[1].id);
     ioctl(pwm_fd, PWM_IOCTL_START,    &pwm[1].id);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -68,11 +68,11 @@ int pwm_init(void)
  */
 int pwm_is_initialized(void)
 {
-    if ( fcntl(pwm_fd, F_GETFD) == -1 ) {
+    if ( fcntl(pwm_fd, F_GETFD) < 0 ) {
         fprintf(stderr, "*** Error: PWM Library is uninitialized.\n");
-        return EXIT_FAILURE;
+        return -1;
     }
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -82,9 +82,9 @@ int pwm_is_initialized(void)
 int pwm_end(void)
 {
     if ( close(pwm_fd) > 0 )
-        return EXIT_SUCCESS;
+        return 0;
     else
-        return EXIT_FAILURE;
+        return -1;
 }
 
 
@@ -106,15 +106,15 @@ void pwm_set(unsigned int val)
 int ir_led_set(unsigned int val)
 {
     if (pwm_is_initialized() < 0)
-        return EXIT_FAILURE;
+        return -1;
 
     if (val <= 0xff) {
         fprintf(stderr, "*** Setting IR led to %d\n", val);
         pwm_set(val);
-        return EXIT_SUCCESS;
+        return 0;
     } else
         fprintf(stderr, "*** Error: Use a value in between 0-255\n");
-        return EXIT_FAILURE;
+        return -1;
 }
 
 
@@ -150,10 +150,10 @@ int ir_led_status(void)
 
     if (pwm[0].duty_ratio > 0) {
         fprintf(stdout, "*** IR Led is on\n");
-        return EXIT_SUCCESS;
+        return 0;
     } else {
         fprintf(stdout, "*** IR Led is off\n");
-        return EXIT_FAILURE;
+        return -1;
     }
 }
 
@@ -175,7 +175,7 @@ int ir_led_info(void)
     printf("  Duty: %d\n", pwm[0].duty_ratio);
     printf("*************************\n");
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 
@@ -189,5 +189,5 @@ int ir_led_info_json(void)
 
     ioctl(pwm_fd, PWM_IOCTL_GET_INFO, &pwm[0]);
     printf("{\"id\":%d,\"source\":%d,\"frequency\":%d,\"step\":%d,\"duty\":%d}", pwm[0].id, pwm[0].clksrc, pwm[0].freq, pwm[0].duty_steps, pwm[0].duty_ratio);
-    return EXIT_SUCCESS;
+    return 0;
 }
