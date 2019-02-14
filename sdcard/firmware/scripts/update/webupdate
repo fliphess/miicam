@@ -1,4 +1,5 @@
 #!/bin/sh
+INPUT="$1"
 
 PATH="/tmp/sd/firmware/scripts/update:$PATH"
 
@@ -54,6 +55,13 @@ checksum()
 
 main()
 {
+    if [ "$INPUT" != "--update" ]
+    then
+        echo "Usage: $0 --update"
+        echo "Update the web interface if needed"
+        exit 0
+    fi
+
     ## Get versions of current and latest
     local LATEST_VERSION="$(  webversion --latest  )" || die "Failed to retrieve the tag of the latest version"
     local CURRENT_VERSION="$( webversion --current )" || die "Failed to retrieve the tag of the current version"
