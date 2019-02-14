@@ -75,6 +75,7 @@ all:                                 \
 	sdcard/config.cfg                \
 	sdcard/manufacture.bin           \
 	sdcard/firmware/etc/os-release   \
+	$(BUILDDIR)/audio_playback       \
 	$(BUILDDIR)/rtspd                \
 	$(BUILDDIR)/zlib                 \
 	$(BUILDDIR)/libxml2              \
@@ -117,6 +118,24 @@ $(SOURCEDIR):
 
 $(PREFIXDIR)/bin:
 	@mkdir -p $(PREFIXDIR)/bin
+
+
+#################################################################
+## Audio playback                                              ##
+#################################################################
+
+$(BUILDDIR)/audio_playback: $(PREFIXDIR)/bin
+	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
+	cd $(RTSPDDIR)        \
+	&& $(TARGET)-gcc      \
+		-DLOG_USE_COLOR   \
+		-Wall             \
+		-I$(GMLIBDIR)/inc \
+		-L$(GMLIBDIR)/lib \
+		$(GMLIBDIR)/audio_playback.c \
+		-lpthread -lm -lrt -lgm -o $(TOOLSDIR)/bin/audio_playback \
+	&& $(TARGET)-strip $(TOOLSDIR)/bin/audio_playback
+	@touch $@
 
 
 #################################################################
