@@ -49,7 +49,7 @@ function get_password() {
 ###############################################
 
 function renew_make() {
-    for file in Makefile OUTPUT.mk SOURCES.mk ; do
+    for file in Makefile tools/make/*.mk ; do
         test -f /result/$file && cp -v /result/$file /env/$file
     done
 }
@@ -84,7 +84,7 @@ function upload_binary() {
     fi
 
     get_password
-    scp "$FILENAME" root@$CAMERA_HOSTNAME:
+    scp "$FILENAME" root@$CAMERA_HOSTNAME:/tmp/sd/firmware/bin
 }
 
 
