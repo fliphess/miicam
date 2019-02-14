@@ -56,7 +56,7 @@ fi
 ## Disable the others (will be changed using restore state if required)
 ${SD_MOUNTDIR}/firmware/bin/yellow_led -d
 ${SD_MOUNTDIR}/firmware/bin/ir_led -d
-${SD_MOUNTDIR}/firmware/bin/ir_led -d
+${SD_MOUNTDIR}/firmware/bin/ir_cut -d
 
 ####################################
 ## Restore settings               ##
