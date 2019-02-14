@@ -14,11 +14,10 @@ int last_ev_value   = 0;
 int lowest_ev_value = 0;
 
 int last_ir_value   = 0;
-int lowest_ir_value = 0;
+int highest_ir_value = 0;
 
 int switch_led      = 0;
 int switch_nm       = 0;
-
 int delay           = 0;
 int verbose         = 0;
 
@@ -31,7 +30,7 @@ static void print_usage(void)
         "\nAvailable options:\n"
         "  -d  (int)  delay in seconds (default: 10)\n"
         "  -e  (int)  lowest EV value\n"
-        "  -i  (int)  lowest IR value\n"
+        "  -i  (int)  highest IR value\n"
         "  -l  (bool) switch IR led\n"
         "  -n  (bool) switch night mode\n"
         "  -v  be verbose\n"
@@ -100,7 +99,7 @@ int main(int argc, char *argv[])
                 lowest_ev_value = atoi(optarg);
                 break;
             case 'i':
-                lowest_ir_value = atoi(optarg);
+                highest_ir_value = atoi(optarg);
                 break;
             case 'l':
                 switch_led = 1;
@@ -118,12 +117,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!lowest_ev_value && !lowest_ir_value && !switch_led && !switch_nm) {
+    if (!lowest_ev_value && !highest_ir_value && !switch_led && !switch_nm) {
         print_usage();
         return -1;
     }
 
-    // * Don't allow a delay below 3
+    // * Don't allow a delay below 3 (because we <3 delay)
     if (delay < 3)
         delay = 3;
 
@@ -165,7 +164,6 @@ int main(int argc, char *argv[])
                     enable_nightmode();
             }
         }
-
         else if (light_info.ev >= lowest_ev_value) {
             if (nightmode_is_on) {
                 if (verbose == 1)
@@ -177,19 +175,26 @@ int main(int argc, char *argv[])
         }
 
         // * Check IR values and switch on IR led
-        if (light_info.ir < lowest_ir_value) {
+        // * Follow requested guidelines:
+        // *
+        // * When the IR value is over N the IR led is switched ON
+        // * When the IR value is below N the IR led is switch OFF
+        // *
+        // * See: https://github.com/miicam/MiiCam/issues/1
+
+        if (light_info.ir >= highest_ir_value) {
             if (!led_is_on) {
                 if (verbose == 1)
-                    fprintf(stderr, "*** Enable IR led triggered: ir=(%d,%d)\n", light_info.ir, lowest_ir_value);
+                    fprintf(stderr, "*** Enable IR led triggered: ir=(%d >= %d)\n", light_info.ir, highest_ir_value);
 
                 if (switch_led)
                     enable_led();
             }
         }
-        else if (light_info.ir >= lowest_ir_value) {
+        else if (light_info.ir < highest_ir_value) {
             if (led_is_on) {
                 if (verbose == 1)
-                    fprintf(stderr, "*** Disable IR led triggered: ir=(%d,%d)\n", light_info.ir, lowest_ir_value);
+                    fprintf(stderr, "*** Disable IR led triggered: ir=(%d < %d)\n", light_info.ir, highest_ir_value);
 
                 if (switch_led)
                     disable_led();
