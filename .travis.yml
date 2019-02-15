@@ -1,3 +1,4 @@
+
 sudo: required
 dist: xenial
 services:
@@ -10,6 +11,9 @@ before_install:
 script:
 - docker run -i -v "$(pwd):/result" --detach=false --tty=true miicam/miicam /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz /result/'
 
+after_success:
+  - test $TRAVIS_EVENT_TYPE = "cron" && bash tools/dev/nightly-build.sh
+
 notifications:
   email: false
   webhooks:
@@ -18,12 +22,6 @@ notifications:
     on_success: change
     on_failure: always
     on_start: never
-
-before_deploy:
-- git config --local user.name "Travis Releases Build Bot"
-- git config --local user.email "spam@fliphess.com"
-- git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
-
 
 deploy:
   provider: releases
