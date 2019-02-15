@@ -4,7 +4,7 @@
 
 LIBJPEGVERSION := 1.5.3
 LIBJPEGARCHIVE := libjpeg-turbo-$(LIBJPEGVERSION).tar.gz
-LIBJPEGURI     := http://prdownloads.sourceforge.net/libjpeg-turbo/$(LIBJPEGARCHIVE)
+LIBJPEGURI     := https://downloads.sourceforge.net/project/libjpeg-turbo/$(LIBJPEGVERSION)/$(LIBJPEGARCHIVE)
 
 #################################################################
 ##                                                             ##

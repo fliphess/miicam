@@ -4,7 +4,7 @@
 
 LIBPCAPVERSION := 1.9.0
 LIBPCAPARCHIVE := libpcap-$(LIBPCAPVERSION).tar.gz
-LIBPCAPURI     := http://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
+LIBPCAPURI     := https://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
 
 TCPDUMPVERSION := 4.9.2
 TCPDUMPARCHIVE := tcpdump-$(TCPDUMPVERSION).tar.gz

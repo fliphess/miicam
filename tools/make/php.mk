@@ -4,7 +4,7 @@
 
 PHPVERSION := 7.2.12
 PHPARCHIVE := php-$(PHPVERSION).tar.bz2
-PHPURI     := http://php.net/get/$(PHPARCHIVE)/from/this/mirror
+PHPURI     := https://php.net/get/$(PHPARCHIVE)/from/this/mirror
 
 
 #################################################################

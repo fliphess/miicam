@@ -4,7 +4,7 @@ PATH         := $(TOOLCHAINDIR):$(PATH)
 TARGET       := arm-unknown-linux-uclibcgnueabi
 PROCS        := 7
 
-DOWNLOADCMD := wget -t 5 -T 10 -c -O
+DOWNLOADCMD := curl -qs -L --retry 10 --output
 
 BUILDENV :=                 \
 	AR=$(TARGET)-ar         \

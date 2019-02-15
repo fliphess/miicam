@@ -4,7 +4,7 @@
 
 WGETVERSION := 1.18
 WGETARCHIVE := wget-$(WGETVERSION).tar.gz
-WGETURI     := http://ftp.gnu.org/gnu/wget/$(WGETARCHIVE)
+WGETURI     := https://ftp.gnu.org/gnu/wget/$(WGETARCHIVE)
 
 
 #################################################################
