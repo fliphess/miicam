@@ -4,9 +4,6 @@ set -e -o pipefail
 ## Install miniconda
 ##
 
-echo "*** Installing anaconda-client"
-pip install anaconda-client
-
 echo "*** Uploading nightly build to anaconda cloud"
 
 export VERSION="$( date +%Y.%m.%d )"
