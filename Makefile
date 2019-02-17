@@ -4,7 +4,7 @@ PATH         := $(TOOLCHAINDIR):$(PATH)
 TARGET       := arm-unknown-linux-uclibcgnueabi
 PROCS        := 7
 
-DOWNLOADCMD := curl -qs -L --retry 10 --output
+DOWNLOADCMD := curl -qs --http1.1 -L --retry 10 --output
 
 BUILDENV :=                 \
 	AR=$(TARGET)-ar         \
@@ -302,9 +302,9 @@ clean:
 	&& echo "*** Removing directories with build artifacts" \
 	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(WEBCONTENTDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR) \
 	\
-	&& echo "Removing all own-brewed binaries" \
+	&& echo "*** Removing all own-brewed binaries" \
 	&& find $(TOOLSDIR)/bin -maxdepth 1 -type f -delete \
 	\
-	&& echo "Removing all self-brewed libraries" \
+	&& echo "*** Removing all self-brewed libraries" \
 	&& find $(TOOLSDIR)/lib -maxdepth 1 -type f -name '*.so' -delete
 
