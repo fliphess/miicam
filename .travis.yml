@@ -1,8 +1,12 @@
 
 sudo: required
 dist: xenial
+language: python
+
+
 services:
 - docker
+
 before_install:
 - docker ps -a
 - docker pull quay.io/miicam/miicam
@@ -12,7 +16,7 @@ script:
 - docker run -i -v "$(pwd):/result" --detach=false --tty=true miicam/miicam /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz /result/'
 
 after_success:
-  - test $TRAVIS_EVENT_TYPE = "cron" && sudo pip install anaconda-client && bash tools/dev/nightly-build.sh
+  - test $TRAVIS_EVENT_TYPE = "cron" && bash tools/dev/nightly-build.sh
 
 notifications:
   email: false

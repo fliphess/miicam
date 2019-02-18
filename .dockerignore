@@ -1,5 +1,6 @@
 .git/
 .gitignore
+.github
 .dockerignore
 .travis.yml
 Dockerfile
