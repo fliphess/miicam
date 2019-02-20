@@ -4,6 +4,7 @@ src
 tools/bin/*
 tools/lib/*.so
 tools/lib/*.o
+tools/dev/host.cfg
 sdcard/firmware/bin/*
 sdcard/manufacture.bin
 sdcard/log

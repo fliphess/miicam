@@ -7,7 +7,10 @@
 # This is a library with helper functions for repeating tasks while developing
 # It can be used to quickly rebuild and upload several daemons.
 
-export CAMERA_HOSTNAME="camera3"
+if [ -f tools/dev/host.cfg ]
+then
+    export CAMERA_HOSTNAME="$( cat tools/dev/host.cfg )"
+fi
 
 export TOOLCHAINDIR="/usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin"
 export PATH="${TOOLCHAINDIR}:${PATH}:$HOME/.composer/vendor/mediamonks/composer-vendor-cleaner/bin"
