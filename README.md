@@ -1,5 +1,10 @@
 [![Build Status](https://travis-ci.org/miicam/MiiCam.svg?branch=master)](https://travis-ci.org/miicam/MiiCam)
 [![Docker Repository on Quay](https://quay.io/repository/miicam/miicam/status "Docker Repository on Quay")](https://quay.io/repository/miicam/miicam)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/MiiCam/MiiCam.svg)
+![GitHub issues](https://img.shields.io/github/issues-raw/MiiCam/MiiCam.svg)
+![GitHub All Releases](https://img.shields.io/github/downloads/MiiCam/MiiCam/total.svg)
+[![Anaconda-Server Badge](https://anaconda.org/miicam/miicam-nightly/badges/version.svg)](https://anaconda.org/miicam/miicam-nightly/files)
+
 
 # MiiCam hack project
 
