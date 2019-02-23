@@ -132,8 +132,9 @@ if [ -n "${ROOT_PASSWORD}" ]
 then
     echo "*** Setting root password... "
     echo "root:${ROOT_PASSWORD}" | chpasswd
+    echo "admin:${ROOT_PASSWORD}" | chpasswd
 else
-    echo "WARN: root password must be set for SSH and or Telnet"
+    echo "WARN: root password must be set for SSH and or Telnet access"
 fi
 
 

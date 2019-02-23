@@ -1,0 +1,5 @@
+# /etc/shells: valid login shells
+/bin/sh
+/tmp/sd/firmware/bin/bash
+/bin/ash
+/bin/busybox
