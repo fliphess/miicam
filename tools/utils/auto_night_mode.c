@@ -9,7 +9,7 @@
 
 int led_is_on       = 0;
 int nightmode_is_on = 0;
-int ir_cut_is_on    = 0;
+int ircut_is_on     = 0;
 
 int last_ev_value   = 0;
 int lowest_ev_value = 0;
@@ -80,7 +80,7 @@ void disable_led(void)
 
 void enable_ircut(void)
 {
-    ir_cut_is_on = 0;
+    ircut_is_on = 0;
     if (verbose == 1)
         fprintf(stderr, "*** Turning on IR cut\n");
 
@@ -89,7 +89,7 @@ void enable_ircut(void)
 
 void disable_ircut(void)
 {
-    ir_cut_is_on = 0;
+    ircut_is_on = 0;
     if (verbose == 1)
         fprintf(stderr, "*** Turning off IR cut\n");
 
@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
                     enable_led();
 
                 if (switch_ic)
-                    disable_ir_cut();
+                    disable_ircut();
             }
         }
         else if (light_info.ir < highest_ir_value) {
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
                     disable_led();
 
                 if (switch_ic)
-                    enable_ir_cut();
+                    enable_ircut();
             }
         }
 
