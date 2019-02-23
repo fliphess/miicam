@@ -9,6 +9,7 @@
 
 int led_is_on       = 0;
 int nightmode_is_on = 0;
+int ir_cut_is_on    = 0;
 
 int last_ev_value   = 0;
 int lowest_ev_value = 0;
@@ -18,6 +19,7 @@ int highest_ir_value = 0;
 
 int switch_led      = 0;
 int switch_nm       = 0;
+int switch_ic       = 0;
 int delay           = 0;
 int verbose         = 0;
 
@@ -33,6 +35,7 @@ static void print_usage(void)
         "  -i  (int)  highest IR value\n"
         "  -l  (bool) switch IR led\n"
         "  -n  (bool) switch night mode\n"
+        "  -c  (bool) switch IR Cut\n"
         "  -v  be verbose\n"
     );
 
@@ -75,6 +78,24 @@ void disable_led(void)
     system("/tmp/sd/firmware/bin/ir_led -d");
 }
 
+void enable_ircut(void)
+{
+    ir_cut_is_on = 0;
+    if (verbose == 1)
+        fprintf(stderr, "*** Turning on IR cut\n");
+
+    system("/tmp/sd/firmware/bin/ir_cut -e");
+}
+
+void disable_ircut(void)
+{
+    ir_cut_is_on = 0;
+    if (verbose == 1)
+        fprintf(stderr, "*** Turning off IR cut\n");
+
+    system("/tmp/sd/firmware/bin/ir_cut -d");
+}
+
 void signal_handler(int sig)
 {
     if (verbose == 1)
@@ -107,6 +128,9 @@ int main(int argc, char *argv[])
             case 'n':
                 switch_nm = 1;
                 break;
+            case 'c':
+                switch_ic = 1;
+                break;
             case 'v':
                 verbose = 1;
                 break;
@@ -117,7 +141,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!lowest_ev_value && !highest_ir_value && !switch_led && !switch_nm) {
+    if (!lowest_ev_value && !highest_ir_value && !switch_led && !switch_nm && !switch_ic) {
         print_usage();
         return -1;
     }
@@ -189,6 +213,9 @@ int main(int argc, char *argv[])
 
                 if (switch_led)
                     enable_led();
+
+                if (switch_ic)
+                    disable_ir_cut();
             }
         }
         else if (light_info.ir < highest_ir_value) {
@@ -198,6 +225,9 @@ int main(int argc, char *argv[])
 
                 if (switch_led)
                     disable_led();
+
+                if (switch_ic)
+                    enable_ir_cut();
             }
         }
 
