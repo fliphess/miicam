@@ -16,6 +16,7 @@ THIRD_PARTY_BINS :=				\
 	scp	dbclient dropbearkey	\
 	sftp-server 				\
 	arm-php	arm-php-cgi			\
+	bash						\
 	ffmpeg ffprobe				\
 	openssl						\
 	procan socat filan			\
@@ -114,6 +115,7 @@ THIRD_PARTY_LIBS :=				\
 
 ## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
 THIRD_PARTY_LIB_EXTRAS :=		\
+	bash                        \
 	libjq.so					\
 	libjq.so.1					\
 	libonig.so					\

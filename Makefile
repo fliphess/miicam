@@ -85,6 +85,7 @@ all:                                 \
 	$(BUILDDIR)/x264                 \
 	$(BUILDDIR)/ncurses              \
 	$(BUILDDIR)/readline             \
+	$(BUILDDIR)/bash                 \
 	$(BUILDDIR)/wget                 \
 	$(BUILDDIR)/dosfstools           \
 	$(BUILDDIR)/libpcap              \
@@ -208,7 +209,7 @@ $(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
 
 
 #################################################################
-##                                                             ##
+## Firmware config                                             ##
 #################################################################
 
 sdcard/config.cfg:
@@ -234,6 +235,7 @@ include tools/make/libpopt.mk
 include tools/make/h264.mk
 include tools/make/ncurses.mk
 include tools/make/readline.mk
+include tools/make/bash.mk
 include tools/make/dosfstools.mk
 include tools/make/tcpdump.mk
 include tools/make/openssl.mk
