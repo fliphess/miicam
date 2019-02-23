@@ -3,8 +3,8 @@
 #################################################################
 
 LIBPNGVERSION := 1.6.36
-LIBPNGARCHIVE := libpng-$(LIBPNGVERSION).tar.gz
-LIBPNGURI     := https://prdownloads.sourceforge.net/libpng/$(LIBPNGARCHIVE)
+LIBPNGARCHIVE := v$(LIBPNGVERSION).tar.gz
+LIBPNGURI     := https://github.com/glennrp/libpng/archive/$(LIBPNGARCHIVE)
 
 
 #################################################################
@@ -19,7 +19,7 @@ $(SOURCEDIR)/$(LIBPNGARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/libpng: $(SOURCEDIR)/$(LIBPNGARCHIVE)
+$(BUILDDIR)/libpng: $(SOURCEDIR)/$(LIBPNGARCHIVE) $(BUILDDIR)/zlib
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPNGVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIBPNGARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(LIBPNGVERSION)			&& \
