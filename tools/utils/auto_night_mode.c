@@ -64,6 +64,7 @@ void enable_led(void)
         fprintf(stderr, "*** Turning off IR led\n");
 
     system("/tmp/sd/firmware/bin/ir_led -e");
+    system("/tmp/sd/firmware/bin/ir_cut -d");
 }
 
 void disable_led(void)
@@ -73,6 +74,7 @@ void disable_led(void)
         fprintf(stderr, "*** Turning off IR led\n");
 
     system("/tmp/sd/firmware/bin/ir_led -d");
+    system("/tmp/sd/firmware/bin/ir_cut -e");
 }
 
 void signal_handler(int sig)
