@@ -34,8 +34,6 @@ $(BUILDDIR)/bash: $(SOURCEDIR)/$(BASHARCHIVE) $(BUILDDIR)/readline
 		make -j$(PROCS)						&& \
 		make -j$(PROCS) install 			&& \
 	rm $(PREFIXDIR)/lib/bash/Makefile.inc   && \
-	$(TARGET)-strip $(PREFIXDIR)/lib/bash/* && \
-	cp -r $(PREFIXDIR)/lib/bash $(LIBRARIESDIR)
 	@rm -rf $@-$(BASHVERSION)
 	@touch $@
 
