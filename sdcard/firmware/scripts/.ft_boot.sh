@@ -18,19 +18,31 @@ fi
 export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 export SD_MOUNTDIR=/tmp/sd
 
-if [ -f "${SD_MOUNTDIR}/config.cfg" ]
+if [ ! -f "${SD_MOUNTDIR}/config.cfg" ]
 then
-    . "${SD_MOUNTDIR}/config.cfg"
-else
-    echo "Config not found! Running normal boot!" | tee -a "${LOGFILE}"
+    echo "Config not found, starting normal boot sequence." | tee -a "${LOGFILE}"
     echo 0 > /tmp/ft_mode
     do_vg_boot
     exit
 fi
 
+
+## Load the config file
+. "${SD_MOUNTDIR}/config.cfg"
+
+if [ "${?}" -ne 0 ]
+then
+    echo "Failed to load ${SD_MOUNTDIR}/config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
+    echo 0 > /tmp/ft_mode
+    do_vg_boot
+    exit
+fi
+
+
+## Bail out if disabled in configuration
 if [ "${DISABLE_HACK}" -eq 1 ]
 then
-    echo "Hack disabled, proceed with default start" | tee -a "${LOGFILE}"
+    echo "Hack disabled in config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
     echo 0 > /tmp/ft_mode
     do_vg_boot
     exit
