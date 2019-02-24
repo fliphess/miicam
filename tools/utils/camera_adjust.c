@@ -6,6 +6,18 @@
 #include "chuangmi_isp328.h"
 
 
+struct CommandLineArguments
+{
+    unsigned int get;
+    unsigned int set;
+    unsigned int type;
+    unsigned int info;
+    unsigned int json;
+    unsigned int shell;
+    unsigned int reset;
+} cli = {0, 0, 0, 0, 0, 0, 0};
+
+
 static void print_usage_and_exit(void)
 {
     printf("Usage:\n");
@@ -34,15 +46,6 @@ static void print_usage_and_exit(void)
 int main(int argc, char *argv[])
 {
     int opt;
-    int get   = 0;
-    int set   = 0;
-    int type  = 0;
-
-    int info  = 0;
-    int json  = 0;
-    int shell = 0;
-
-    int reset = 0;
 
     char *setting;
     unsigned int value;
@@ -51,27 +54,27 @@ int main(int argc, char *argv[])
         switch (opt)
         {
             case 'g':
-                get = 1;
+                cli.get = 1;
                 break;
             case 's':
-                set = 1;
+                cli.set = 1;
                 value = atoi(optarg);
                 break;
             case 't':
-                type = 1;
+                cli.type = 1;
                 setting = optarg;
                 break;
             case 'i':
-                info = 1;
+                cli.info = 1;
                 break;
             case 'j':
-                json = 1;
+                cli.json = 1;
                 break;
             case 'k':
-                shell = 1;
+                cli.shell = 1;
                 break;
             case 'r':
-                reset = 1;
+                cli.reset = 1;
                 break;
             default:
                 print_usage_and_exit();
@@ -79,11 +82,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (get + set + info + json + shell + reset == 0) {
+    if (cli.get + cli.set + cli.info + cli.json + cli.shell + cli.reset == 0) {
         print_usage_and_exit();
     }
 
-    if (get + set + json + info + shell + reset > 1) {
+    if (cli.get + cli.set + cli.json + cli.info + cli.shell + cli.reset > 1) {
         fprintf(stderr, "Use either -j, -i, -k, -r, -g or -s but not more then one!\n");
         print_usage_and_exit();
     }
@@ -93,54 +96,54 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (reset) {
+    if (cli.reset) {
         return reset_camera_adjustments();
     }
 
-    if (info)
+    if (cli.info)
         return print_camera_info();
 
-    if (json)
+    if (cli.json)
         return print_camera_info_json();
 
-    if (shell)
+    if (cli.shell)
         return print_camera_info_shell();
 
     int success;
     if (strcmp(setting, "brightness") == 0) {
-        if (set == 1)
+        if (cli.set == 1)
             success = brightness_set(value);
-        else if (get == 1)
+        else if (cli.get == 1)
             success = brightness_print();
     }
     else if (strcmp(setting, "contrast") == 0) {
-        if (set == 1)
+        if (cli.set == 1)
             success = contrast_set(value);
-        else if (get == 1)
+        else if (cli.get == 1)
             success = contrast_print();
     }
     else if (strcmp(setting, "hue") == 0) {
-        if (set == 1)
+        if (cli.set == 1)
             success = hue_set(value);
-        else if (get == 1)
+        else if (cli.get == 1)
             success = hue_print();
     }
     else if (strcmp(setting, "saturation") == 0) {
-        if (set == 1)
+        if (cli.set == 1)
             success = saturation_set(value);
-        else if (get == 1)
+        else if (cli.get == 1)
             success = saturation_print();
     }
     else if (strcmp(setting, "denoise") == 0) {
-        if (set == 1)
+        if (cli.set == 1)
             success = denoise_set(value);
-        else if (get == 1)
+        else if (cli.get == 1)
             success = denoise_print();
     }
     else if (strcmp(setting, "sharpness") == 0) {
-        if (set == 1)
+        if (cli.set == 1)
             success = sharpness_set(value);
-        else if (get == 1)
+        else if (cli.get == 1)
             success = sharpness_print();
     }
     else {

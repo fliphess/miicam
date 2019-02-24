@@ -7,7 +7,8 @@
 #include "chuangmi_isp328.h"
 
 
-struct CommandLineArguments {
+struct CommandLineArguments
+{
     unsigned int ev_value;
     unsigned int ir_value;
     unsigned int ir_led;
@@ -18,7 +19,8 @@ struct CommandLineArguments {
 } cli = {0, 0, 0, 0, 0, 0, 0};
 
 
-struct State {
+struct State
+{
     unsigned int ir_led;
     unsigned int nightmode;
     unsigned int ir_cut;

@@ -5,6 +5,7 @@
 
 #include "chuangmi_isp328.h"
 
+
 static void print_usage(void)
 {
     printf("Usage:\n");
@@ -20,24 +21,29 @@ static void print_usage(void)
 }
 
 
+struct CommandLineArguments
+{
+    unsigned int enable;
+    unsigned int disable;
+    unsigned int status;
+} cli = {0, 0, 0};
+
+
 int main(int argc, char *argv[])
 {
     int opt;
-    int enable  = 0;
-    int disable = 0;
-    int status  = 0;
 
     while ((opt = getopt(argc, argv, "eds")) != -1) {
         switch (opt)
         {
             case 'e':
-                enable = 1;
+                cli.enable = 1;
                 break;
             case 'd':
-                disable = 1;
+                cli.disable = 1;
                 break;
             case 's':
-                status = 1;
+                cli.status = 1;
                 break;
             default:
                 fprintf(stderr, "*** Error: unknown option: %c\n", optopt);
@@ -46,12 +52,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!enable && !disable && !status) {
+    if (!cli.enable && !cli.disable && !cli.status) {
         print_usage();
         return EXIT_FAILURE;
     }
 
-    if ((enable + disable + status > 1)) {
+    if ((cli.enable + cli.disable + cli.status > 1)) {
         print_usage();
         return EXIT_FAILURE;
     }
@@ -62,11 +68,11 @@ int main(int argc, char *argv[])
     }
 
     int success;
-    if (enable)
+    if (cli.enable)
         success = flipmode_on();
-    else if (disable)
+    else if (cli.disable)
         success = flipmode_off();
-    else if (status)
+    else if (cli.status)
         success = flipmode_status();
 
     isp328_end();
