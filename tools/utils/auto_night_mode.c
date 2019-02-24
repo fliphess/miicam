@@ -7,21 +7,24 @@
 #include "chuangmi_isp328.h"
 
 
-int led_is_on       = 0;
-int nightmode_is_on = 0;
-int ircut_is_on     = 0;
+struct CommandLineArguments {
+    unsigned int ev_value;
+    unsigned int ir_value;
+    unsigned int ir_led;
+    unsigned int nightmode;
+    unsigned int ir_cut;
+    unsigned int delay;
+    unsigned int verbose;
+} cli = {0, 0, 0, 0, 0, 0, 0};
 
-int last_ev_value   = 0;
-int lowest_ev_value = 0;
 
-int last_ir_value   = 0;
-int highest_ir_value = 0;
-
-int switch_led      = 0;
-int switch_nm       = 0;
-int switch_ic       = 0;
-int delay           = 0;
-int verbose         = 0;
+struct State {
+    unsigned int ir_led;
+    unsigned int nightmode;
+    unsigned int ir_cut;
+    unsigned int ev_value;
+    unsigned int ir_value;
+} state = {0, 0, 0, 0, 0};
 
 
 static void print_usage(void)
@@ -44,8 +47,8 @@ static void print_usage(void)
 
 void enable_nightmode(void)
 {
-    nightmode_is_on = 1;
-    if (verbose == 1)
+    state.nightmode = 1;
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Turning on nightmode\n");
 
     system("/tmp/sd/firmware/bin/nightmode -e");
@@ -53,8 +56,8 @@ void enable_nightmode(void)
 
 void disable_nightmode(void)
 {
-    nightmode_is_on = 0;
-    if (verbose == 1)
+    state.nightmode = 0;
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Turning off nightmode\n");
 
     system("/tmp/sd/firmware/bin/nightmode -d");
@@ -62,8 +65,8 @@ void disable_nightmode(void)
 
 void enable_led(void)
 {
-    led_is_on = 1;
-    if (verbose == 1)
+    state.ir_led = 1;
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Turning off IR led\n");
 
     system("/tmp/sd/firmware/bin/ir_led -e");
@@ -71,8 +74,8 @@ void enable_led(void)
 
 void disable_led(void)
 {
-    led_is_on = 0;
-    if (verbose == 1)
+    state.ir_led = 0;
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Turning off IR led\n");
 
     system("/tmp/sd/firmware/bin/ir_led -d");
@@ -80,8 +83,8 @@ void disable_led(void)
 
 void enable_ircut(void)
 {
-    ircut_is_on = 0;
-    if (verbose == 1)
+    state.ir_cut = 0;
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Turning on IR cut\n");
 
     system("/tmp/sd/firmware/bin/ir_cut -e");
@@ -89,8 +92,8 @@ void enable_ircut(void)
 
 void disable_ircut(void)
 {
-    ircut_is_on = 0;
-    if (verbose == 1)
+    state.ir_cut = 0;
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Turning off IR cut\n");
 
     system("/tmp/sd/firmware/bin/ir_cut -d");
@@ -98,7 +101,7 @@ void disable_ircut(void)
 
 void signal_handler(int sig)
 {
-    if (verbose == 1)
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Exiting auto_night_mode: CTRL+C pressed, or exit requested\n");
 
     isp328_end();
@@ -114,25 +117,25 @@ int main(int argc, char *argv[])
         switch (opt)
         {
             case 'd':
-                delay = atoi(optarg);
+                cli.delay = atoi(optarg);
                 break;
             case 'e':
-                lowest_ev_value = atoi(optarg);
+                cli.ev_value = atoi(optarg);
                 break;
             case 'i':
-                highest_ir_value = atoi(optarg);
+                cli.ir_value = atoi(optarg);
                 break;
             case 'l':
-                switch_led = 1;
+                cli.ir_led = 1;
                 break;
             case 'n':
-                switch_nm = 1;
+                cli.nightmode = 1;
                 break;
             case 'c':
-                switch_ic = 1;
+                cli.ir_cut = 1;
                 break;
             case 'v':
-                verbose = 1;
+                cli.verbose = 1;
                 break;
             default:
                 fprintf(stderr, "*** Error: unknown option: %c\n", optopt);
@@ -141,14 +144,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!lowest_ev_value && !highest_ir_value && !switch_led && !switch_nm && !switch_ic) {
+    if (!cli.ev_value && !cli.ir_value && !cli.ir_led && !cli.nightmode && !cli.ir_cut) {
         print_usage();
         return -1;
     }
 
     // * Don't allow a delay below 3 (because we <3 delay)
-    if (delay < 3)
-        delay = 3;
+    if (cli.delay < 3)
+        cli.delay = 3;
 
     if (isp328_init() < 0) {
         fprintf(stderr, "*** Error: ISP328 initialization failed");
@@ -160,7 +163,7 @@ int main(int argc, char *argv[])
     signal(SIGHUP,  signal_handler);
     signal(SIGTERM, signal_handler);
 
-    if (verbose == 1)
+    if (cli.verbose == 1)
         fprintf(stderr, "*** Auto nightmode started\n");
 
     while(1) {
@@ -169,31 +172,31 @@ int main(int argc, char *argv[])
             sleep(5);
         }
 
-        if (last_ev_value != light_info.ev || last_ir_value != light_info.ir) {
-            if (verbose == 1)
+        if (state.ev_value != light_info.ev || state.ir_value != light_info.ir) {
+            if (cli.verbose == 1)
                 fprintf(stderr, "*** Nightmode values changed: ev=%d ir=%d\n", light_info.ev, light_info.ir);
         }
 
-        last_ev_value = light_info.ev;
-        last_ir_value = light_info.ir;
+        state.ev_value = light_info.ev;
+        state.ir_value = light_info.ir;
 
         // * Check EV values and switch on night mode
-        if (light_info.ev < lowest_ev_value) {
-            if (!nightmode_is_on) {
+        if (light_info.ev < cli.ev_value) {
+            if (!state.nightmode) {
 
-                if (verbose == 1)
-                    fprintf(stderr, "*** Enable night mode triggered: ev=(%d,%d)\n", light_info.ev, lowest_ev_value);
+                if (cli.verbose == 1)
+                    fprintf(stderr, "*** Enable night mode triggered: ev=(%d,%d)\n", light_info.ev, cli.ev_value);
 
-                if (switch_nm)
+                if (cli.nightmode)
                     enable_nightmode();
             }
         }
-        else if (light_info.ev >= lowest_ev_value) {
-            if (nightmode_is_on) {
-                if (verbose == 1)
-                    fprintf(stderr, "*** Disable night mode triggered: ev=(%d,%d)\n", light_info.ev, lowest_ev_value);
+        else if (light_info.ev >= cli.ev_value) {
+            if (state.nightmode) {
+                if (cli.verbose == 1)
+                    fprintf(stderr, "*** Disable night mode triggered: ev=(%d,%d)\n", light_info.ev, cli.ev_value);
 
-                if (switch_nm)
+                if (cli.nightmode)
                     disable_nightmode();
             }
         }
@@ -206,32 +209,32 @@ int main(int argc, char *argv[])
         // *
         // * See: https://github.com/miicam/MiiCam/issues/1
 
-        if (light_info.ir >= highest_ir_value) {
-            if (!led_is_on) {
-                if (verbose == 1)
-                    fprintf(stderr, "*** Enable IR led triggered: ir=(%d >= %d)\n", light_info.ir, highest_ir_value);
+        if (light_info.ir >= cli.ir_value) {
+            if (!state.ir_led) {
+                if (cli.verbose == 1)
+                    fprintf(stderr, "*** Enable IR led triggered: ir=(%d >= %d)\n", light_info.ir, cli.ir_value);
 
-                if (switch_led)
+                if (cli.ir_led)
                     enable_led();
 
-                if (switch_ic)
+                if (cli.ir_cut)
                     disable_ircut();
             }
         }
-        else if (light_info.ir < highest_ir_value) {
-            if (led_is_on) {
-                if (verbose == 1)
-                    fprintf(stderr, "*** Disable IR led triggered: ir=(%d < %d)\n", light_info.ir, highest_ir_value);
+        else if (light_info.ir < cli.ir_value) {
+            if (state.ir_led) {
+                if (cli.verbose == 1)
+                    fprintf(stderr, "*** Disable IR led triggered: ir=(%d < %d)\n", light_info.ir, cli.ir_value);
 
-                if (switch_led)
+                if (cli.ir_led)
                     disable_led();
 
-                if (switch_ic)
+                if (cli.ir_cut)
                     enable_ircut();
             }
         }
 
-        sleep(delay);
+        sleep(cli.delay);
     }
 
     return 0;
