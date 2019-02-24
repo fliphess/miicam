@@ -13,6 +13,8 @@ THIRD_PARTY_SBINS :=			\
 
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=				\
+	clear infocmp tabs tic		\
+	toe tput tset				\
 	scp	dbclient dropbearkey	\
 	sftp-server 				\
 	arm-php	arm-php-cgi			\
@@ -32,6 +34,9 @@ THIRD_PARTY_BINS :=				\
 
 ## Extra tools and symlinks that should not be stripped but copied too
 THIRD_PARTY_BIN_EXTRAS :=		\
+	captoinfo					\
+	infotocap					\
+	reset						\
 	rview						\
 	vimdiff						\
 	ex							\

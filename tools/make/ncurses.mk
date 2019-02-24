@@ -31,9 +31,10 @@ $(BUILDDIR)/ncurses: $(SOURCEDIR)/$(NCURSESARCHIVE)
 			--without-debug				\
 			--without-ada				\
 			--with-default-terminfo=/usr/share/terminfo \
-			--with-terminfo-dirs="/etc/terminfo:/lib/terminfo:/usr/share/terminfo:/usr/lib/terminfo" && \
+			--with-terminfo-dirs="/etc/terminfo:/lib/terminfo:/usr/share/terminfo:/usr/lib/terminfo" \
+			--disable-stripping         && \
 		make -j$(PROCS)					&& \
-		make -j$(PROCS) install.libs install.includes
+		make -j$(PROCS) install
 	@rm -rf $@-$(NCURSESVERSION)
 	@touch $@
 
