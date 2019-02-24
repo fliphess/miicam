@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 {
     int opt;
 
-    while ((opt = getopt(argc, argv, "d:e:i:lnv")) != -1) {
+    while ((opt = getopt(argc, argv, "d:e:i:lcnv")) != -1) {
         switch (opt)
         {
             case 'd':
