@@ -113,7 +113,7 @@ THIRD_PARTY_LIBS :=				\
 	mod_wstunnel.so
 
 
-## The symlinks to library files that are linked and should be copied to firmware/lib but not stripped
+## The symlinks to library files that should be copied to firmware/lib but not stripped
 THIRD_PARTY_LIB_EXTRAS :=		\
 	libjq.so					\
 	libjq.so.1					\
