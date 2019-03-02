@@ -50,7 +50,7 @@ get_topic() {
 
 led_blue_status()
 {
-    mqtt_send "${MQTT_TOPIC}/leds/blue" "$( /tmp/sd/firmware/bin/blue_led -s | last_f )"
+    mqtt_send "${MQTT_TOPIC}/leds/blue" "$( blue_led --status | last_f )"
 }
 
 led_blue_set()
@@ -60,13 +60,13 @@ led_blue_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning blue led on"
-        /tmp/sd/firmware/bin/blue_led -e
+        blue_led --enable
         mqtt_send "${MQTT_TOPIC}/leds/blue" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning blue led off"
-        /tmp/sd/firmware/bin/blue_led -d
+        blue_led --disable
         mqtt_send "${MQTT_TOPIC}/leds/blue" "${MQTT_OFF}"
     fi
 }
@@ -78,7 +78,7 @@ led_blue_set()
 
 led_yellow_status()
 {
-     mqtt_send "${MQTT_TOPIC}/leds/yellow" "$( /tmp/sd/firmware/bin/yellow_led -s | last_f )"
+     mqtt_send "${MQTT_TOPIC}/leds/yellow" "$( yellow_led --status | last_f )"
 }
 
 led_yellow_set()
@@ -88,13 +88,13 @@ led_yellow_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning yellow led on"
-        /tmp/sd/firmware/bin/yellow_led -e
+        yellow_led --enable
         mqtt_send "${MQTT_TOPIC}/leds/yellow" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning yellow led off"
-        /tmp/sd/firmware/bin/yellow_led -d
+        yellow_led --disable
         mqtt_send "${MQTT_TOPIC}/leds/yellow" "${MQTT_OFF}"
     fi
 }
@@ -106,8 +106,8 @@ led_yellow_set()
 
 led_ir_status()
 {
-    mqtt_send "${MQTT_TOPIC}/leds/ir"      "$( /tmp/sd/firmware/bin/ir_led -s | last_f )"
-    mqtt_send "${MQTT_TOPIC}/leds/ir/json" "$( /tmp/sd/firmware/bin/ir_led -j )"
+    mqtt_send "${MQTT_TOPIC}/leds/ir"      "$( ir_led --status | last_f )"
+    mqtt_send "${MQTT_TOPIC}/leds/ir/json" "$( ir_led --json )"
 }
 
 led_ir_set()
@@ -117,13 +117,13 @@ led_ir_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning ir led on"
-        /tmp/sd/firmware/bin/ir_led -e
+        ir_led --enable
         mqtt_send "${MQTT_TOPIC}/leds/ir" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning ir led off"
-        /tmp/sd/firmware/bin/ir_led -d
+        ir_led --disable
         mqtt_send "${MQTT_TOPIC}/leds/ir" "${MQTT_OFF}"
     fi
 }
@@ -134,8 +134,8 @@ led_ir_set()
 
 ir_cut_status()
 {
-     mqtt_send "${MQTT_TOPIC}/ir_cut"      "$( /tmp/sd/firmware/bin/ir_cut -s | last_f )"
-     mqtt_send "${MQTT_TOPIC}/ir_cut/json" "$( /tmp/sd/firmware/bin/ir_cut -j )"
+     mqtt_send "${MQTT_TOPIC}/ir_cut"      "$( ir_cut --status | last_f )"
+     mqtt_send "${MQTT_TOPIC}/ir_cut/json" "$( ir_cut --json )"
 }
 
 ir_cut_set()
@@ -145,13 +145,13 @@ ir_cut_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning IR cut to on"
-        /tmp/sd/firmware/bin/ir_cut -e
+        ir_cut --enable
         mqtt_send "${MQTT_TOPIC}/ir_cut" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
     log "MQTT Action: Turning IR cut to off"
-        /tmp/sd/firmware/bin/ir_cut -d
+        ir_cut --disable
         mqtt_send "${MQTT_TOPIC}/ir_cut" "${MQTT_OFF}"
     fi
 }
@@ -163,7 +163,7 @@ ir_cut_set()
 
 mirror_mode_status()
 {
-     mqtt_send "${MQTT_TOPIC}/mirror" "$( /tmp/sd/firmware/bin/mirrormode -s | last_f )"
+     mqtt_send "${MQTT_TOPIC}/mirror" "$( mirrormode --status | last_f )"
 }
 
 
@@ -174,13 +174,13 @@ mirror_mode_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
     log "MQTT Action: Setting mirror mode to ${VALUE}"
-        /tmp/sd/firmware/bin/mirrormode -e
+        mirrormode --enable
         mqtt_send "${MQTT_TOPIC}/mirror_mode" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Setting mirror mode to ${VALUE}"
-        /tmp/sd/firmware/bin/mirrormode -d
+        mirrormode --disable
         mqtt_send "${MQTT_TOPIC}/mirror_mode" "${MQTT_OFF}"
     fi
 }
@@ -192,8 +192,8 @@ mirror_mode_set()
 
 night_mode_status()
 {
-    mqtt_send "${MQTT_TOPIC}/night_mode"      "$( /tmp/sd/firmware/bin/nightmode -s | last_f )"
-    mqtt_send "${MQTT_TOPIC}/night_mode/json" "$( /tmp/sd/firmware/bin/nightmode -j )"
+    mqtt_send "${MQTT_TOPIC}/night_mode"      "$( nightmode --status | last_f )"
+    mqtt_send "${MQTT_TOPIC}/night_mode/json" "$( nightmode --json )"
 }
 
 night_mode_set()
@@ -203,13 +203,13 @@ night_mode_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Setting night mode to ${VALUE}"
-        /tmp/sd/firmware/bin/nightmode -e
+        nightmode --enable
         mqtt_send "${MQTT_TOPIC}/night_mode" "${MQTT_OFF}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Setting night mode to ${VALUE}"
-        /tmp/sd/firmware/bin/nightmode -d
+        nightmode --disable
         mqtt_send "${MQTT_TOPIC}/night_mode" "${MQTT_OFF}"
     fi
 }
@@ -220,7 +220,7 @@ night_mode_set()
 
 flip_mode_status()
 {
-    mqtt_send "${MQTT_TOPIC}/flip_mode" "$( /tmp/sd/firmware/bin/flipmode -s | last_f )"
+    mqtt_send "${MQTT_TOPIC}/flip_mode" "$( flipmode --status | last_f )"
 }
 
 flip_mode_set()
@@ -230,13 +230,13 @@ flip_mode_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Setting flip mode to ${VALUE}"
-        /tmp/sd/firmware/bin/flipmode -e
+        flipmode --enable
         mqtt_send "${MQTT_TOPIC}/flip_mode" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Setting flip mode to ${VALUE}"
-        /tmp/sd/firmware/bin/flipmode -d
+        flipmode --disable
         mqtt_send "${MQTT_TOPIC}/flip_mode" "${MQTT_OFF}"
     fi
 }
@@ -247,7 +247,7 @@ flip_mode_set()
 
 brightness_status()
 {
-    mqtt_send "${MQTT_TOPIC}/brightness" "$( /tmp/sd/firmware/bin/camera_adjust -t brightness -g | last_f )"
+    mqtt_send "${MQTT_TOPIC}/brightness" "$( camera_adjust -t brightness -g | last_f )"
 }
 
 brightness_set()
@@ -255,7 +255,7 @@ brightness_set()
     local VALUE="${1}"
 
     log "MQTT Action: Setting brightness to ${VALUE}"
-    /tmp/sd/firmware/bin/camera_adjust -t brightness -s "${VALUE}"
+    camera_adjust -t brightness -s "${VALUE}"
 
     brightness_status
 }
@@ -266,7 +266,7 @@ brightness_set()
 
 contrast_status()
 {
-    mqtt_send "${MQTT_TOPIC}/contrast" "$( /tmp/sd/firmware/bin/camera_adjust -t contrast -g | last_f )"
+    mqtt_send "${MQTT_TOPIC}/contrast" "$( camera_adjust -t contrast -g | last_f )"
 }
 
 contrast_set()
@@ -274,7 +274,7 @@ contrast_set()
     local VALUE="${1}"
 
     log "MQTT Action: Setting contrast to ${VALUE}"
-    /tmp/sd/firmware/bin/camera_adjust -t contrast -s "${VALUE}"
+    camera_adjust -t contrast -s "${VALUE}"
 
     contrast_status
 }
@@ -285,7 +285,7 @@ contrast_set()
 
 hue_status()
 {
-    mqtt_send "${MQTT_TOPIC}/hue" "$( /tmp/sd/firmware/bin/camera_adjust -t hue -g | last_f )"
+    mqtt_send "${MQTT_TOPIC}/hue" "$( camera_adjust -t hue -g | last_f )"
 }
 
 hue_set()
@@ -293,7 +293,7 @@ hue_set()
     local VALUE="${1}"
 
     log "MQTT Action: Setting hue to ${VALUE}"
-    /tmp/sd/firmware/bin/camera_adjust -t hue -s "${VALUE}"
+    camera_adjust -t hue -s "${VALUE}"
 
     hue_status
 }
@@ -304,7 +304,7 @@ hue_set()
 
 saturation_status()
 {
-    mqtt_send "${MQTT_TOPIC}/saturation" "$( /tmp/sd/firmware/bin/camera_adjust -t saturation -g | last_f )"
+    mqtt_send "${MQTT_TOPIC}/saturation" "$( camera_adjust -t saturation -g | last_f )"
 }
 
 saturation_set()
@@ -312,7 +312,7 @@ saturation_set()
     local VALUE="${1}"
 
     log "MQTT Action: Setting saturation to ${VALUE}"
-    /tmp/sd/firmware/bin/camera_adjust -t saturation -s "${VALUE}"
+    camera_adjust -t saturation -s "${VALUE}"
 
     saturation_set
 }
@@ -323,7 +323,7 @@ saturation_set()
 
 denoise_status()
 {
-    mqtt_send "${MQTT_TOPIC}/denoise" "$( /tmp/sd/firmware/bin/camera_adjust -t denoise -g | last_f )"
+    mqtt_send "${MQTT_TOPIC}/denoise" "$( camera_adjust -t denoise -g | last_f )"
 }
 
 denoise_set()
@@ -331,7 +331,7 @@ denoise_set()
     local VALUE="${1}"
 
     log "MQTT Action: Setting denoise to ${VALUE}"
-    /tmp/sd/firmware/bin/camera_adjust -t denoise -s "${VALUE}"
+    camera_adjust -t denoise -s "${VALUE}"
 
     denoise_status
 }
@@ -342,7 +342,7 @@ denoise_set()
 
 sharpness_status()
 {
-    mqtt_send "${MQTT_TOPIC}/sharpness" "$( /tmp/sd/firmware/bin/camera_adjust -t sharpness -g | last_f )"
+    mqtt_send "${MQTT_TOPIC}/sharpness" "$( camera_adjust -t sharpness -g | last_f )"
 }
 
 sharpness_set()
@@ -350,7 +350,7 @@ sharpness_set()
     local VALUE="${1}"
 
     log "MQTT Action: Setting sharpness to ${VALUE}"
-    /tmp/sd/firmware/bin/camera_adjust -t sharpness -s "${VALUE}"
+    camera_adjust -t sharpness -s "${VALUE}"
 
     sharpness_status
 }
@@ -433,7 +433,7 @@ get_led_status()
 get_camera_status()
 {
     log "MQTT Action: Sending camera settings"
-    mqtt_send "${MQTT_TOPIC}/camera/settings" "$( /tmp/sd/firmware/bin/camera_adjust -j )"
+    mqtt_send "${MQTT_TOPIC}/camera/settings" "$( camera_adjust -j )"
 }
 
 
@@ -444,7 +444,7 @@ get_camera_status()
 snapshot_get()
 {
     log "MQTT Action: Requesting video recording"
-    mqtt_send "${MQTT_TOPIC}/recording" "$( /tmp/sd/firmware/bin/take_video 2> /dev/null | last_f )"
+    mqtt_send "${MQTT_TOPIC}/recording" "$( take_video 2> /dev/null | last_f )"
 }
 
 
@@ -455,7 +455,7 @@ snapshot_get()
 recording_get()
 {
     log "MQTT Action: Requesting snapshot"
-    mqtt_send "${MQTT_TOPIC}/snapshot" "$( /tmp/sd/firmware/bin/take_snapshot 2> /dev/null | last_f )"
+    mqtt_send "${MQTT_TOPIC}/snapshot" "$( take_snapshot 2> /dev/null | last_f )"
 }
 
 
