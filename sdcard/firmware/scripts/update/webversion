@@ -2,6 +2,14 @@
 INPUT="$1"
 FILE="$2"
 
+## Set the curl command depending on local or camera
+if [ "$( uname -m )" == "armv5tel" ]
+then
+    CURL='curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -qs '
+else
+    CURL='curl -qs '
+fi
+
 fileversion()
 {
     local FILENAME="$1"
@@ -18,7 +26,6 @@ fileversion()
 }
 
 
-
 current()
 {
     ## Get version for web ui
@@ -26,9 +33,25 @@ current()
 }
 
 
+nightly()
+{
+    ## Get the latest nightly build of the web interface from anaconda
+    TAG="$( ${CURL} https://api.anaconda.org/package/MiiCam/MiiCamWeb/files | jq -r '. | to_entries[] .value.version'  | sort | tail -n 1 )"
+
+    if [ "x$TAG" == "x" ]
+    then
+        echo "Tag not found!"
+        exit 1
+    else
+        echo "$TAG"
+        exit 0
+    fi
+}
+
+
 latest()
 {
-    TAG="$( curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.tag_name' )"
+    TAG="$( ${CURL} https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.tag_name' )"
 
     if [ "x$TAG" == "x" ]
     then
@@ -44,7 +67,7 @@ latest()
 usage()
 {
     echo "Retrieve the latest or current version tag of the web ui"
-    echo "Usage: $0 [--latest|--current|--file]"
+    echo "Usage: $0 [--latest|--current|--nightly|--file]"
     exit 0
 }
 
@@ -54,6 +77,9 @@ main()
     if [ "$INPUT" == "--current" ]
     then
         current
+    elif [ "$INPUT" == "--nightly" ]
+    then
+        nightly
     elif [ "$INPUT" == "--latest" ]
     then
         latest
