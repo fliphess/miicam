@@ -74,6 +74,7 @@ all:                                 \
 	website                          \
 	sdcard/config.cfg                \
 	sdcard/manufacture.bin           \
+	sdcard/firmware/etc/os-release   \
 	$(BUILDDIR)/rtspd                \
 	$(BUILDDIR)/zlib                 \
 	$(BUILDDIR)/libxml2              \
@@ -220,6 +221,9 @@ sdcard/config.cfg:
 
 sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
+
+sdcard/firmware/etc/os-release:
+	$(TOPDIR)/tools/dev/print-version tee $@
 
 
 #################################################################
