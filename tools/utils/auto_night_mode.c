@@ -3,102 +3,51 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include <popt.h>
 
 #include "chuangmi_isp328.h"
 
-
 struct CommandLineArguments
 {
-    unsigned int ev_value;
-    unsigned int ir_value;
-    unsigned int ir_led;
-    unsigned int nightmode;
-    unsigned int ir_cut;
-    unsigned int delay;
-    unsigned int verbose;
-} cli = {0, 0, 0, 0, 0, 0, 0};
+    int ir_on;
+    int ir_off;
 
+    int ev_on;
+    int ev_off;
+
+    int ir_cut;
+    int ir_led;
+
+    int delay;
+    int verbose;
+} cli = {0, 0, 0, 0, 0, 0, 0, 0};
 
 struct State
 {
-    unsigned int ir_led;
-    unsigned int nightmode;
-    unsigned int ir_cut;
     unsigned int ev_value;
     unsigned int ir_value;
-} state = {0, 0, 0, 0, 0};
+} state = {0, 0};
 
-
-static void print_usage(void)
+void enable_darkness_mode(void)
 {
-    printf("Usage:\n");
-    printf("   auto_night_mode [-d|-e|-i|-l|-n|-v]\n");
-    printf(
-        "\nAvailable options:\n"
-        "  -d  (int)  delay in seconds (default: 10)\n"
-        "  -e  (int)  lowest EV value\n"
-        "  -i  (int)  highest IR value\n"
-        "  -l  (bool) switch IR led\n"
-        "  -n  (bool) switch night mode\n"
-        "  -c  (bool) switch IR Cut\n"
-        "  -v  be verbose\n"
-    );
-
-    exit(EXIT_FAILURE);
-}
-
-void enable_nightmode(void)
-{
-    state.nightmode = 1;
     if (cli.verbose == 1)
-        fprintf(stderr, "*** Turning on nightmode\n");
+        fprintf(stderr, "*** Enabling darkness mode\n");
 
     system("/tmp/sd/firmware/bin/nightmode -e");
+
+    if (cli.ir_led) system("/tmp/sd/firmware/bin/ir_led -e");
+    if (cli.ir_cut) system("/tmp/sd/firmware/bin/ir_cut -d");
 }
 
-void disable_nightmode(void)
+void disable_darkness_mode(void)
 {
-    state.nightmode = 0;
     if (cli.verbose == 1)
-        fprintf(stderr, "*** Turning off nightmode\n");
+        fprintf(stderr, "*** Disabling darkness mode\n");
 
     system("/tmp/sd/firmware/bin/nightmode -d");
-}
 
-void enable_led(void)
-{
-    state.ir_led = 1;
-    if (cli.verbose == 1)
-        fprintf(stderr, "*** Turning off IR led\n");
-
-    system("/tmp/sd/firmware/bin/ir_led -e");
-}
-
-void disable_led(void)
-{
-    state.ir_led = 0;
-    if (cli.verbose == 1)
-        fprintf(stderr, "*** Turning off IR led\n");
-
-    system("/tmp/sd/firmware/bin/ir_led -d");
-}
-
-void enable_ircut(void)
-{
-    state.ir_cut = 0;
-    if (cli.verbose == 1)
-        fprintf(stderr, "*** Turning on IR cut\n");
-
-    system("/tmp/sd/firmware/bin/ir_cut -e");
-}
-
-void disable_ircut(void)
-{
-    state.ir_cut = 0;
-    if (cli.verbose == 1)
-        fprintf(stderr, "*** Turning off IR cut\n");
-
-    system("/tmp/sd/firmware/bin/ir_cut -d");
+    if (cli.ir_led) system("/tmp/sd/firmware/bin/ir_led -d");
+    if (cli.ir_cut) system("/tmp/sd/firmware/bin/ir_cut -e");
 }
 
 void signal_handler(int sig)
@@ -111,45 +60,48 @@ void signal_handler(int sig)
     exit(0);
 }
 
+
 int main(int argc, char *argv[])
 {
-    int opt;
+    poptContext pc;
+    struct poptOption po[] = {
+        {"ir-on",  'p', POPT_ARG_INT, &cli.ir_on,  90,   "IR on",  "The IR on value "},
+        {"ir-off", 'q', POPT_ARG_INT, &cli.ir_off, 1000, "IR off", "The IR off value"},
+        {"ev-on",  'r', POPT_ARG_INT, &cli.ev_on,  30,   "EV on",  "The EV on value"},
+        {"ev-off", 's', POPT_ARG_INT, &cli.ev_off, 100,  "EV off", "The EV off value"},
 
-    while ((opt = getopt(argc, argv, "d:e:i:lcnv")) != -1) {
-        switch (opt)
-        {
-            case 'd':
-                cli.delay = atoi(optarg);
-                break;
-            case 'e':
-                cli.ev_value = atoi(optarg);
-                break;
-            case 'i':
-                cli.ir_value = atoi(optarg);
-                break;
-            case 'l':
-                cli.ir_led = 1;
-                break;
-            case 'n':
-                cli.nightmode = 1;
-                break;
-            case 'c':
-                cli.ir_cut = 1;
-                break;
-            case 'v':
-                cli.verbose = 1;
-                break;
-            default:
-                fprintf(stderr, "*** Error: unknown option: %c\n", optopt);
-                print_usage();
-                break;
-        }
+        {"set-ircut", 'c', POPT_ARG_NONE, &cli.ir_cut, 0, "Set IR Cut", "Set the IR Cut when darkness mode changes"},
+        {"set-irled", 'l', POPT_ARG_NONE, &cli.ir_led, 0, "Set IR Led", "Set the IR Led when darkness mode changes"},
+
+        {"verbose",   'v', POPT_ARG_NONE, &cli.verbose, 0, "Be verbose", "Be more verbose"},
+        {"delay",     'd', POPT_ARG_INT,  &cli.delay, 0, "Set delay",    "The sleep time between measurements"},
+        POPT_AUTOHELP
+        {NULL}
+    };
+
+    pc = poptGetContext(NULL, argc, (const char **)argv, po, 0);
+    poptSetOtherOptionHelp(pc, "[ARG...]");
+
+    if (argc < 2) {
+        poptPrintUsage(pc, stderr, 0);
+        exit(1);
     }
 
-    if (!cli.ev_value && !cli.ir_value && !cli.ir_led && !cli.nightmode && !cli.ir_cut) {
-        print_usage();
-        return -1;
+    // process options and handle each val returned
+    int val;
+    while ((val = poptGetNextOpt(pc)) >= 0) {
     }
+
+    if (val != -1) {
+        fprintf(stderr, "%s: %s\n", poptBadOption(pc, POPT_BADOPTION_NOALIAS), poptStrerror(val));
+        return 1;
+    }
+
+     // Handle ARG... part of commandline
+     while (poptPeekArg(pc) != NULL) {
+         char *arg = (char*)poptGetArg(pc);
+         printf("poptGetArg returned arg: \"%s\"\n", arg);
+     }
 
     // * Don't allow a delay below 3 (because we <3 delay)
     if (cli.delay < 3)
@@ -176,63 +128,18 @@ int main(int argc, char *argv[])
 
         if (state.ev_value != light_info.ev || state.ir_value != light_info.ir) {
             if (cli.verbose == 1)
-                fprintf(stderr, "*** Nightmode values changed: ev=%d ir=%d\n", light_info.ev, light_info.ir);
-        }
+                fprintf(stderr, "*** New measurements: ev=%d ir=%d\n", light_info.ev, light_info.ir);
 
-        state.ev_value = light_info.ev;
-        state.ir_value = light_info.ir;
+            state.ev_value = light_info.ev;
+            state.ir_value = light_info.ir;
 
-        // * Check EV values and switch on night mode
-        if (light_info.ev < cli.ev_value) {
-            if (!state.nightmode) {
+            int nightmode = nightmode_is_on();
 
-                if (cli.verbose == 1)
-                    fprintf(stderr, "*** Enable night mode triggered: ev=(%d,%d)\n", light_info.ev, cli.ev_value);
-
-                if (cli.nightmode)
-                    enable_nightmode();
+            if (light_info.ev < cli.ev_on && light_info.ir > cli.ir_on && nightmode == 0) {
+                enable_darkness_mode();
             }
-        }
-        else if (light_info.ev >= cli.ev_value) {
-            if (state.nightmode) {
-                if (cli.verbose == 1)
-                    fprintf(stderr, "*** Disable night mode triggered: ev=(%d,%d)\n", light_info.ev, cli.ev_value);
-
-                if (cli.nightmode)
-                    disable_nightmode();
-            }
-        }
-
-        // * Check IR values and switch on IR led
-        // * Follow requested guidelines:
-        // *
-        // * When the IR value is over N the IR led is switched ON
-        // * When the IR value is below N the IR led is switch OFF
-        // *
-        // * See: https://github.com/miicam/MiiCam/issues/1
-
-        if (light_info.ir >= cli.ir_value) {
-            if (!state.ir_led) {
-                if (cli.verbose == 1)
-                    fprintf(stderr, "*** Enable IR led triggered: ir=(%d >= %d)\n", light_info.ir, cli.ir_value);
-
-                if (cli.ir_led)
-                    enable_led();
-
-                if (cli.ir_cut)
-                    disable_ircut();
-            }
-        }
-        else if (light_info.ir < cli.ir_value) {
-            if (state.ir_led) {
-                if (cli.verbose == 1)
-                    fprintf(stderr, "*** Disable IR led triggered: ir=(%d < %d)\n", light_info.ir, cli.ir_value);
-
-                if (cli.ir_led)
-                    disable_led();
-
-                if (cli.ir_cut)
-                    enable_ircut();
+            else if (light_info.ev > cli.ev_off && light_info.ir < cli.ir_off && nightmode == 1) {
+                disable_darkness_mode();
             }
         }
 

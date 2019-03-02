@@ -26,39 +26,39 @@ startup()
 
     source "${STATEFILE}" || die "Failed to source ${STATEFILE}"
 
-    [ "${BLUE_LED}" == "on"  ] && /tmp/sd/firmware/bin/blue_led -e
-    [ "${BLUE_LED}" == "off" ] && /tmp/sd/firmware/bin/blue_led -d
+    [ "${BLUE_LED}" == "on"  ] && blue_led --enable
+    [ "${BLUE_LED}" == "off" ] && blue_led --disable
 
-    [ "${YELLOW_LED}" == "on"  ] && /tmp/sd/firmware/bin/yellow_led -e
-    [ "${YELLOW_LED}" == "off" ] && /tmp/sd/firmware/bin/yellow_led -d
+    [ "${YELLOW_LED}" == "on"  ] && yellow_led --enable
+    [ "${YELLOW_LED}" == "off" ] && yellow_led --disable
 
-    [ "${IR_CUT}" == "on"  ] && /tmp/sd/firmware/bin/ir_cut -e
-    [ "${IR_CUT}" == "off" ] && /tmp/sd/firmware/bin/ir_cut -d
+    [ "${IR_CUT}" == "on"  ] && ir_cut --enable
+    [ "${IR_CUT}" == "off" ] && ir_cut --disable
 
     if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
     then
-        [ "${IR_LED}" == "on"  ] && /tmp/sd/firmware/bin/ir_led -e
-        [ "${IR_LED}" == "off" ] && /tmp/sd/firmware/bin/ir_led -d
+        [ "${IR_LED}" == "on"  ] && ir_led --enable
+        [ "${IR_LED}" == "off" ] && ir_led --disable
 
-        [ "${NIGHT_MODE}"  == "on"  ] && /tmp/sd/firmware/bin/nightmode -e
-        [ "${NIGHT_MODE}"  == "off" ] && /tmp/sd/firmware/bin/nightmode -d
+        [ "${NIGHT_MODE}"  == "on"  ] && nightmode --enable
+        [ "${NIGHT_MODE}"  == "off" ] && nightmode --disable
     fi
 
     if [ "${CEILING_MODE}" -eq 0 ]
     then
-        [ "${FLIP_MODE}"   == "on"  ] && /tmp/sd/firmware/bin/flipmode -e
-        [ "${FLIP_MODE}"   == "off" ] && /tmp/sd/firmware/bin/flipmode -d
+        [ "${FLIP_MODE}"   == "on"  ] && flipmode --enable
+        [ "${FLIP_MODE}"   == "off" ] && flipmode --disable
 
-        [ "${MIRROR_MODE}" == "on"  ] && /tmp/sd/firmware/bin/mirrormode -e
-        [ "${MIRROR_MODE}" == "off" ] && /tmp/sd/firmware/bin/mirrormode -d
+        [ "${MIRROR_MODE}" == "on"  ] && mirrormode --enable
+        [ "${MIRROR_MODE}" == "off" ] && mirrormode --disable
     fi
 
-    [ "${BRIGHTNESS}" ] && /tmp/sd/firmware/bin/camera_adjust -t brightness -s "${BRIGHTNESS}"
-    [ "${CONTRAST}"   ] && /tmp/sd/firmware/bin/camera_adjust -t contrast   -s "${CONTRAST}"
-    [ "${HUE}"        ] && /tmp/sd/firmware/bin/camera_adjust -t hue        -s "${HUE}"
-    [ "${SATURATION}" ] && /tmp/sd/firmware/bin/camera_adjust -t saturation -s "${SATURATION}"
-    [ "${DENOISE}"    ] && /tmp/sd/firmware/bin/camera_adjust -t denoise    -s "${DENOISE}"
-    [ "${SHARPNESS}"  ] && /tmp/sd/firmware/bin/camera_adjust -t sharpness  -s "${SHARPNESS}"
+    [ "${BRIGHTNESS}" ] && camera_adjust -t brightness -s "${BRIGHTNESS}"
+    [ "${CONTRAST}"   ] && camera_adjust -t contrast   -s "${CONTRAST}"
+    [ "${HUE}"        ] && camera_adjust -t hue        -s "${HUE}"
+    [ "${SATURATION}" ] && camera_adjust -t saturation -s "${SATURATION}"
+    [ "${DENOISE}"    ] && camera_adjust -t denoise    -s "${DENOISE}"
+    [ "${SHARPNESS}"  ] && camera_adjust -t sharpness  -s "${SHARPNESS}"
 
 }
 
@@ -69,7 +69,7 @@ startup()
 save_state()
 {
     echo "*** Saving settings for leds and image configuration"
-    /tmp/sd/firmware/bin/camera_adjust -k > /tmp/sd/firmware/etc/restore_state.db
+    camera_adjust -k > /tmp/sd/firmware/etc/restore_state.db
     mode_status --shell >> /tmp/sd/firmware/etc/restore_state.db
     led_status  --shell >> /tmp/sd/firmware/etc/restore_state.db
 }

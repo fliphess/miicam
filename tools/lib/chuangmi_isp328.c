@@ -17,9 +17,6 @@
 // ** ISP 328 Functions                                                    ** //
 // ************************************************************************** //
 
-int isp_fd;
-
-
 /*
  * Initialize the ISP328 device
  */
@@ -131,6 +128,23 @@ int mirrormode_status(void)
 // ************************************************************************** //
 
 /*
+ * Get night mode state (Returns: 1/0)
+ */
+int nightmode_is_on(void)
+{
+    if (isp328_is_initialized() < 0)
+       return -1;
+
+    int mode;
+    ioctl(isp_fd, _IOR(0x6d, 0x0a, int), &mode);
+
+    if (mode == 1)
+        return 1;
+
+    return 0;
+}
+
+/*
  * Set night mode to a value (Valid: 1/0)
  */
 int nightmode_set(int value)
@@ -205,10 +219,9 @@ int nightmode_status(void)
     if (isp328_is_initialized() < 0)
         return -1;
 
-    int mode;
-    ioctl(isp_fd, _IOR(0x6d, 0x0a, int), &mode);
-    fprintf(stdout, "*** Night mode is: %s\n", (mode == 1) ? "on" : "off");
+    int state = nightmode_is_on();
 
+    fprintf(stdout, "*** Night mode is: %s\n", (state == 1) ? "on" : "off");
     return 0;
 }
 

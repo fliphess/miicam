@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <popt.h>
+
 
 #include "chuangmi_led.h"
 
@@ -15,61 +17,39 @@ struct CommandLineArguments
     unsigned int json;
 } cli = {0, 0, 0, 0, 0};
 
-
-static void print_usage(void)
-{
-    printf("Usage:\n");
-    printf("   yellow_led [-e|-d|-b|-s|-j]\n");
-    printf(
-        "\nAvailable options:\n"
-        "  -e    enable\n"
-        "  -d    disable\n"
-        "  -b    blink\n"
-        "  -s    status\n"
-        "  -j    json status\n"
-    );
-
-    exit(EXIT_FAILURE);
-}
-
-
 int main(int argc, char *argv[])
 {
-    int opt;
+    poptContext pc;
+    struct poptOption po[] = {
+        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the yellow led",          "Enable"},
+        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the yellow led",         "Disable"},
+        {"blink",   'b', POPT_ARG_NONE, &cli.blink,   0, "Turn the yellow led to blink",   "Blink"},
+        {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status of the led", "Led Status"},
+        {"json",    'j', POPT_ARG_NONE, &cli.json,    0, "Retrieve the status in json",    "Status Json"},
+        POPT_AUTOHELP
+        {NULL}
+    };
 
-    while ((opt = getopt(argc, argv, "edbsj")) != -1) {
-        switch (opt)
-        {
-        case 'e':
-            cli.enable = 1;
-            break;
-        case 'd':
-            cli.disable = 1;
-            break;
-        case 'b':
-            cli.blink = 1;
-            break;
-        case 's':
-            cli.status = 1;
-            break;
-        case 'j':
-            cli.json = 1;
-            break;
-        default:
-            fprintf(stderr, "*** Error: unknown option: %c\n", optopt);
-            print_usage();
-            break;
-        }
+    pc = poptGetContext(NULL, argc, (const char **)argv, po, 0);
+    poptSetOtherOptionHelp(pc, "[ARG...]");
+
+    if (argc < 2) {
+        poptPrintUsage(pc, stderr, 0);
+        exit(1);
     }
 
-    if (!cli.enable && !cli.disable && !cli.blink && !cli.status && !cli.json) {
-        print_usage();
-        return EXIT_FAILURE;
+    int val;
+    while ((val = poptGetNextOpt(pc)) >= 0) {
+    }
+
+    if (val != -1) {
+        fprintf(stderr, "%s: %s\n", poptBadOption(pc, POPT_BADOPTION_NOALIAS), poptStrerror(val));
+        return 1;
     }
 
     if ((cli.enable + cli.disable + cli.blink + cli.status + cli.json > 1)) {
-        print_usage();
-        return EXIT_FAILURE;
+        poptPrintUsage(pc, stderr, 0);
+        exit(0);
     }
 
     int success = 0;
@@ -89,8 +69,10 @@ int main(int argc, char *argv[])
     else if (cli.json)
         success = yellow_led_status_json();
 
-    else
-        print_usage();
+    else {
+        poptPrintUsage(pc, stderr, 0);
+        exit(0);
+    }
 
     return success;
 }

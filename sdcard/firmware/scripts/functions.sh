@@ -11,7 +11,6 @@ SD_MOUNTDIR="/tmp/sd"
 LOGDIR="${SD_MOUNTDIR}/log"
 LOGFILE="${LOGDIR}/ft_boot.log"
 BASECFG="${SD_MOUNTDIR}/config.cfg"
-CTRL="${SD_MOUNTDIR}/firmware/bin/chuangmi_ctrl"
 
 if [ -f "${BASECFG}" ]
 then
@@ -374,7 +373,7 @@ mqtt_subscribe()
     ## Add generic moquitto options from config.cfg to string
     OPTIONS="${OPTIONS} ${MOSQUITTOOPTS} -v"
 
-    /usr/bin/mosquitto_sub -k 10 ${OPTIONS} -t "${TOPIC}"
+    mosquitto_sub -k 10 ${OPTIONS} -t "${TOPIC}"
 }
 
 
@@ -424,9 +423,9 @@ led_status()
 {
     local ARGS="$1"
 
-    BLUE="$(   /tmp/sd/firmware/bin/blue_led -s   | last_f )"
-    YELLOW="$( /tmp/sd/firmware/bin/yellow_led -s | last_f )"
-    IR_LED="$( /tmp/sd/firmware/bin/ir_led -s     | last_f )"
+    BLUE="$(   blue_led   --status | last_f )"
+    YELLOW="$( yellow_led --status | last_f )"
+    IR_LED="$( ir_led     --status | last_f )"
 
     if [ "$ARGS" == "--json" ]
     then
@@ -450,10 +449,10 @@ mode_status()
 {
     local ARGS="$1"
 
-    NIGHT="$(  /tmp/sd/firmware/bin/nightmode  -s | last_f )"
-    IR_CUT="$( /tmp/sd/firmware/bin/ir_cut     -s | last_f )"
-    MIRROR="$( /tmp/sd/firmware/bin/mirrormode -s | last_f )"
-    FLIP="$(   /tmp/sd/firmware/bin/flipmode   -s | last_f )"
+    NIGHT="$(  nightmode  --status | last_f )"
+    IR_CUT="$( ir_cut     --status | last_f )"
+    MIRROR="$( mirrormode --status | last_f )"
+    FLIP="$(   flipmode   --status | last_f )"
 
     if [ "$ARGS" == "--json" ]
     then

@@ -65,6 +65,7 @@ struct isp_light_info {
 };
 
 struct isp_light_info light_info = {0,0};
+int isp_fd;
 
 int isp328_init(void);
 int isp328_end(void);
@@ -75,6 +76,8 @@ int mirrormode_on(void);
 int mirrormode_off(void);
 int mirrormode_status(void);
 
+int nightmode_is_on(void);
+int nightmode_update_values(void);
 int nightmode_set(int value);
 int nightmode_update_values(void);
 
