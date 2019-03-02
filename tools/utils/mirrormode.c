@@ -2,23 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <popt.h>
+
 
 #include "chuangmi_isp328.h"
-
-
-static void print_usage(void)
-{
-    printf("Usage:\n");
-    printf("   mirrormode [-e|-d|-s]\n");
-    printf(
-        "\nAvailable options:\n"
-        "  -e    enable\n"
-        "  -d    disable\n"
-        "  -s    status\n"
-    );
-
-    exit(EXIT_FAILURE);
-}
 
 
 struct CommandLineArguments
@@ -31,35 +18,40 @@ struct CommandLineArguments
 
 int main(int argc, char *argv[])
 {
-    int opt;
+   poptContext pc;
+    struct poptOption po[] = {
+        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the Mirrormode",  "Enable"},
+        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the Mirrormode", "Disable"},
+        {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",    "Status"},
+        POPT_AUTOHELP
+        {NULL}
+    };
 
-    while ((opt = getopt(argc, argv, "eds")) != -1) {
-        switch (opt)
-        {
-            case 'e':
-                cli.enable = 1;
-                break;
-            case 'd':
-                cli.disable = 1;
-                break;
-            case 's':
-                cli.status = 1;
-                break;
-            default:
-                fprintf(stderr, "*** Error: unknown option: %c\n", optopt);
-                print_usage();
-                break;
-        }
+    pc = poptGetContext(NULL, argc, (const char **)argv, po, 0);
+    poptSetOtherOptionHelp(pc, "[ARG...]");
+
+    if (argc < 2) {
+        poptPrintUsage(pc, stderr, 0);
+        exit(1);
+    }
+
+    int val;
+    while ((val = poptGetNextOpt(pc)) >= 0) {
+    }
+
+    if (val != -1) {
+        fprintf(stderr, "%s: %s\n", poptBadOption(pc, POPT_BADOPTION_NOALIAS), poptStrerror(val));
+        return 1;
     }
 
     if (!cli.enable && !cli.disable && !cli.status) {
-        print_usage();
-        return EXIT_FAILURE;
+        poptPrintUsage(pc, stderr, 0);
+        exit(1);
     }
 
     if ((cli.enable + cli.disable + cli.status > 1)) {
-        print_usage();
-        return EXIT_FAILURE;
+        poptPrintUsage(pc, stderr, 0);
+        exit(1);
     }
 
     if (isp328_init() < 0) {

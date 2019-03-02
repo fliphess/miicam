@@ -2,25 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <popt.h>
+
 
 #include "chuangmi_pwm.h"
-
-
-static void print_usage(void)
-{
-    printf("Usage:\n");
-    printf("   ir_led [-e|-d|-s|-j]\n");
-    printf(
-        "\nAvailable options:\n"
-        "  -e    enable\n"
-        "  -d    disable\n"
-        "  -s    status\n"
-        "  -i    info\n"
-        "  -j    json info\n"
-    );
-
-    exit(EXIT_FAILURE);
-}
 
 
 struct CommandLineArguments
@@ -35,40 +20,41 @@ struct CommandLineArguments
 
 int main(int argc, char *argv[])
 {
-    int opt;
+    poptContext pc;
+    struct poptOption po[] = {
+        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the IR led",         "Enable"},
+        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the IR led",        "Disable"},
+        {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",       "Led Status"},
+        {"info",    'i',  POPT_ARG_NONE, &cli.info,   0, "Retrieve PWM info",         "Info"},
+        {"json",    'j', POPT_ARG_NONE, &cli.json,    0, "Retrieve the info in json", "Status Json"},
+        POPT_AUTOHELP
+        {NULL}
+    };
 
-    while ((opt = getopt(argc, argv, "edsji")) != -1) {
-        switch (opt)
-        {
-        case 'e':
-            cli.enable = 1;
-            break;
-        case 'd':
-            cli.disable = 1;
-            break;
-        case 's':
-            cli.status = 1;
-            break;
-        case 'i':
-            cli.info = 1;
-            break;
-        case 'j':
-            cli.json = 1;
-            break;
-        default:
-            fprintf(stderr, "*** Error: unknown option: -%c\n", optopt);
-            print_usage();
-            break;
-        }
+    pc = poptGetContext(NULL, argc, (const char **)argv, po, 0);
+    poptSetOtherOptionHelp(pc, "[ARG...]");
+
+    if (argc < 2) {
+        poptPrintUsage(pc, stderr, 0);
+        exit(1);
+    }
+
+    int val;
+    while ((val = poptGetNextOpt(pc)) >= 0) {
+    }
+
+    if (val != -1) {
+        fprintf(stderr, "%s: %s\n", poptBadOption(pc, POPT_BADOPTION_NOALIAS), poptStrerror(val));
+        return 1;
     }
 
     if (!cli.enable && !cli.disable && !cli.status && !cli.json && !cli.info) {
-        print_usage();
+        poptPrintUsage(pc, stderr, 0);
         return EXIT_FAILURE;
     }
 
     if ((cli.enable + cli.disable + cli.status + cli.json + cli.info > 1)) {
-        print_usage();
+        poptPrintUsage(pc, stderr, 0);
         return EXIT_FAILURE;
     }
 

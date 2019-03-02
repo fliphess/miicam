@@ -177,19 +177,21 @@ $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/chuangmi_utils
 	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c && \
 	touch $@
 
-$(UTILS): $(PREFIXDIR)/bin $(LIBS)
+$(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
 	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc \
 		-Wall \
 		-o $(TOOLSDIR)/bin/$(@F) $(UTILSDIR)/$(@F).c \
-		-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib \
-		-lchuangmi_ircut  \
-		-lchuangmi_utils  \
-		-lchuangmi_isp328 \
-		-lchuangmi_led    \
-		-lchuangmi_pwm && \
+		-I $(TOOLSDIR)/lib -L$(TOOLSDIR)/lib \
+		-I $(PREFIXDIR)/include -L$(PREFIXDIR)/lib \
+		-l popt            \
+		-l chuangmi_ircut  \
+		-l chuangmi_utils  \
+		-l chuangmi_isp328 \
+		-l chuangmi_led    \
+		-l chuangmi_pwm && \
 	touch $(BUILDDIR)/$(@F)
 
 
