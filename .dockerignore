@@ -1,4 +1,3 @@
-.git/
 .gitignore
 .github
 .dockerignore
@@ -32,3 +31,4 @@ sdk/
 tmp/
 .idea
 tf_recovery.img
+*.sw[pod]
