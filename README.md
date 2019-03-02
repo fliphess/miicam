@@ -24,7 +24,7 @@ Tave a look in the documentation for [all the available options and features](ht
 
 ## Installation on the Chuangmi 720P camera
 
-To use install the hack on your SD card, use the compiled sources.
+To use install the hack on your SD card, use the compiled sources, and a SD card with a max size of 32GB.
 Copying the files in the repository to your sd card without building the binaries wil **Not** work.
 
 In the docs you can find [instructions on how to install the hack](https://miicam.github.io/getting-started).
