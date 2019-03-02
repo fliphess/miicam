@@ -14,17 +14,15 @@ before_install:
 
 script:
 - docker run -i -v "$(pwd):/result" --detach=false --tty=true miicam/miicam /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz /result/'
+- md5sum MiiCam.tgz > MiiCam.tgz.md5sum || die "Failed to create MiiCam.tgz.md5sum"
+- md5sum MiiCam.zip > MiiCam.zip.md5sum || die "Failed to create MiiCam.zip.md5sum"
 
 after_success:
-  - test $TRAVIS_EVENT_TYPE = "cron" && bash tools/dev/nightly-build.sh
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh success $DISCORD_WEBHOOK_URL
+- test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
+- wget -O /tmp/send.sh https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x /tmp/send.sh && /tmp/send.sh success $DISCORD_WEBHOOK_URL
 
 after_failure:
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh failure $DISCORD_WEBHOOK_URL
+- wget -O /tmp/send.sh https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x /tmp/send.sh && /tmp/send.sh failure $DISCORD_WEBHOOK_URL
 
 notifications:
   email: false
