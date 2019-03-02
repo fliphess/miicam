@@ -296,7 +296,8 @@ ENABLE_RESTARTD="${ENABLE_RESTARTD:-0}"
 AUTO_NIGHT_MODE="${AUTO_NIGHT_MODE:-0}"
 
 ## Command line arguments for the auto night mode and irled switcher
-AUTO_NIGHT_MODE_ARGS="${AUTO_NIGHT_MODE_ARGS:-"-d 5 -e 140 -i 120 -l -n -c"}"
+AUTO_NIGHT_MODE_ARGS="${AUTO_NIGHT_MODE_ARGS:-"--ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled"}"
+
 
 ############################################################
 ## Camera options                                         ##
