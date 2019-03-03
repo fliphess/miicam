@@ -223,7 +223,7 @@ sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
 
 sdcard/firmware/etc/os-release:
-	$(TOPDIR)/tools/dev/print-version tee $@
+	$(TOPDIR)/tools/dev/print-version | tee $@
 
 
 #################################################################
