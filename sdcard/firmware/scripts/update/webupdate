@@ -165,7 +165,7 @@ download_nightly()
 
 verify_nightly()
 {
-    local ANACONDA_SUM="$( ${CURL} https://api.anaconda.org/package/MiiCam/MiiCamWeb/files | jq -r '. | to_entries[] | .value.md5' )"
+    local ANACONDA_SUM="$( ${CURL} https://api.anaconda.org/package/MiiCam/MiiCamweb/files | jq -r '. | to_entries[] | "\(.value.version) \(.value.md5)"'  | sort | tail -n 1 | awk '{ print $NF }' )"
     local LOCAL_SUM="$( md5sum "${WEBSITETGZ}" | cut -d' ' -f1 )"
 
     if [ "${ANACONDA_SUM}" == "${LOCAL_SUM}"]
