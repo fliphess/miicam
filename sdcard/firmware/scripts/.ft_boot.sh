@@ -16,6 +16,7 @@ fi
 ##################################################################################
 
 export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
+export PATH="/tmp/sd/firmware/bin:$PATH"
 export SD_MOUNTDIR=/tmp/sd
 
 if [ ! -f "${SD_MOUNTDIR}/config.cfg" ]

@@ -16,6 +16,7 @@ else
 fi
 
 export LOGFILE="${LOGDIR}/ft_boot.log"
+export PATH="/tmp/sd/firmware/bin:$PATH"
 export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 
 (
