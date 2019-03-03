@@ -18,10 +18,10 @@ check_daemon_bin "${DAEMON}" "${DESC}"
 
 case "$1" in
   start)
-	    start_daemon
+	    start_daemon_background
         ;;
   stop)
-	    stop_daemon
+	    stop_daemon_background
         ;;
   status)
         status_daemon
