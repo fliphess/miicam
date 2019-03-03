@@ -1,6 +1,6 @@
 #!/bin/sh
 SD_MOUNTDIR="/tmp/sd"
-echo "OTA: before we start, free out more memory..." | /tmp/busybox logger -t miio_ota
+echo "OTA: before we start, free out more memory..." | busybox logger -t miicam_ota
 for i in ${SD_MOUNTDIR}/firmware/etc/init/S99* ;do
   [ "$i" == "${SD_MOUNTDIR}/firmware/etc/init/S99dropbear" ] || \
   [ "$i" == "/tmp/sd/firmware/etc/init/S99restore_state" ]   && continue
