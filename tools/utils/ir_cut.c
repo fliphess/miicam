@@ -69,9 +69,10 @@ int main(int argc, char *argv[])
         success = ircut_status();
     else if (cli.json)
         success = ircut_status_json();
-    else
+    else {
         poptPrintUsage(pc, stderr, 0);
         exit(1);
+    }
 
     return success;
 }
