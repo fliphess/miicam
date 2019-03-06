@@ -22,8 +22,8 @@ before_install:
 script:
 - mkdir -p "${CACHEDIR}"
 - docker run -i -v "$(pwd):/result" -v "${CACHEDIR}:/env/src" --detach=false --rm --tty=true miicam/miicam /bin/bash -c 'make PROCS=2 images clean && mv /env/MiiCam.zip /env/MiiCam.tgz /result/'
-- md5sum MiiCam.tgz > MiiCam.tgz.md5sum
-- md5sum MiiCam.zip > MiiCam.zip.md5sum
+- md5sum MiiCam.tgz > MiiCam.tgz.md5sum || exit 1
+- md5sum MiiCam.zip > MiiCam.zip.md5sum || exit 1
 
 after_success:
 - test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
