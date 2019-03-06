@@ -91,6 +91,30 @@ function upload_binary() {
 }
 
 
+function build() {
+    tool="$1"; shift
+    cd /env/tools/gm_lib
+
+    arm-unknown-linux-uclibcgnueabi-gcc \
+        -Wall                           \
+        -I /env/tools/gm_lib/inc        \
+        -I /env/tools/lib               \
+        -I /env/prefix/include          \
+        -L /env/tools/lib               \
+        -L /env/tools/gm_lib/lib        \
+        -L /env/prefix/lib              \
+        -o /env/tools/bin/${tool}       \
+        /env/tools/gm_lib/${tool}.c     \
+        -l gm                           \
+        -l m                            \
+        -l popt                         \
+        -l rt                           \
+        -l pthread
+
+    arm-unknown-linux-uclibcgnueabi-strip /env/tools/bin/${tool}
+}
+
+
 ###############################################
 ## Utils and libs helpers                    ##
 ###############################################
