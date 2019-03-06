@@ -95,7 +95,7 @@
         "uri": "https://github.com/vim/vim/archive/v{version}.tar.gz"
     },
     "wget": {
-        "version": "1.18",
+        "version": "1.20",
         "archive": "wget-{version}.tar.gz",
         "uri": "https://ftp.gnu.org/gnu/wget/{archive}"
     },
