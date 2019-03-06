@@ -4,7 +4,11 @@ ARGUMENTS=$*
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 CONTAINER_IMAGE="miicam/miicam"
-DOCKER_CLI="docker run -i -v ${SCRIPTPATH}:/result --detach=false --rm --tty=true"
+
+CACHEDIR="$HOME/.cache/miicam/src"
+test -d "$CACHEDIR" || mkdir -p "$CACHEDIR"
+
+DOCKER_CLI="docker run -i -v ${SCRIPTPATH}:/result -v ${CACHEDIR}:/env/src --detach=false --rm --tty=true"
 
 ## Print help output
 function usage()

@@ -2,7 +2,7 @@
 ## OPENSSL													 ##
 #################################################################
 
-OPENSSLVERSION := 1.0.2q
+OPENSSLVERSION := 1.1.1b
 OPENSSLARCHIVE := openssl-$(OPENSSLVERSION).tar.gz
 OPENSSLURI     := https://www.openssl.org/source/$(OPENSSLARCHIVE)
 

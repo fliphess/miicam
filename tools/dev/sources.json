@@ -45,7 +45,7 @@
         "uri": "https://ftp.gnu.org/gnu/readline/{archive}"
     },
     "openssl": {
-        "version": "1.0.2q",
+        "version": "1.1.1b",
         "archive": "openssl-{version}.tar.gz",
         "uri": "https://www.openssl.org/source/{archive}"
     },
