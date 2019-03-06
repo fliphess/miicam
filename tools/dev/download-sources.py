@@ -27,7 +27,7 @@ def download(task):
     child = subprocess.Popen(command_line.split(), stdout=subprocess.PIPE)
     output = child.communicate()[0]
 
-    return dict(name=name, exit=child.returncode)
+    return dict(name=name, exit=child.returncode, output=output)
 
 
 def format_downloads(data, destdir):
@@ -94,7 +94,7 @@ def main():
         print("  --> Starting {}".format(task))
         runner.call(task)
 
-    print("Waiting for all checks to be completed")
+    print("Waiting for all downloads to be completed")
     runner.wait()
 
 
