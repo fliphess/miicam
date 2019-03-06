@@ -12,7 +12,7 @@ PCREURI     := https://ftp.pcre.org/pub/pcre/$(PCREARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(PCREARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(PCREURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(PCREURI) || rm -f $@
 
 
 #################################################################

@@ -12,7 +12,7 @@ SOCATURI     := http://www.dest-unreach.org/socat/download/$(SOCATARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(SOCATARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(SOCATURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(SOCATURI) || rm -f $@
 
 
 #################################################################

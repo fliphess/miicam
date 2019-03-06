@@ -12,7 +12,7 @@ LIGHTTPDURI     := https://download.lighttpd.net/lighttpd/releases-1.4.x/$(LIGHT
 #################################################################
 
 $(SOURCEDIR)/$(LIGHTTPDARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIGHTTPDURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIGHTTPDURI) || rm -f $@
 
 
 #################################################################

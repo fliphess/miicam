@@ -11,7 +11,7 @@ FFMPEGURI     := https://ffmpeg.org/releases/$(FFMPEGARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(FFMPEGARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(FFMPEGURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(FFMPEGURI) || rm -f $@
 
 
 #################################################################

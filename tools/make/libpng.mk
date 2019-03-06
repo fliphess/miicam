@@ -12,7 +12,7 @@ LIBPNGURI     := https://github.com/glennrp/libpng/archive/$(LIBPNGARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(LIBPNGARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIBPNGURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIBPNGURI) || rm -f $@
 
 
 #################################################################

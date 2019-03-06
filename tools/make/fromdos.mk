@@ -12,7 +12,7 @@ FROMDOSURI     := http://tofrodos.sourceforge.net/download/tfd1713.zip
 #################################################################
 
 $(SOURCEDIR)/$(FROMDOSARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(FROMDOSURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(FROMDOSURI) || rm -f $@
 
 
 #################################################################

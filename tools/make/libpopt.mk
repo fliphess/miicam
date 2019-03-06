@@ -12,7 +12,7 @@ LIBPOPTURI     := http://rpm5.org/files/popt/popt-$(LIBPOPTVERSION).tar.gz
 #################################################################
 
 $(SOURCEDIR)/$(LIBPOPTARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIBPOPTURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIBPOPTURI) || rm -f $@
 
 
 #################################################################

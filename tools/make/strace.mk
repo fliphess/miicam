@@ -12,7 +12,7 @@ STRACEURI     := https://github.com/strace/strace/releases/download/v$(STRACEVER
 #################################################################
 
 $(SOURCEDIR)/$(STRACEARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(STRACEURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(STRACEURI) || rm -f $@
 
 
 #################################################################

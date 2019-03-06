@@ -12,7 +12,7 @@ NCURSESURI     := https://ftp.gnu.org/pub/gnu/ncurses/$(NCURSESARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(NCURSESARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(NCURSESURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(NCURSESURI) || rm -f $@
 
 
 #################################################################

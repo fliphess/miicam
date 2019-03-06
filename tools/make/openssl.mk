@@ -12,7 +12,7 @@ OPENSSLURI     := https://www.openssl.org/source/$(OPENSSLARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(OPENSSLARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(OPENSSLURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(OPENSSLURI) || rm -f $@
 
 
 #################################################################

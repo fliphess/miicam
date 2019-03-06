@@ -16,11 +16,11 @@ DROPBEARURI := https://matt.ucc.asn.au/dropbear/releases/$(DROPBEARARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(SFTPARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(SFTPURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(SFTPURI) || rm -f $@
 
 
 $(SOURCEDIR)/$(DROPBEARARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(DROPBEARURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(DROPBEARURI) || rm -f $@
 
 
 #################################################################

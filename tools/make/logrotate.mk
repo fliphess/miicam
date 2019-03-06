@@ -12,7 +12,7 @@ LOGROTATEURI     := https://github.com/logrotate/logrotate/releases/download/$(L
 #################################################################
 
 $(SOURCEDIR)/$(LOGROTATEARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LOGROTATEURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LOGROTATEURI) || rm -f $@
 
 
 #################################################################

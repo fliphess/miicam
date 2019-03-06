@@ -11,7 +11,7 @@ DOSFSTOOLSURI     := https://github.com/dosfstools/dosfstools/releases/download/
 #################################################################
 
 $(SOURCEDIR)/$(DOSFSTOOLSARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(DOSFSTOOLSURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(DOSFSTOOLSURI) || rm -f $@
 
 
 #################################################################

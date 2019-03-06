@@ -47,7 +47,6 @@ LIBS :=                              \
 	$(BUILDDIR)/chuangmi_led         \
 	$(BUILDDIR)/chuangmi_utils
 
-
 UTILS :=                             \
 	$(BUILDDIR)/chuangmi_ctrl        \
 	$(BUILDDIR)/take_snapshot        \
@@ -62,20 +61,11 @@ UTILS :=                             \
 	$(BUILDDIR)/camera_adjust        \
 	$(BUILDDIR)/auto_night_mode
 
-website: $(WEBCONTENTDIR)
+GMUTILS :=                           \
+	$(BUILDDIR)/audio_playback       \
+	$(BUILDDIR)/osd
 
-utils: $(UTILS)
-
-libs: $(LIBS)
-
-all:                                 \
-	libs                             \
-	utils                            \
-	website                          \
-	sdcard/config.cfg                \
-	sdcard/manufacture.bin           \
-	sdcard/firmware/etc/os-release   \
-	$(BUILDDIR)/rtspd                \
+THIRD_PARTY_SOFTWARE :=              \
 	$(BUILDDIR)/zlib                 \
 	$(BUILDDIR)/libxml2              \
 	$(BUILDDIR)/libjpeg-turbo        \
@@ -106,6 +96,29 @@ all:                                 \
 	$(BUILDDIR)/lsof                 \
 	$(BUILDDIR)/strace               \
 	$(BUILDDIR)/ffmpeg
+
+libs: $(LIBS)
+
+third-party: $(THIRD_PARTY_SOFTWARE)
+
+website: $(WEBCONTENTDIR)
+
+utils: $(UTILS)
+
+libs: $(LIBS)
+
+gmutils: $(GMUTILS)
+
+all:                                 \
+	libs                             \
+	utils                            \
+	gmutils                          \
+	website                          \
+	sdcard/config.cfg                \
+	sdcard/manufacture.bin           \
+	sdcard/firmware/etc/os-release   \
+	$(BUILDDIR)/rtspd                \
+	third-party
 
 
 #################################################################
@@ -197,13 +210,38 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
 
 
 #################################################################
+## GM Utils                                                    ##
+#################################################################
+
+$(GMUTILS): $(BUILDDIR)/popt
+	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
+	cd $(GMLIBDIR)               \
+	&& $(TARGET)-gcc             \
+		-Wall                    \
+		-I $(GMLIBDIR)/inc       \
+		-I $(TOOLSDIR)/lib       \
+		-I $(PREFIXDIR)/include  \
+		-L $(TOOLSDIR)/lib       \
+		-L $(GMLIBDIR)/lib       \
+		-L $(PREFIXDIR)/lib      \
+		-o $(TOOLSDIR)/bin/$(@F) \
+		$(GMLIBDIR)/$(@F).c      \
+		-l gm                    \
+		-l m                     \
+		-l popt                  \
+		-l rt                    \
+		-l pthread               \
+	&& $(TARGET)-strip $(TOOLSDIR)/bin/$(@F) \
+	&& touch $@
+
+
+#################################################################
 ## WEB INTERFACE                                               ##
 #################################################################
 
 $(SOURCEDIR)/$(WEBSITEARCHIVE):
 	echo "*** Downloading webui content" \
 	&& $(TOPDIR)/tools/dev/download-website.sh
-
 
 $(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
 	mkdir -p $(WEBCONTENTDIR)                         \
@@ -212,12 +250,11 @@ $(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
 
 
 #################################################################
-## Firmware config                                             ##
+## Firmware configuration files                                ##
 #################################################################
 
 sdcard/config.cfg:
 	$(TOPDIR)/sdcard/firmware/scripts/update/configupdate $(TOPDIR)/sdcard/config.cfg
-
 
 sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv

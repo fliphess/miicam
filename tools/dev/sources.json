@@ -91,8 +91,23 @@
     },
     "vim": {
         "version": "8.1.0629",
-        "archive": "vim-{version}",
+        "archive": "vim-{version}.tar.gz",
         "uri": "https://github.com/vim/vim/archive/v{version}.tar.gz"
+    },
+    "wget": {
+        "version": "1.18",
+        "archive": "wget-{version}.tar.gz",
+        "uri": "https://ftp.gnu.org/gnu/wget/{archive}"
+    },
+    "bash": {
+        "version": "4.4",
+        "archive": "bash-{version}.tar.gz",
+        "uri": "https://ftp.gnu.org/gnu/bash/{archive}"
+    },
+    "dosfstools": {
+        "version": "4.1",
+        "archive": "dosfstools-{version}.tar.gz",
+        "uri": "https://github.com/dosfstools/dosfstools/releases/download/v{version}/{archive}"
     },
     "rsync": {
         "version": "3.1.3",
@@ -106,7 +121,7 @@
     },
     "ffmpeg": {
         "version": "4.0.2",
-        "archive": "ffmpeg-{version}",
+        "archive": "ffmpeg-{version}.tar.bz2",
         "uri": "https://ffmpeg.org/releases/{archive}"
     },
     "strace": {

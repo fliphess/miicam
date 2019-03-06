@@ -12,7 +12,7 @@ ZLIBURI     := https://www.zlib.net/$(ZLIBARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(ZLIBARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(ZLIBURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(ZLIBURI) || rm -f $@
 
 
 #################################################################

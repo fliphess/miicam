@@ -12,7 +12,7 @@ RSYNCURI     := https://download.samba.org/pub/rsync/src/$(RSYNCARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(RSYNCARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(RSYNCURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(RSYNCURI) || rm -f $@
 
 
 #################################################################

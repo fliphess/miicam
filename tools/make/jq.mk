@@ -12,7 +12,7 @@ JQURI     := https://github.com/stedolan/jq/releases/download/jq-$(JQVERSION)/$(
 #################################################################
 
 $(SOURCEDIR)/$(JQARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(JQURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(JQURI) || rm -f $@
 
 
 #################################################################

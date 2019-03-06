@@ -12,7 +12,7 @@ NANOURI     := https://www.nano-editor.org/dist/v2.9/$(NANOARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(NANOARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(NANOURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(NANOURI) || rm -f $@
 
 
 #################################################################

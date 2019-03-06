@@ -12,7 +12,7 @@ LIBGDURI     := https://github.com/libgd/libgd/releases/download/gd-$(LIBGDVERSI
 #################################################################
 
 $(SOURCEDIR)/$(LIBGDARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIBGDURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIBGDURI) || rm -f $@
 
 
 #################################################################

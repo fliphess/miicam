@@ -12,7 +12,7 @@ WGETURI     := https://ftp.gnu.org/gnu/wget/$(WGETARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(WGETARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(WGETURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(WGETURI) || rm -f $@
 
 
 #################################################################

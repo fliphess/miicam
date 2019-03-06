@@ -12,7 +12,7 @@ LIBXML2URI     := http://xmlsoft.org/sources/$(LIBXML2ARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(LIBXML2ARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIBXML2URI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIBXML2URI) || rm -f $@
 
 
 #################################################################

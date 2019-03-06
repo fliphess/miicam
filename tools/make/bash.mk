@@ -12,7 +12,7 @@ BASHURI     := https://ftp.gnu.org/gnu/bash/$(BASHARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(BASHARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(BASHURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(BASHURI) || rm -f $@
 
 
 #################################################################

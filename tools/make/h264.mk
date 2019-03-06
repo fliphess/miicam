@@ -12,7 +12,7 @@ X264URI     := https://download.videolan.org/pub/x264/snapshots/$(X264ARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(X264ARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(X264URI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(X264URI) || rm -f $@
 
 
 #################################################################

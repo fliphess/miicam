@@ -4,14 +4,14 @@
 
 LIBJPEGVERSION := 1.5.3
 LIBJPEGARCHIVE := libjpeg-turbo-$(LIBJPEGVERSION).tar.gz
-LIBJPEGURI     := https://downloads.sourceforge.net/project/libjpeg-turbo/$(LIBJPEGVERSION)/$(LIBJPEGARCHIVE)
+LIBJPEGURI     := https://npm.taobao.org/mirrors/libjpeg-turbo/$(LIBJPEGVERSION)/$(LIBJPEGARCHIVE)
 
 #################################################################
 ##                                                             ##
 #################################################################
 
 $(SOURCEDIR)/$(LIBJPEGARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIBJPEGURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIBJPEGURI) || rm -f $@
 
 
 #################################################################

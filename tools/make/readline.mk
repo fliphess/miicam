@@ -12,7 +12,7 @@ READLINEURI     := https://ftp.gnu.org/gnu/readline/$(READLINEARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(READLINEARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(READLINEURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(READLINEURI) || rm -f $@
 
 
 #################################################################

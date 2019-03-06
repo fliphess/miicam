@@ -16,11 +16,11 @@ TCPDUMPURI     := http://www.tcpdump.org/release/$(TCPDUMPARCHIVE)
 #################################################################
 
 $(SOURCEDIR)/$(LIBPCAPARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LIBPCAPURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LIBPCAPURI) || rm -f $@
 
 
 $(SOURCEDIR)/$(TCPDUMPARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(TCPDUMPURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(TCPDUMPURI) || rm -f $@
 
 
 #################################################################

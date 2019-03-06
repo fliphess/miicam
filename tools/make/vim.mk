@@ -12,7 +12,7 @@ VIMURI     := https://github.com/vim/vim/archive/v$(VIMVERSION).tar.gz
 #################################################################
 
 $(SOURCEDIR)/$(VIMARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(VIMURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(VIMURI) || rm -f $@
 
 
 #################################################################

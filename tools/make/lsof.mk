@@ -12,7 +12,7 @@ LSOFURI     := https://github.com/Distrotech/lsof/archive/$(LSOFVERSION).tar.gz
 #################################################################
 
 $(SOURCEDIR)/$(LSOFARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(LSOFURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(LSOFURI) || rm -f $@
 
 
 #################################################################

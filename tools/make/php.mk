@@ -12,7 +12,7 @@ PHPURI     := https://php.net/get/$(PHPARCHIVE)/from/this/mirror
 #################################################################
 
 $(SOURCEDIR)/$(PHPARCHIVE): $(SOURCEDIR)
-	$(DOWNLOADCMD) $@ $(PHPURI) || rm -f $@
+	test -f $@ || $(DOWNLOADCMD) $@ $(PHPURI) || rm -f $@
 
 
 #################################################################
