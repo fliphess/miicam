@@ -423,22 +423,25 @@ led_status()
 {
     local ARGS="$1"
 
-    BLUE="$(   blue_led   --status | last_f )"
+    BLUE="$( blue_led     --status | last_f )"
     YELLOW="$( yellow_led --status | last_f )"
     IR_LED="$( ir_led     --status | last_f )"
 
     if [ "$ARGS" == "--json" ]
     then
         echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
+
     elif [ "${ARGS}" == "--shell" ]
     then
         echo "IR_LED=\"$IR_LED\""
         echo "BLUE_LED=\"$BLUE\""
         echo "YELLOW_LED=\"$YELLOW\""
+
     else
         echo "IR Led    : ${IR_LED}"
         echo "Blue Led  : ${BLUE}"
         echo "Yellow Led: ${YELLOW}"
+
     fi
 
     return 0
@@ -452,7 +455,7 @@ mode_status()
     NIGHT="$(  nightmode  --status | last_f )"
     IR_CUT="$( ir_cut     --status | last_f )"
     MIRROR="$( mirrormode --status | last_f )"
-    FLIP="$(   flipmode   --status | last_f )"
+    FLIP="$( flipmode     --status | last_f )"
 
     if [ "$ARGS" == "--json" ]
     then
@@ -461,13 +464,13 @@ mode_status()
     elif [ "$ARGS" == "--shell" ]
     then
         echo "MIRROR_MODE=\"${MIRROR}\""
-        echo "FLIP_MODE=\"${FLIP}\""
         echo "NIGHT_MODE=\"${NIGHT}\""
+        echo "FLIP_MODE=\"${FLIP}\""
         echo "IR_CUT=\"${IR_CUT}\""
     else
         echo "Mirror Mode: ${MIRROR}"
         echo "Night Mode : ${NIGHT}"
-        echo "Flip Mode  : ${FLIP_MODE}"
+        echo "Flip Mode  : ${FLIP}"
         echo "IR Cut     : ${IR_CUT}"
     fi
 
