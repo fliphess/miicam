@@ -63,6 +63,7 @@ UTILS :=                             \
 
 GMUTILS :=                           \
 	$(BUILDDIR)/audio_playback       \
+	$(BUILDDIR)/encode_with_osd      \
 	$(BUILDDIR)/osd
 
 THIRD_PARTY_SOFTWARE :=              \
