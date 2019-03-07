@@ -349,7 +349,7 @@ clean:
 	@cd $(TOPDIR) \
 	\
 	&& echo "*** Removing directories with build artifacts" \
-	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(WEBCONTENTDIR) $(SOURCEDIR) $(PREFIXDIR) $(BUILDDIR) \
+	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(WEBCONTENTDIR) $(PREFIXDIR) $(BUILDDIR) \
 	\
 	&& echo "*** Removing all own-brewed binaries" \
 	&& find $(TOOLSDIR)/bin -maxdepth 1 -type f -delete \
