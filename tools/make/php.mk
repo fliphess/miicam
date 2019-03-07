@@ -2,7 +2,7 @@
 ## PHP														 ##
 #################################################################
 
-PHPVERSION := 7.2.12
+PHPVERSION := 7.2.15
 PHPARCHIVE := php-$(PHPVERSION).tar.bz2
 PHPURI     := https://php.net/get/$(PHPARCHIVE)/from/this/mirror
 

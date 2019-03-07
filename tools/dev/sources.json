@@ -80,7 +80,7 @@
         "uri": "https://download.lighttpd.net/lighttpd/releases-1.4.x/{archive}"
     },
     "php": {
-        "version": "7.2.12",
+        "version": "7.2.15",
         "archive": "php-{version}.tar.bz2",
         "uri": "http://php.net/get/{archive}/from/this/mirror"
     },
