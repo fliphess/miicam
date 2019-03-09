@@ -86,6 +86,7 @@ THIRD_PARTY_SOFTWARE :=              \
 	$(BUILDDIR)/socat                \
 	$(BUILDDIR)/fromdos              \
 	$(BUILDDIR)/jq                   \
+	$(BUILDDIR)/file                 \
 	$(BUILDDIR)/logrotate            \
 	$(BUILDDIR)/sftp                 \
 	$(BUILDDIR)/dropbear             \
@@ -296,6 +297,7 @@ include tools/make/strace.mk
 include tools/make/lsof.mk
 include tools/make/fromdos.mk
 include tools/make/jq.mk
+include tools/make/file.mk
 include tools/make/ffmpeg.mk
 
 

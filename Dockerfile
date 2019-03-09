@@ -48,6 +48,7 @@ RUN echo "*** Install required packages" \
       build-essential        \
       cpio                   \
       curl                   \
+      file                   \
       flex                   \
       gawk                   \
       gettext                \

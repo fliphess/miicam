@@ -16,6 +16,7 @@ THIRD_PARTY_BINS :=				\
 	clear infocmp tabs tic		\
 	toe tput tset				\
 	scp	dbclient dropbearkey	\
+	file						\
 	sftp-server 				\
 	arm-php	arm-php-cgi			\
 	bash						\
@@ -56,6 +57,7 @@ THIRD_PARTY_LIBS :=				\
 	libgd.so.3.0.5				\
 	libhistory.so.7.0			\
 	libjpeg.so.62.2.0			\
+	libmagic.so.1.0.0			\
 	libmenu.a					\
 	libncurses++.a				\
 	libncurses.a				\
@@ -140,6 +142,8 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libhistory.so.7				\
 	libjpeg.so					\
 	libjpeg.so.62				\
+	libmagic.so 				\
+	libmagic.so.1				\
 	libpcap.so					\
 	libpcap.so.1				\
 	libpcre.so					\
