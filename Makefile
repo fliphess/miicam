@@ -2,7 +2,7 @@
 TOOLCHAINDIR := /usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin
 PATH         := $(TOOLCHAINDIR):$(PATH)
 TARGET       := arm-unknown-linux-uclibcgnueabi
-PROCS        := 7
+PROCS        := $(shell nproc --all )
 
 DOWNLOADCMD := curl -qs --http1.1 -L --retry 10 --output
 
@@ -343,6 +343,9 @@ images: all install
 	\
 	&& echo "*** Creating tar archive of sdcard/ to MiiCam.tgz" \
 	&& tar czf MiiCam.tgz -C $(TOPDIR) README.md sdcard \
+	\
+	&& md5sum MiiCam.tgz > MiiCam.tgz.md5sum \
+	&& md5sum MiiCam.zip > MiiCam.zip.md5sum \
 	\
 	&& echo "*** MiiCam.zip and MiiCam.tgz created"
 
