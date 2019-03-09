@@ -25,7 +25,9 @@ prefix/*
 tf_recovery.img
 tf_recovery.img.bak
 MiiCam.zip
+MiiCam.zip.md5sum
 MiiCam.tgz
+MiiCam.tgz.md5sum
 sdk/
 tmp/
 .idea

@@ -25,7 +25,9 @@ sdcard/firmware/www/vendor
 sdcard/firmware/www/composer.lock
 sdk/
 MiiCam.zip
+MiiCam.zip.md5sum
 MiiCam.tgz
+MiiCam.tgz.md5sum
 .idea/
 .vscode
 tmp/
