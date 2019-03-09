@@ -1,7 +1,7 @@
 
 alias php='/tmp/sd/firmware/bin/arm-php'
 alias ssh='/tmp/sd/firmware/bin/dbclient'
-alias curl='curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem'
+alias curl='curl --cacert /tmp/sd/firmware/share/ssl/cacert.pem'
 alias reboot='reboot && exit'
 alias w='who'
 alias crontab='crontab -c /var/run/cron'

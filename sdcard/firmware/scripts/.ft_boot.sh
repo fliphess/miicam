@@ -71,9 +71,9 @@ echo "*** Enabling logging"
 
 if [ "$ENABLE_LOGGING" -eq 1 ]
 then
-    sh "${SD_MOUNTDIR}/firmware/etc/init/S01logging" restart
+    sh "${SD_MOUNTDIR}/firmware/init/S01logging" restart
 else
-    sh "${SD_MOUNTDIR}/firmware/etc/init/S01logging" stop
+    sh "${SD_MOUNTDIR}/firmware/init/S01logging" stop
 fi
 
 ##################################################################################
@@ -196,8 +196,9 @@ fi
 
 if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
 then
-    echo "*** Replacing restartd startup script and config with our own version"
-    mount --bind /etc/init/S99restartd /mnt/data/imi/imi_init/S99restartd
+    echo "*** Repl/acing restartd startup script and config with our own version"
+    cp /tmp/sd/firmware/init/S99restartd /etc/S99restartd
+    mount --bind /etc/S99restartd /mnt/data/imi/imi_init/S99restartd
 fi
 
 if [ ! -f /tmp/etc/restartd.conf.org ] && mountpoint -q /etc
@@ -213,14 +214,14 @@ fi
 
 if [ "${DISABLE_CLOUD}" -eq 1 ]
 then
-    sh "${SD_MOUNTDIR}/firmware/etc/init/S50disable_cloud" start
-    sh "${SD_MOUNTDIR}/firmware/etc/init/S50disable_ota" start
+    sh "${SD_MOUNTDIR}/firmware/init/S50disable_cloud" start
+    sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" start
 
 elif [ "${DISABLE_OTA}" -eq 1 ]
 then
-    sh "${SD_MOUNTDIR}/firmware/etc/init/S50disable_ota" start
+    sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" start
 else
-    sh "${SD_MOUNTDIR}/firmware/etc/init/S50disable_ota" stop
+    sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" stop
 fi
 
 

@@ -371,13 +371,13 @@ rtsp_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Turning on rtspd"
-        /etc/init/S99rtsp start
+        /tmp/sd/firmware/init/S99rtsp start
         mqtt_send "${MQTT_TOPIC}/rtsp" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Turning off rtspd"
-        /etc/init/S99rtsp stop
+        /tmp/sd/firmware/init/S99rtsp stop
         mqtt_send "${MQTT_TOPIC}/rtsp" "${MQTT_OFF}"
     fi
 }
@@ -398,12 +398,12 @@ night_mode_auto_set()
     if [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Starting auto night mode daemon"
-        /etc/init/S99auto_night_mode start
+        /tmp/sd/firmware/init/S99auto_night_mode start
         mqtt_send "${MQTT_TOPIC}/night_mode/auto" "${MQTT_ON}"
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Stopping auto night mode daemon"
-        /etc/init/S99auto_night_mode stop
+        /tmp/sd/firmware/init/S99auto_night_mode stop
         mqtt_send "${MQTT_TOPIC}/night_mode/auto" "${MQTT_OFF}"
     fi
 }

@@ -7,9 +7,9 @@ die() { log "$1" ; exit 1; }
 log "*** Starting preparation for mii update"
 
 log "*** Freeing up memory by stopping all services"
-for i in ${SD_MOUNTDIR}/firmware/etc/init/S99* ;do
-  [ "$i" == "${SD_MOUNTDIR}/firmware/etc/init/S99dropbear" ] || \
-  [ "$i" == "/tmp/sd/firmware/etc/init/S99restore_state" ]   && continue
+for i in ${SD_MOUNTDIR}/firmware/init/S99* ;do
+  [ "$i" == "${SD_MOUNTDIR}/firmware/init/S99dropbear" ] || \
+  [ "$i" == "/tmp/sd/firmware/init/S99restore_state" ]   && continue
   $i stop
 done
 

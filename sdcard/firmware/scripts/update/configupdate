@@ -173,7 +173,7 @@ MQTT_PORT="${MQTT_PORT:-1883}"
 MQTT_TOPIC="${MQTT_TOPIC:-"home/\$CAMERA_HOSTNAME"}"
 
 ## Define additional options for Mosquitto here.
-## IE: --cafile /tmp/sd/firmware/etc/cacert.pem --tls-version tlsv1
+## IE: --cafile /tmp/sd/firmware/share/ssl/cacert.pem --tls-version tlsv1
 MOSQUITTOOPTS="${MOSQUITTOOPTS:-""}"
 
 ## Add options for mosquitto_pub (IE: -r for retaining messages)

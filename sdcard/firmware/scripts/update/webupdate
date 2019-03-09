@@ -10,8 +10,8 @@ WEBSITEDIR="/tmp/sd/firmware/www"
 ## Set the curl command depending on local or camera
 if [ "$( uname -m )" == "armv5tel" ]
 then
-    CURL='curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -qs '
-    WGET='/tmp/sd/firmware/bin/wget --ca-certificate /tmp/sd/firmware/etc/ssl/cacert.pem '
+    CURL='curl --cacert /tmp/sd/firmware/share/ssl/cacert.pem -qs '
+    WGET='/tmp/sd/firmware/bin/wget --ca-certificate /tmp/sd/firmware/share/ssl/cacert.pem '
 else
     CURL='curl -qs '
     WGET='wget '

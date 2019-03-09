@@ -28,7 +28,7 @@ if [ $BIN_BUSYBOX_MD5 == $TMP_BUSYBOX_MD5 ] &&
     /mnt/data/imi/imi_init/S93miot_devicekit stop
     /mnt/data/imi/imi_init/_S50mosquitto_noUsed stop
     /mnt/data/imi/imi_init/S50telnet stop
-    for i in ${SD_MOUNTDIR}/firmware/etc/init/S99* ;do
+    for i in ${SD_MOUNTDIR}/firmware/init/S99* ;do
       $i stop
     done
 

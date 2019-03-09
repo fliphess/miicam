@@ -7,4 +7,4 @@ PATH=/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:/sbin:/bin:/usr/sbin:/usr/bin
 59    23   *            *     *           flock -n -x /tmp/.logrotate.lock -c logrotate /etc/logrotate.conf
 
 ## Save the state file every hour
-00    *    *            *     *           flock -n -x /tmp/.save_state.lock -c /etc/init/S99restore_state save
+00    *    *            *     *           flock -n -x /tmp/.save_state.lock -c /tmp/sd/firmware/init/S99restore_state save

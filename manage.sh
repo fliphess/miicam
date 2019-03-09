@@ -102,7 +102,7 @@ function gencert() {
         run '/env/manage.sh --gencert'
     else
         USE_NAME="$( grep ^CAMERA_HOSTNAME sdcard/config.cfg  | cut -d= -f2 | sed -e 's/"//g' )"
-        SSLDIR="/result/sdcard/firmware/etc/ssl"
+        SSLDIR="/result/sdcard/firmware/share/ssl"
 
         [ -d "${SSLDIR}" ] || mkdir -p "$SSLDIR"
 

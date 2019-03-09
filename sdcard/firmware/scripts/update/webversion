@@ -5,7 +5,7 @@ FILE="$2"
 ## Set the curl command depending on local or camera
 if [ "$( uname -m )" == "armv5tel" ]
 then
-    CURL='curl --cacert /tmp/sd/firmware/etc/ssl/cacert.pem -qs '
+    CURL='curl --cacert /tmp/sd/firmware/share/ssl/cacert.pem -qs '
 else
     CURL='curl -qs '
 fi
