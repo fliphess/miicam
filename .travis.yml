@@ -21,11 +21,11 @@ before_install:
 
 script:
 - mkdir -p "${CACHEDIR}"
-- docker run -i -v "$(pwd):/result" -v "${CACHEDIR}:/env/src" --detach=false --rm --tty=true miicam/miicam /bin/bash -c 'make images clean && mv /env/MiiCam.* /result/'
+- docker run -i -v "$(pwd):/result" -v "${CACHEDIR}:/env/src" --detach=false --rm --tty=true miicam/miicam /bin/bash -c 'make images clean && cp /env/MiiCam.* /result/'
 
 after_success:
-- test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
 - wget -O /tmp/send.sh https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x /tmp/send.sh && /tmp/send.sh success $DISCORD_WEBHOOK_URL
+- test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
 
 after_failure:
 - wget -O /tmp/send.sh https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x /tmp/send.sh && /tmp/send.sh failure $DISCORD_WEBHOOK_URL
