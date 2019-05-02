@@ -59,6 +59,13 @@ And for the web interface, [create an issue in the repo for the web interface](h
 
 ## Getting Help
 
+I've spend many hours documenting anything I ran into.
+
+Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
+
+If something is not documented, [please let me know](https://github.com/miicam/MiiCam/issues) so I can extend the documentation.
+
+
 Please always do some proper research yourself first and only create issues if you are very sure it's a bug in the camera and not either human error or another issue that is related to your home setup instead of the camera.
 
 If you need help setting up, ask the friendly people on the discord channel for some advice. If you answer their questions properly and give them the required information, they might be willing to point you in the right direction.
@@ -70,16 +77,4 @@ I might respond itchy or close and lock issues straight after creation to preven
 If you think it's an actual bug and I was to quick with closing your issue, please don't be offended but create a new bugreport with more details on why you think it's a bug or send me a message on discord.
 
 Keep in mind that the issue tracker is not a helpdesk or community forum, but a bug tracker for an open source project.
-
-
-## Need help? Want to help? Ideas? suggestions?
-
-I've spend many hours documenting anything I ran into.
-Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
-If something is not documented, [please let me know](https://github.com/miicam/MiiCam/issues) so I can extend the documentation.
-
-Feel welcome to bring pull requests and feature requests on the table.
-
-If you're good at making a nice web interface, let me know! I'm quite tasteless when it comes to the web and layout, so I could use some help :)
-
 
