@@ -71,7 +71,6 @@ If you think it's an actual bug and I was to quick with closing your issue, plea
 
 Keep in mind that the issue tracker is not a helpdesk or community forum, but a bug tracker for an open source project.
 
-Keep in mind that the issue tracker is not a helpdesk or community website, but a bug tracker for an open source project.
 
 ## Need help? Want to help? Ideas? suggestions?
 
