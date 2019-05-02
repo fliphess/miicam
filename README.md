@@ -57,6 +57,19 @@ If there is a bug in the documentation, [create an issue in the docs repo](https
 And for the web interface, [create an issue in the repo for the web interface](https://github.com/miicam/MiiCamWeb/).
 
 
+## Getting Help
+
+Please always do some proper research yourself first and only create issues if you are very sure it's a bug in the camera and not either human error or another issue that is related to your home setup instead of the camera.
+
+If you need help setting up, ask the friendly people on the discord channel for some advice. If you answer their questions properly and give them the required information, they might be willing to point you in the right direction.
+
+I'm not that good (read: not socially equipped) to help people setting up their home automation as I've a limited usecase for the camera myself.
+If your issue is not related to the camera or does not contain enough information to start searching for the issue, I might respond itchy or close and lock issues straight after creation to prevent the issue tracker from filling up.
+If you think it's an actual bug and I was to quick with closing your issue, please don't be offended but create a new bugreport with more details on why you think it's a bug or send me a message on discord.
+
+
+Keep in mind that the issue tracker is not a helpdesk or community website, but a bug tracker for an open source project.
+
 ## Need help? Want to help? Ideas? suggestions?
 
 I've spend many hours documenting anything I ran into.
@@ -66,4 +79,5 @@ If something is not documented, [please let me know](https://github.com/miicam/M
 Feel welcome to bring pull requests and feature requests on the table.
 
 If you're good at making a nice web interface, let me know! I'm quite tasteless when it comes to the web and layout, so I could use some help :)
+
 
