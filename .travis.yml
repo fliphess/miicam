@@ -4,13 +4,13 @@ dist: xenial
 language: python
 python:  3.6
 
-#env:
-#  global:
-#    - 'CACHEDIR=/home/travis/.cache/miicam/src'
-#
-#cache:
-#  directories:
-#    - /home/travis/.cache/miicam/src
+env:
+  global:
+    - 'CACHEDIR=/home/travis/.cache/miicam/src'
+
+cache:
+  directories:
+    - /home/travis/.cache/miicam/src
 
 services:
 - docker
