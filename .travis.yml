@@ -7,9 +7,9 @@ env:
   global:
     - 'CACHEDIR=/home/travis/.cache/miicam/src'
 
-#cache:
-#  directories:
-#    - /home/travis/.cache/miicam/src
+cache:
+  directories:
+    - /home/travis/.cache/miicam/src
 
 services:
 - docker
