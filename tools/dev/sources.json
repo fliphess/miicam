@@ -45,7 +45,7 @@
         "uri": "https://ftp.gnu.org/gnu/readline/{archive}"
     },
     "openssl": {
-        "version": "1.0.2r",
+        "version": "1.0.2s",
         "archive": "openssl-{version}.tar.gz",
         "uri": "https://www.openssl.org/source/{archive}"
     },
@@ -80,7 +80,7 @@
         "uri": "https://download.lighttpd.net/lighttpd/releases-1.4.x/{archive}"
     },
     "php": {
-        "version": "7.2.15",
+        "version": "7.2.20",
         "archive": "php-{version}.tar.bz2",
         "uri": "http://php.net/get/{archive}/from/this/mirror"
     },
