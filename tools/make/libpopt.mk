@@ -4,7 +4,7 @@
 
 LIBPOPTVERSION := 1.16
 LIBPOPTARCHIVE := popt-$(LIBPOPTVERSION).tar.gz
-LIBPOPTURI     := http://rpm5.org/files/popt/popt-$(LIBPOPTVERSION).tar.gz
+LIBPOPTURI     := http://ftp.rpm.org/mirror/popt/popt-$(LIBPOPTVERSION).tar.gz
 
 
 #################################################################

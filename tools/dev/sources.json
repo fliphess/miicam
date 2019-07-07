@@ -32,7 +32,7 @@
     "libopt": {
         "version": "1.16",
         "archive": "popt-{version}.tar.gz",
-        "uri": "http://rpm5.org/files/popt/popt-{version}.tar.gz"
+        "uri": "http://ftp.rpm.org/mirror/popt/popt-{version}.tar.gz"
     },
     "ncurses": {
         "version": "6.1",
