@@ -3,7 +3,7 @@
 ################################################################################
 
 # Number of days of inactivity before an Issue is closed for lack of response
-daysUntilClose: 14
+daysUntilClose: 100
 
 # Label requiring a response
 responseRequiredLabel: "Waiting for info"
