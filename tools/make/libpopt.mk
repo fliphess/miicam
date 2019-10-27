@@ -2,9 +2,9 @@
 ## Libpopt													 ##
 #################################################################
 
-LIBPOPTVERSION := 1.16
-LIBPOPTARCHIVE := popt-$(LIBPOPTVERSION).tar.gz
-LIBPOPTURI     := http://ftp.rpm.org/mirror/popt/popt-$(LIBPOPTVERSION).tar.gz
+LIBPOPTVERSION := $(shell cat $(SOURCES) | jq -r '.libpopt.version' )
+LIBPOPTARCHIVE := $(shell cat $(SOURCES) | jq -r '.libpopt.archive' )
+LIBPOPTURI     := $(shell cat $(SOURCES) | jq -r '.libpopt.uri' )
 
 
 #################################################################

@@ -2,9 +2,9 @@
 ## DOSFSTOOLS													##
 #################################################################
 
-DOSFSTOOLSVERSION := 4.1
-DOSFSTOOLSARCHIVE := dosfstools-$(DOSFSTOOLSVERSION).tar.gz
-DOSFSTOOLSURI     := https://github.com/dosfstools/dosfstools/releases/download/v$(DOSFSTOOLSVERSION)/$(DOSFSTOOLSARCHIVE)
+DOSFSTOOLSVERSION := $(shell cat $(SOURCES) | jq -r '.dosfstools.version' )
+DOSFSTOOLSARCHIVE := $(shell cat $(SOURCES) | jq -r '.dosfstools.archive' )
+DOSFSTOOLSURI     := $(shell cat $(SOURCES) | jq -r '.dosfstools.uri' )
 
 #################################################################
 ##                                                             ##

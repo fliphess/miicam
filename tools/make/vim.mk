@@ -2,9 +2,9 @@
 ## VIM														 ##
 #################################################################
 
-VIMVERSION := 8.1.0629
-VIMARCHIVE := vim-$(VIMVERSION)
-VIMURI     := https://github.com/vim/vim/archive/v$(VIMVERSION).tar.gz
+VIMVERSION := $(shell cat $(SOURCES) | jq -r '.vim.version' )
+VIMARCHIVE := $(shell cat $(SOURCES) | jq -r '.vim.archive' )
+VIMURI     := $(shell cat $(SOURCES) | jq -r '.vim.uri' )
 
 
 #################################################################

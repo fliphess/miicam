@@ -2,9 +2,9 @@
 ## LIBXML													  ##
 #################################################################
 
-LIBXML2VERSION := 2.9.8
-LIBXML2ARCHIVE := libxml2-$(LIBXML2VERSION).tar.gz
-LIBXML2URI     := http://xmlsoft.org/sources/$(LIBXML2ARCHIVE)
+LIBXML2VERSION := $(shell cat $(SOURCES) | jq -r '.libxml.version' )
+LIBXML2ARCHIVE := $(shell cat $(SOURCES) | jq -r '.libxml.archive' )
+LIBXML2URI     := $(shell cat $(SOURCES) | jq -r '.libxml.uri' )
 
 
 #################################################################

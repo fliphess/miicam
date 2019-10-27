@@ -2,9 +2,9 @@
 ## TOFROMDOS												   ##
 #################################################################
 
-FROMDOSVERSION := 1713
-FROMDOSARCHIVE := tofrodos-$(FROMDOSVERSION).zip
-FROMDOSURI     := http://tofrodos.sourceforge.net/download/tfd1713.zip
+FROMDOSVERSION := $(shell cat $(SOURCES) | jq -r '.fromdos.version' )
+FROMDOSARCHIVE := $(shell cat $(SOURCES) | jq -r '.fromdos.archive' )
+FROMDOSURI     := $(shell cat $(SOURCES) | jq -r '.fromdos.uri' )
 
 
 #################################################################

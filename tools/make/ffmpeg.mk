@@ -2,9 +2,9 @@
 ## FFMPEG													  ##
 #################################################################
 
-FFMPEGVERSION := 4.0.2
-FFMPEGARCHIVE := ffmpeg-$(FFMPEGVERSION).tar.bz2
-FFMPEGURI     := https://ffmpeg.org/releases/$(FFMPEGARCHIVE)
+FFMPEGVERSION := $(shell cat $(SOURCES) | jq -r '.ffmpeg.version' )
+FFMPEGARCHIVE := $(shell cat $(SOURCES) | jq -r '.ffmpeg.archive' )
+FFMPEGURI     := $(shell cat $(SOURCES) | jq -r '.ffmpeg.uri' )
 
 #################################################################
 ##                                                             ##

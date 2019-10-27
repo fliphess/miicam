@@ -2,9 +2,9 @@
 ## LIBPCRE													 ##
 #################################################################
 
-PCREVERSION := 8.42
-PCREARCHIVE := pcre-$(PCREVERSION).zip
-PCREURI     := https://ftp.pcre.org/pub/pcre/$(PCREARCHIVE)
+PCREVERSION := $(shell cat $(SOURCES) | jq -r '.pcre.version' )
+PCREARCHIVE := $(shell cat $(SOURCES) | jq -r '.pcre.archive' )
+PCREURI     := $(shell cat $(SOURCES) | jq -r '.pcre.uri' )
 
 
 #################################################################

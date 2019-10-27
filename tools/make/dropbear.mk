@@ -2,13 +2,13 @@
 ## DROPBEAR                                                    ##
 #################################################################
 
-SFTPVERSION := 7.9p1
-SFTPARCHIVE := openssh-$(SFTPVERSION).tar.gz
-SFTPURI     := https://ftp.nluug.nl/pub/OpenBSD/OpenSSH/portable/$(SFTPARCHIVE)
+SFTPVERSION := $(shell cat $(SOURCES) | jq -r '.sftp.version' )
+SFTPARCHIVE := $(shell cat $(SOURCES) | jq -r '.sftp.archive' )
+SFTPURI     := $(shell cat $(SOURCES) | jq -r '.sftp.uri' )
 
-DROPBEARVERSION := 2018.76
-DROPBEARARCHIVE := dropbear-$(DROPBEARVERSION).tar.bz2
-DROPBEARURI := https://matt.ucc.asn.au/dropbear/releases/$(DROPBEARARCHIVE)
+DROPBEARVERSION := $(shell cat $(SOURCES) | jq -r '.dropbear.version' )
+DROPBEARARCHIVE := $(shell cat $(SOURCES) | jq -r '.dropbear.archive' )
+DROPBEARURI     := $(shell cat $(SOURCES) | jq -r '.dropbear.uri' )
 
 
 #################################################################

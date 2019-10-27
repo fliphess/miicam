@@ -2,9 +2,9 @@
 ## FILE                                                          ##
 #################################################################
 
-FILEVERSION := "FILE5_32"
-FILEARCHIVE := file-$(FILEVERSION).tar.gz
-FILEURI     := https://github.com/file/file/archive/$(FILEVERSION).tar.gz
+FILEVERSION := $(shell cat $(SOURCES) | jq -r '.file.version' )
+FILEARCHIVE := $(shell cat $(SOURCES) | jq -r '.file.archive' )
+FILEURI     := $(shell cat $(SOURCES) | jq -r '.file.uri' )
 
 
 #################################################################

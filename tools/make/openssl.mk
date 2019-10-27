@@ -2,9 +2,9 @@
 ## OPENSSL													 ##
 #################################################################
 
-OPENSSLVERSION := "1.0.2s"
-OPENSSLARCHIVE := openssl-$(OPENSSLVERSION).tar.gz
-OPENSSLURI     := https://www.openssl.org/source/$(OPENSSLARCHIVE)
+OPENSSLVERSION := $(shell cat $(SOURCES) | jq -r '.openssl.version' )
+OPENSSLARCHIVE := $(shell cat $(SOURCES) | jq -r '.openssl.archive' )
+OPENSSLURI     := $(shell cat $(SOURCES) | jq -r '.openssl.uri' )
 
 
 #################################################################

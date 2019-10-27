@@ -2,10 +2,9 @@
 ## BASH													       ##
 #################################################################
 
-BASHVERSION := 4.4
-BASHARCHIVE := bash-$(BASHVERSION).tar.gz
-BASHURI     := https://ftp.gnu.org/gnu/bash/$(BASHARCHIVE)
-
+BASHVERSION := $(shell cat $(SOURCES) | jq -r '.bash.version' )
+BASHARCHIVE := $(shell cat $(SOURCES) | jq -r '.bash.archive' )
+BASHURI     := $(shell cat $(SOURCES) | jq -r '.bash.uri' )
 
 #################################################################
 ##                                                             ##

@@ -2,9 +2,9 @@
 ## ZLIB														##
 #################################################################
 
-ZLIBVERSION := 1.2.11
-ZLIBARCHIVE := zlib-$(ZLIBVERSION).tar.gz
-ZLIBURI     := https://www.zlib.net/$(ZLIBARCHIVE)
+ZLIBVERSION := $(shell cat $(SOURCES) | jq -r '.zlib.version' )
+ZLIBARCHIVE := $(shell cat $(SOURCES) | jq -r '.zlib.archive' )
+ZLIBURI     := $(shell cat $(SOURCES) | jq -r '.zlib.uri' )
 
 
 #################################################################

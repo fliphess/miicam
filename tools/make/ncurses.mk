@@ -2,9 +2,9 @@
 ## NCURSES													 ##
 #################################################################
 
-NCURSESVERSION := 6.1
-NCURSESARCHIVE := ncurses-$(NCURSESVERSION).tar.gz
-NCURSESURI     := https://ftp.gnu.org/pub/gnu/ncurses/$(NCURSESARCHIVE)
+NCURSESVERSION := $(shell cat $(SOURCES) | jq -r '.ncurses.version' )
+NCURSESARCHIVE := $(shell cat $(SOURCES) | jq -r '.ncurses.archive' )
+NCURSESURI     := $(shell cat $(SOURCES) | jq -r '.ncurses.uri' )
 
 
 #################################################################

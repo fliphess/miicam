@@ -2,9 +2,9 @@
 ## NANO														##
 #################################################################
 
-NANOVERSION := 2.9.8
-NANOARCHIVE := nano-$(NANOVERSION).tar.gz
-NANOURI     := https://www.nano-editor.org/dist/v2.9/$(NANOARCHIVE)
+NANOVERSION := $(shell cat $(SOURCES) | jq -r '.nano.version' )
+NANOARCHIVE := $(shell cat $(SOURCES) | jq -r '.nano.archive' )
+NANOURI     := $(shell cat $(SOURCES) | jq -r '.nano.uri' )
 
 
 #################################################################

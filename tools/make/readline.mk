@@ -2,9 +2,9 @@
 ## READLINE													##
 #################################################################
 
-READLINEVERSION := 7.0
-READLINEARCHIVE := readline-$(READLINEVERSION).tar.gz
-READLINEURI     := https://ftp.gnu.org/gnu/readline/$(READLINEARCHIVE)
+READLINEVERSION := $(shell cat $(SOURCES) | jq -r '.readline.version' )
+READLINEARCHIVE := $(shell cat $(SOURCES) | jq -r '.readline.archive' )
+READLINEURI     := $(shell cat $(SOURCES) | jq -r '.readline.uri' )
 
 
 #################################################################

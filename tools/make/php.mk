@@ -2,9 +2,9 @@
 ## PHP														 ##
 #################################################################
 
-PHPVERSION := 7.2.20
-PHPARCHIVE := php-$(PHPVERSION).tar.bz2
-PHPURI     := https://php.net/get/$(PHPARCHIVE)/from/this/mirror
+PHPVERSION := $(shell cat $(SOURCES) | jq -r '.php.version' )
+PHPARCHIVE := $(shell cat $(SOURCES) | jq -r '.php.archive' )
+PHPURI     := $(shell cat $(SOURCES) | jq -r '.php.uri' )
 
 
 #################################################################
@@ -47,6 +47,7 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 			--with-gd						\
 			--with-xpm-dir=no				\
 			--without-pear					\
+			--without-libzip                \
 			--without-xsl					\
 			--enable-pdo					\
 			--enable-simplexml				\

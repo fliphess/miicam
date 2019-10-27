@@ -2,9 +2,9 @@
 ## LOGROTATE												   ##
 #################################################################
 
-LOGROTATEVERSION := 3.15.0
-LOGROTATEARCHIVE := logrotate-$(LOGROTATEVERSION).tar.gz
-LOGROTATEURI     := https://github.com/logrotate/logrotate/releases/download/$(LOGROTATEVERSION)/$(LOGROTATEARCHIVE)
+LOGROTATEVERSION := $(shell cat $(SOURCES) | jq -r '.logrotate.version' )
+LOGROTATEARCHIVE := $(shell cat $(SOURCES) | jq -r '.logrotate.archive' )
+LOGROTATEURI     := $(shell cat $(SOURCES) | jq -r '.logrotate.uri' )
 
 
 #################################################################

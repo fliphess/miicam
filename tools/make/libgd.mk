@@ -2,9 +2,9 @@
 ## LIBGD													   ##
 #################################################################
 
-LIBGDVERSION := 2.2.5
-LIBGDARCHIVE := libgd-$(LIBGDVERSION).tar.gz
-LIBGDURI     := https://github.com/libgd/libgd/releases/download/gd-$(LIBGDVERSION)/$(LIBGDARCHIVE)
+LIBGDVERSION := $(shell cat $(SOURCES) | jq -r '.libgd.version' )
+LIBGDARCHIVE := $(shell cat $(SOURCES) | jq -r '.libgd.archive' )
+LIBGDURI     := $(shell cat $(SOURCES) | jq -r '.libgd.uri' )
 
 
 #################################################################

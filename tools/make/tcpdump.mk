@@ -2,13 +2,13 @@
 ## LIBPCAP/TCPDUMP											 ##
 #################################################################
 
-LIBPCAPVERSION := 1.9.0
-LIBPCAPARCHIVE := libpcap-$(LIBPCAPVERSION).tar.gz
-LIBPCAPURI     := https://www.tcpdump.org/release/$(LIBPCAPARCHIVE)
+LIBPCAPVERSION := $(shell cat $(SOURCES) | jq -r '.libpcap.version' )
+LIBPCAPARCHIVE := $(shell cat $(SOURCES) | jq -r '.libpcap.archive' )
+LIBPCAPURI     := $(shell cat $(SOURCES) | jq -r '.libpcap.uri' )
 
-TCPDUMPVERSION := 4.9.2
-TCPDUMPARCHIVE := tcpdump-$(TCPDUMPVERSION).tar.gz
-TCPDUMPURI     := http://www.tcpdump.org/release/$(TCPDUMPARCHIVE)
+TCPDUMPVERSION := $(shell cat $(SOURCES) | jq -r '.tcpdump.version' )
+TCPDUMPARCHIVE := $(shell cat $(SOURCES) | jq -r '.tcpdump.archive' )
+TCPDUMPURI     := $(shell cat $(SOURCES) | jq -r '.tcpdump.uri' )
 
 
 #################################################################

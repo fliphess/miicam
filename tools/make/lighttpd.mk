@@ -2,9 +2,9 @@
 ## LIGHTTPD													##
 #################################################################
 
-LIGHTTPDVERSION := 1.4.52
-LIGHTTPDARCHIVE := lighttpd-$(LIGHTTPDVERSION).tar.gz
-LIGHTTPDURI     := https://download.lighttpd.net/lighttpd/releases-1.4.x/$(LIGHTTPDARCHIVE)
+LIGHTTPDVERSION := $(shell cat $(SOURCES) | jq -r '.lighttpd.version' )
+LIGHTTPDARCHIVE := $(shell cat $(SOURCES) | jq -r '.lighttpd.archive' )
+LIGHTTPDURI     := $(shell cat $(SOURCES) | jq -r '.lighttpd.uri' )
 
 
 #################################################################

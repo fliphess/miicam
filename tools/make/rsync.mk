@@ -2,9 +2,9 @@
 ## RSYNC													   ##
 #################################################################
 
-RSYNCVERSION := 3.1.3
-RSYNCARCHIVE := rsync-$(RSYNCVERSION).tar.gz
-RSYNCURI     := https://download.samba.org/pub/rsync/src/$(RSYNCARCHIVE)
+RSYNCVERSION := $(shell cat $(SOURCES) | jq -r '.rsync.version' )
+RSYNCARCHIVE := $(shell cat $(SOURCES) | jq -r '.rsync.archive' )
+RSYNCURI     := $(shell cat $(SOURCES) | jq -r '.rsync.uri' )
 
 
 #################################################################

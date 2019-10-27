@@ -2,9 +2,9 @@
 ## JQ                                                          ##
 #################################################################
 
-JQVERSION := 1.6
-JQARCHIVE := jq-$(JQVERSION).tar.gz
-JQURI     := https://github.com/stedolan/jq/releases/download/jq-$(JQVERSION)/$(JQARCHIVE)
+JQVERSION := $(shell cat $(SOURCES) | jq -r '.jq.version' )
+JQARCHIVE := $(shell cat $(SOURCES) | jq -r '.jq.archive' )
+JQURI     := $(shell cat $(SOURCES) | jq -r '.jq.uri' )
 
 
 #################################################################

@@ -2,9 +2,9 @@
 ## WGET													       ##
 #################################################################
 
-WGETVERSION := 1.20
-WGETARCHIVE := wget-$(WGETVERSION).tar.gz
-WGETURI     := https://ftp.gnu.org/gnu/wget/$(WGETARCHIVE)
+WGETVERSION := $(shell cat $(SOURCES) | jq -r '.wget.version' )
+WGETARCHIVE := $(shell cat $(SOURCES) | jq -r '.wget.archive' )
+WGETURI     := $(shell cat $(SOURCES) | jq -r '.wget.uri' )
 
 
 #################################################################

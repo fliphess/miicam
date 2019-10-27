@@ -2,9 +2,9 @@
 ## STRACE													   ##
 #################################################################
 
-STRACEVERSION := 4.26
-STRACEARCHIVE := strace-$(STRACEVERSION).tar.xz
-STRACEURI     := https://github.com/strace/strace/releases/download/v$(STRACEVERSION)/$(STRACEARCHIVE)
+STRACEVERSION := $(shell cat $(SOURCES) | jq -r '.strace.version' )
+STRACEARCHIVE := $(shell cat $(SOURCES) | jq -r '.strace.archive' )
+STRACEURI     := $(shell cat $(SOURCES) | jq -r '.strace.uri' )
 
 
 #################################################################

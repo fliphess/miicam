@@ -2,9 +2,9 @@
 ## LSOF														##
 #################################################################
 
-LSOFVERSION := master
-LSOFARCHIVE := $(LSOFVERSION).tar.gz
-LSOFURI     := https://github.com/Distrotech/lsof/archive/$(LSOFVERSION).tar.gz
+LSOFVERSION := $(shell cat $(SOURCES) | jq -r '.lsof.version' )
+LSOFARCHIVE := $(shell cat $(SOURCES) | jq -r '.lsof.archive' )
+LSOFURI     := $(shell cat $(SOURCES) | jq -r '.lsof.uri' )
 
 
 #################################################################

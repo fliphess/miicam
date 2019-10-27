@@ -2,9 +2,9 @@
 ## LIBJPEG-TURBO											   ##
 #################################################################
 
-LIBJPEGVERSION := 1.5.3
-LIBJPEGARCHIVE := libjpeg-turbo-$(LIBJPEGVERSION).tar.gz
-LIBJPEGURI     := https://npm.taobao.org/mirrors/libjpeg-turbo/$(LIBJPEGVERSION)/$(LIBJPEGARCHIVE)
+LIBJPEGVERSION := $(shell cat $(SOURCES) | jq -r '.libjpeg.version' )
+LIBJPEGARCHIVE := $(shell cat $(SOURCES) | jq -r '.libjpeg.archive' )
+LIBJPEGURI     := $(shell cat $(SOURCES) | jq -r '.libjpeg.uri' )
 
 #################################################################
 ##                                                             ##

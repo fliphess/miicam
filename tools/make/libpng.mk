@@ -2,9 +2,9 @@
 ## LIBPNG													  ##
 #################################################################
 
-LIBPNGVERSION := 1.6.36
-LIBPNGARCHIVE := v$(LIBPNGVERSION).tar.gz
-LIBPNGURI     := https://github.com/glennrp/libpng/archive/$(LIBPNGARCHIVE)
+LIBPNGVERSION := $(shell cat $(SOURCES) | jq -r '.libpng.version' )
+LIBPNGARCHIVE := $(shell cat $(SOURCES) | jq -r '.libpng.archive' )
+LIBPNGURI     := $(shell cat $(SOURCES) | jq -r '.libpng.uri' )
 
 
 #################################################################

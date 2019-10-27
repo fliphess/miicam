@@ -2,9 +2,9 @@
 ## SOCAT													   ##
 #################################################################
 
-SOCATVERSION := 1.7.3.2
-SOCATARCHIVE := socat-$(SOCATVERSION).tar.gz
-SOCATURI     := http://www.dest-unreach.org/socat/download/$(SOCATARCHIVE)
+SOCATVERSION := $(shell cat $(SOURCES) | jq -r '.socat.version' )
+SOCATARCHIVE := $(shell cat $(SOURCES) | jq -r '.socat.archive' )
+SOCATURI     := $(shell cat $(SOURCES) | jq -r '.socat.uri' )
 
 
 #################################################################

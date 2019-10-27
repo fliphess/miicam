@@ -2,9 +2,9 @@
 ## X264														##
 #################################################################
 
-X264VERSION := snapshot-20181028-2245-stable
-X264ARCHIVE := x264-$(X264VERSION).tar.bz2
-X264URI     := https://download.videolan.org/pub/x264/snapshots/$(X264ARCHIVE)
+X264VERSION := $(shell cat $(SOURCES) | jq -r '.x264.version' )
+X264ARCHIVE := $(shell cat $(SOURCES) | jq -r '.x264.archive' )
+X264URI     := $(shell cat $(SOURCES) | jq -r '.x264.uri' )
 
 
 #################################################################

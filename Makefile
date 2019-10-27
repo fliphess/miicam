@@ -36,6 +36,7 @@ LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
 WEBCONTENTDIR  := $(TOPDIR)/sdcard/firmware/www
 
 WEBSITEARCHIVE := website.tgz
+SOURCES        := $(TOOLSDIR)/dev/sources.json
 
 include tools/make/OUTPUT.mk
 
@@ -282,6 +283,7 @@ include tools/make/h264.mk
 include tools/make/ncurses.mk
 include tools/make/readline.mk
 include tools/make/bash.mk
+include tools/make/busybox.mk
 include tools/make/dosfstools.mk
 include tools/make/tcpdump.mk
 include tools/make/openssl.mk
