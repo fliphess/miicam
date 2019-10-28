@@ -1,6 +1,7 @@
 
 ## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
 THIRD_PARTY_SBINS :=			\
+	busybox          			\
 	fatlabel					\
 	fsck.fat					\
 	mkfs.fat					\
@@ -10,27 +11,40 @@ THIRD_PARTY_SBINS :=			\
 	lighttpd-angel				\
 	tcpdump
 
-
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=				\
-	clear infocmp tabs tic		\
-	toe tput tset				\
-	scp	dbclient dropbearkey	\
+	clear						\
+	infocmp						\
+	tabs						\
+	tic							\
+	toe							\
+	tput						\
+	tset						\
+	scp							\
+	dbclient					\
+	dropbearkey					\
 	file						\
-	sftp-server 				\
-	arm-php	arm-php-cgi			\
+	sftp-server					\
+	arm-php						\
+	arm-php-cgi					\
 	bash						\
-	ffmpeg ffprobe				\
+	ffmpeg						\
+	ffprobe						\
 	openssl						\
-	procan socat filan			\
-	pcregrep pcretest			\
+	procan						\
+	socat						\
+	filan						\
+	pcregrep					\
+	pcretest					\
 	jq							\
 	lsof						\
-	fromdos todos				\
+	fromdos						\
+	todos						\
 	nano						\
 	rsync						\
 	strace						\
-	vim	xxd						\
+	vim							\
+	xxd							\
 	wget
 
 ## Extra tools and symlinks that should not be stripped but copied too
@@ -43,7 +57,6 @@ THIRD_PARTY_BIN_EXTRAS :=		\
 	ex							\
 	rvim						\
 	view
-
 
 ## Third party library files that should be stripped and copied to firmware/lib
 THIRD_PARTY_LIBS :=				\
@@ -63,8 +76,8 @@ THIRD_PARTY_LIBS :=				\
 	libncurses.a				\
 	libpanel.a					\
 	libpcap.a					\
-	libpcap.so.1.9.0			\
-	libpcre.so.1.2.10			\
+	libpcap.so.$(LIBPCAPVERSION)	\
+	libpcre.so.$(PCREVERSION) 	\
 	libpcrecpp.so.0.0.1			\
 	libpcreposix.so.0.0.6		\
 	libpng16.so.16.36.0			\
@@ -75,10 +88,10 @@ THIRD_PARTY_LIBS :=				\
 	libswresample.so.3.1.100	\
 	libswscale.so.5.1.100		\
 	libturbojpeg.so.0.1.0		\
-	libx264.so.155				\
-	libxml2.so.2.9.8			\
+	libx264.so.157				\
+	libxml2.so.$(LIBXML2VERSION)	\
 	libz.a						\
-	libz.so.1.2.11				\
+	libz.so.$(ZLIBVERSION)		\
 	libjq.a						\
 	libjq.so.1.0.4				\
 	libonig.a					\
@@ -142,7 +155,7 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libhistory.so.7				\
 	libjpeg.so					\
 	libjpeg.so.62				\
-	libmagic.so 				\
+	libmagic.so					\
 	libmagic.so.1				\
 	libpcap.so					\
 	libpcap.so.1				\
