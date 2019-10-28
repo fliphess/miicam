@@ -206,7 +206,7 @@ fi
 
 if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
 then
-    echo "*** Repl/acing restartd startup script and config with our own version"
+    echo "*** Replacing restartd startup script and config with our own version"
     cp /tmp/sd/firmware/init/S99restartd /etc/S99restartd
     mount --bind /etc/S99restartd /mnt/data/imi/imi_init/S99restartd
 fi
