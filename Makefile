@@ -79,6 +79,7 @@ THIRD_PARTY_SOFTWARE :=              \
 	$(BUILDDIR)/ncurses              \
 	$(BUILDDIR)/readline             \
 	$(BUILDDIR)/bash                 \
+	$(BUILDDIR)/busybox              \
 	$(BUILDDIR)/wget                 \
 	$(BUILDDIR)/dosfstools           \
 	$(BUILDDIR)/libpcap              \
@@ -135,6 +136,11 @@ $(SOURCEDIR):
 $(PREFIXDIR)/bin:
 	@mkdir -p $(PREFIXDIR)/bin
 
+$(PREFIXDIR)/sbin:
+	@mkdir -p $(PREFIXDIR)/sbin
+
+$(PREFIXDIR)/lib:
+	@mkdir -p $(PREFIXDIR)/lib
 
 #################################################################
 ## RTSPD													   ##
