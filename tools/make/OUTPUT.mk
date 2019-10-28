@@ -77,7 +77,7 @@ THIRD_PARTY_LIBS :=				\
 	libpanel.a					\
 	libpcap.a					\
 	libpcap.so.$(LIBPCAPVERSION)	\
-	libpcre.so.$(PCREVERSION) 	\
+	libpcre.so.1.2.11			\
 	libpcrecpp.so.0.0.1			\
 	libpcreposix.so.0.0.6		\
 	libpng16.so.16.36.0			\
