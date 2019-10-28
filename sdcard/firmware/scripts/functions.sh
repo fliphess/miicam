@@ -45,22 +45,22 @@ wait_for_network_until()
     SLEEP="$2"
     IP="$3"
 
-    if [ "x$IP" == "x" ]
+    if [ "x$IP" = "x" ]
     then
         IP="8.8.8.8"
     fi
 
-    if [ "x${RETRIES}" == "x" ]
+    if [ "x${RETRIES}" = "x" ]
     then
         RETRIES=10
     fi
 
-    if [ "x$SLEEP" == "x" ]
+    if [ "x$SLEEP" = "x" ]
     then
         SLEEP=5
     fi
 
-    printf "*** Waiting for ping reply from $IP for $RETRIES times..."
+    printf "*** Waiting for ping reply from %s for %s times..." "$IP" "$RETRIES"
 
     TRIES=0
     until [ $TRIES -ge $RETRIES ]
@@ -128,7 +128,7 @@ disable_binary()
 
     create_disable_binary
 
-    printf "*** Disabling ${1##*/}... \n"
+    printf "*** Disabling %s... \n" "${1##*/}"
 
     if pgrep "${BINARY}" >/dev/null
     then
@@ -153,7 +153,7 @@ enable_binary()
     BINARY="$1"
     RESTART="$2"
 
-    printf "*** Enabling ${1##*/}... \n"
+    printf "*** Enabling %s... \n" "${1##*/}"
 
     if ( mount | grep -q "${BINARY}" )
     then
@@ -384,7 +384,7 @@ mqtt_subscribe()
 ## Get the system status of the webcam / OS
 system_status()
 {
-    local ARGS="$1"
+    ARGS="$1"
 
     UPTIME="$( busybox uptime )"
     SSID="$(    /sbin/iwconfig 2>/dev/null | grep ESSID | sed -e "s/.*ESSID:\"//" | sed -e "s/\".*//" )"
@@ -395,10 +395,10 @@ system_status()
     LINK_QUALITY="$( echo "$QUALITY" | awk '{ print $2}' | sed -e 's/.*=//' | sed -e 's/\/100/\%/' )"
     SIGNAL_LEVEL="$( echo "$QUALITY" | awk '{ print $4}' | sed -e 's/.*=//' | sed -e 's/\/100/\%/' )"
 
-    if [ "$ARGS" == "--json" ]
+    if [ "$ARGS" = "--json" ]
     then
         echo "{\"uptime\":\"$UPTIME\",\"ssid\":\"$SSID\",\"bitrate\":\"$BITRATE\",\"signal_level\":\"$SIGNAL_LEVEL\",\"link_quality\":\"$LINK_QUALITY\",\"noise_level\":\"$NOISE_LEVEL\"}"
-    elif [ "${ARGS}" == "--shell" ]
+    elif [ "${ARGS}" = "--shell" ]
     then
         echo "UPTIME=\"${UPTIME}\""
         echo "SSID=\"${SSID}\""
@@ -421,17 +421,17 @@ system_status()
 ## Get the state of all leds
 led_status()
 {
-    local ARGS="$1"
+    ARGS="$1"
 
     BLUE="$( blue_led     --status | last_f )"
     YELLOW="$( yellow_led --status | last_f )"
     IR_LED="$( ir_led     --status | last_f )"
 
-    if [ "$ARGS" == "--json" ]
+    if [ "$ARGS" = "--json" ]
     then
         echo "{\"blue_led\":\"$BLUE\",\"yellow_led\":\"$YELLOW\",\"ir_led\":\"$IR_LED\"}"
 
-    elif [ "${ARGS}" == "--shell" ]
+    elif [ "${ARGS}" = "--shell" ]
     then
         echo "IR_LED=\"$IR_LED\""
         echo "BLUE_LED=\"$BLUE\""
@@ -450,18 +450,18 @@ led_status()
 ## Get the state of the camera modes
 mode_status()
 {
-    local ARGS="$1"
+    ARGS="$1"
 
     NIGHT="$(  nightmode  --status | last_f )"
     IR_CUT="$( ir_cut     --status | last_f )"
     MIRROR="$( mirrormode --status | last_f )"
     FLIP="$( flipmode     --status | last_f )"
 
-    if [ "$ARGS" == "--json" ]
+    if [ "$ARGS" = "--json" ]
     then
         echo "{\"mirror_mode\":\"${MIRROR}\",\"flip_mode\":\"${FLIP}\",\"night_mode\":\"$NIGHT\",\"ir_cut\":\"$IR_CUT\"}"
 
-    elif [ "$ARGS" == "--shell" ]
+    elif [ "$ARGS" = "--shell" ]
     then
         echo "MIRROR_MODE=\"${MIRROR}\""
         echo "NIGHT_MODE=\"${NIGHT}\""

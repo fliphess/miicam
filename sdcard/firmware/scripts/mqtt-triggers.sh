@@ -25,7 +25,7 @@ fi
 
 ## Logger function
 log() {
-    echo "$( date ) - ${*}" | tee -a ${LOGFILE}
+    echo "$( date ) - ${*}" | tee -a "${LOGFILE}"
 }
 
 
@@ -33,7 +33,7 @@ log() {
 get_value() {
     local INPUT="${1}"
     local TOPIC="$( echo ${INPUT} | cut -d " " -f 1 )"
-    echo ${INPUT} | sed -e "s#${TOPIC}##g"
+    echo "${INPUT}" | sed -e "s#${TOPIC}##g"
 }
 
 
@@ -314,7 +314,7 @@ saturation_set()
     log "MQTT Action: Setting saturation to ${VALUE}"
     camera_adjust -t saturation -s "${VALUE}"
 
-    saturation_set
+    saturation_status
 }
 
 ########################################

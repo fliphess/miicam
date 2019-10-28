@@ -24,33 +24,33 @@ startup()
         exit 1
     fi
 
-    source "${STATEFILE}" || die "Failed to source ${STATEFILE}"
+    . "${STATEFILE}" || die "Failed to source ${STATEFILE}"
 
-    [ "${BLUE_LED}" == "on"  ] && blue_led --enable
-    [ "${BLUE_LED}" == "off" ] && blue_led --disable
+    [ "${BLUE_LED}" = "on"  ] && blue_led --enable
+    [ "${BLUE_LED}" = "off" ] && blue_led --disable
 
-    [ "${YELLOW_LED}" == "on"  ] && yellow_led --enable
-    [ "${YELLOW_LED}" == "off" ] && yellow_led --disable
+    [ "${YELLOW_LED}" = "on"  ] && yellow_led --enable
+    [ "${YELLOW_LED}" = "off" ] && yellow_led --disable
 
-    [ "${IR_CUT}" == "on"  ] && ir_cut --enable
-    [ "${IR_CUT}" == "off" ] && ir_cut --disable
+    [ "${IR_CUT}" = "on"  ] && ir_cut --enable
+    [ "${IR_CUT}" = "off" ] && ir_cut --disable
 
     if [ "${AUTO_NIGHT_MODE}" -eq 0 ]
     then
-        [ "${IR_LED}" == "on"  ] && ir_led --enable
-        [ "${IR_LED}" == "off" ] && ir_led --disable
+        [ "${IR_LED}" = "on"  ] && ir_led --enable
+        [ "${IR_LED}" = "off" ] && ir_led --disable
 
-        [ "${NIGHT_MODE}"  == "on"  ] && nightmode --enable
-        [ "${NIGHT_MODE}"  == "off" ] && nightmode --disable
+        [ "${NIGHT_MODE}"  = "on"  ] && nightmode --enable
+        [ "${NIGHT_MODE}"  = "off" ] && nightmode --disable
     fi
 
     if [ "${CEILING_MODE}" -eq 0 ]
     then
-        [ "${FLIP_MODE}"   == "on"  ] && flipmode --enable
-        [ "${FLIP_MODE}"   == "off" ] && flipmode --disable
+        [ "${FLIP_MODE}"   = "on"  ] && flipmode --enable
+        [ "${FLIP_MODE}"   = "off" ] && flipmode --disable
 
-        [ "${MIRROR_MODE}" == "on"  ] && mirrormode --enable
-        [ "${MIRROR_MODE}" == "off" ] && mirrormode --disable
+        [ "${MIRROR_MODE}" = "on"  ] && mirrormode --enable
+        [ "${MIRROR_MODE}" = "off" ] && mirrormode --disable
     fi
 
     [ "${BRIGHTNESS}" ] && camera_adjust -t brightness -s "${BRIGHTNESS}"
