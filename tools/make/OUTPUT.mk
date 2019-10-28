@@ -1,7 +1,6 @@
 
 ## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
 THIRD_PARTY_SBINS :=			\
-	busybox          			\
 	fatlabel					\
 	fsck.fat					\
 	mkfs.fat					\
@@ -13,39 +12,40 @@ THIRD_PARTY_SBINS :=			\
 
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=				\
-	clear						\
-	infocmp						\
-	tabs						\
-	tic							\
-	toe							\
-	tput						\
-	tset						\
-	scp							\
-	dbclient					\
-	dropbearkey					\
-	file						\
-	sftp-server					\
-	arm-php						\
-	arm-php-cgi					\
-	bash						\
-	ffmpeg						\
-	ffprobe						\
-	openssl						\
-	procan						\
-	socat						\
-	filan						\
-	pcregrep					\
-	pcretest					\
-	jq							\
-	lsof						\
-	fromdos						\
-	todos						\
-	nano						\
-	rsync						\
-	strace						\
-	vim							\
-	xxd							\
-	wget
+    arm-php                     \
+    arm-php-cgi                 \
+    bash                        \
+    busybox                     \
+    clear                       \
+    dbclient                    \
+    dropbearkey                 \
+    ffmpeg                      \
+    ffprobe                     \
+    filan                       \
+    file                        \
+    fromdos                     \
+    infocmp                     \
+    jq                          \
+    lsof                        \
+    nano                        \
+    openssl                     \
+    pcregrep                    \
+    pcretest                    \
+    procan                      \
+    rsync                       \
+    scp                         \
+    sftp-server                 \
+    socat                       \
+    strace                      \
+    tabs                        \
+    tic                         \
+    todos                       \
+    toe                         \
+    tput                        \
+    tset                        \
+    vim                         \
+    wget						\
+    xxd                         \
 
 ## Extra tools and symlinks that should not be stripped but copied too
 THIRD_PARTY_BIN_EXTRAS :=		\

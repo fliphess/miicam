@@ -38,7 +38,6 @@ WEBCONTENTDIR  := $(TOPDIR)/sdcard/firmware/www
 WEBSITEARCHIVE := website.tgz
 SOURCES        := $(TOOLSDIR)/dev/sources.json
 
-include tools/make/OUTPUT.mk
 
 
 LIBS :=                              \
@@ -307,7 +306,7 @@ include tools/make/fromdos.mk
 include tools/make/jq.mk
 include tools/make/file.mk
 include tools/make/ffmpeg.mk
-
+include tools/make/OUTPUT.mk
 
 #################################################################
 ##                                                             ##
