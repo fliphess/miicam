@@ -32,14 +32,11 @@ $(BUILDDIR)/busybox: $(SOURCEDIR)/$(BUSYBOXARCHIVE) dirs
 	cp /env/tools/patches/busybox.config $@-$(BUSYBOXVERSION)/.config && \
 	cd $@-$(BUSYBOXVERSION) && \
 	$(BUILDENV)				    \
-		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS)           && \
-		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS) install   && \
-		\
-		cd $@-$(BUSYBOXVERSION)/_install        && \
-		mv bin/*  usr/bin/*  $(PREFIXDIR)/bin/  && \
-		mv sbin/* usr/sbin/* $(PREFIXDIR)/sbin/ && \
-		touch $@
-		@rm -rf $@-$(BUSYBOXVERSION)
+		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS)         && \
+		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS) install && \
+		mv $@-$(BUSYBOXVERSION)/_install/bin/busybox $(PREFIXDIR)/bin
+	touch $@
+	@rm -rf $@-$(BUSYBOXVERSION)
 
 
 #################################################################
