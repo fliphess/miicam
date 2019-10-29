@@ -100,9 +100,9 @@
         "uri": "https://github.com/vim/vim/archive/v8.1.2226.tar.gz"
     },
     "wget": {
-        "version": "1.20",
-        "archive": "wget-1.20.tar.gz",
-        "uri": "https://ftp.gnu.org/gnu/wget/wget-1.20.tar.gz"
+        "version": "1.20.3",
+        "archive": "wget-1.20.3.tar.gz",
+        "uri": "https://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz"
     },
     "bash": {
         "version": "4.4",
