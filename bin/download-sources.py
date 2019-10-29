@@ -60,7 +60,7 @@ def parse_arguments():
         '--file',
         dest="filename",
         type=str,
-        default="./tools/dev/sources.json",
+        default="sources.json",
         help="The json file with source definitions")
 
     parser.add_argument(

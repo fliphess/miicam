@@ -36,8 +36,7 @@ LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
 WEBCONTENTDIR  := $(TOPDIR)/sdcard/firmware/www
 
 WEBSITEARCHIVE := website.tgz
-SOURCES        := $(TOOLSDIR)/dev/sources.json
-
+SOURCES        := $(TOPDIR)/sources.json
 
 
 LIBS :=                              \
@@ -250,7 +249,7 @@ $(GMUTILS): $(BUILDDIR)/popt
 
 $(SOURCEDIR)/$(WEBSITEARCHIVE):
 	echo "*** Downloading webui content" \
-	&& $(TOPDIR)/tools/dev/download-website.sh
+	&& $(TOPDIR)/bin/download-website.sh
 
 $(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
 	mkdir -p $(WEBCONTENTDIR)                         \
@@ -269,7 +268,7 @@ sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
 
 sdcard/firmware/etc/os-release:
-	$(TOPDIR)/tools/dev/print-version | tee $@
+	$(TOPDIR)/bin/print-version | tee $@
 
 
 #################################################################
@@ -315,7 +314,7 @@ include tools/make/OUTPUT.mk
 .PHONY: sources install images clean
 
 sources:
-	tools/dev/download-sources.py
+	bin/download-sources.py --file $(SOURCES)
 
 install: all
 	@mkdir -p $(BINARIESDIR) \

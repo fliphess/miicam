@@ -32,6 +32,8 @@ function usage()
 
       --gencert        - Create a self-signed certificate for use with lighttpd
 
+      --release        - Create a new tag and release a new package version
+
     Download toolchain: https://fliphess.com/toolchain/
     Repo: https://github.com/MiiCam/MiiCam
 
@@ -172,6 +174,16 @@ EOF
     fi
 }
 
+
+function release()
+{
+   [ "$( git rev-parse --abbrev-ref HEAD )" == "master" ] || die "You are not on the master branch"
+   [ "$( git diff --stat )" == '' ] || die "Git repo is dirrrrrrrty"
+
+   echo "Releasing $VERSION"
+   gitsem newversion
+   echo "Don't forget to push your tags :)"
+}
 
 ## Spawn a shell in the container environment
 function shell()
