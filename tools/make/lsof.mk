@@ -12,6 +12,7 @@ LSOFURI     := $(shell cat $(SOURCES) | jq -r '.lsof.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(LSOFARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading lsof source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(LSOFURI) || rm -f $@
 
 
@@ -20,15 +21,16 @@ $(SOURCEDIR)/$(LSOFARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/lsof: $(PREFIXDIR)/bin $(SOURCEDIR)/$(LSOFARCHIVE)
+	$(call box,"Building lsof source code")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LSOFVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LSOFARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(LSOFVERSION)								&& \
-		export LSOF_CC="$(TOOLCHAINDIR)/$(TARGET)-gcc"	&& \
-		export LSOF_ARCH="$(TARGET)"					&& \
-		$(BUILDENV)										\
-		./Configure -n linux							&& \
-		make -j$(PROCS)									&& \
-		cp lsof $(PREFIXDIR)/bin/lsof
+	@cd $@-$(LSOFVERSION)									\
+		&& export LSOF_CC="$(TOOLCHAINDIR)/$(TARGET)-gcc"	\
+		&& export LSOF_ARCH="$(TARGET)"						\
+		&& $(BUILDENV)										\
+		./Configure -n linux								\
+		&& make -j$(PROCS)									\
+		&& cp lsof $(PREFIXDIR)/bin/lsof
 	@rm -rf $@-$(LSOFVERSION)
 	@touch $@
 

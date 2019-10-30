@@ -11,6 +11,7 @@ FFMPEGURI     := $(shell cat $(SOURCES) | jq -r '.ffmpeg.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(FFMPEGARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading ffmpeg source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(FFMPEGURI) || rm -f $@
 
 
@@ -19,10 +20,11 @@ $(SOURCEDIR)/$(FFMPEGARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/ffmpeg: $(SOURCEDIR)/$(FFMPEGARCHIVE) $(BUILDDIR)/x264 $(BUILDDIR)/zlib
+	$(call box,"Building ffmpeg")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(FFMPEGVERSION)
 	@tar -xjf $(SOURCEDIR)/$(FFMPEGARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(FFMPEGVERSION)						&& \
-		$(BUILDENV)								\
+	@cd $@-$(FFMPEGVERSION)						\
+		&& $(BUILDENV)							\
 		./configure								\
 			--extra-cxxflags="-L$(PREFIXDIR)/lib -I$(PREFIXDIR)/include"   \
 			--extra-ldflags=" -L$(PREFIXDIR)/lib -I$(PREFIXDIR)/include -Wl,-rpath,/tmp/sd/firmware/lib" \

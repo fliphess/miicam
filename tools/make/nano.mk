@@ -12,6 +12,7 @@ NANOURI     := $(shell cat $(SOURCES) | jq -r '.nano.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(NANOARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading nano source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(NANOURI) || rm -f $@
 
 
@@ -20,10 +21,11 @@ $(SOURCEDIR)/$(NANOARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
+	$(call box,"Building nano")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(NANOVERSION)
 	@tar -xzf $(SOURCEDIR)/$(NANOARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(NANOVERSION)				&& \
-	$(BUILDENV)							\
+	@cd $@-$(NANOVERSION)				\
+	&& $(BUILDENV)						\
 	CFLAGS="-O2 -Wall"					\
 	CPPFLAGS="-P -I$(PREFIXDIR)/include -I$(PREFIXDIR)/include/ncurses -L$(PREFIXDIR)/lib/" \
 		./configure						\
@@ -32,9 +34,9 @@ $(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
 			--disable-mouse				\
 			--disable-browser			\
 			--disable-nls				\
-			--disable-dependency-tracking && \
-		make -j$(PROCS)					&& \
-		make -j$(PROCS) install
+			--disable-dependency-tracking \
+		&& make -j$(PROCS)					\
+		&& make -j$(PROCS) install
 	@rm -rf $@-$(NANOVERSION)
 	@touch $@
 

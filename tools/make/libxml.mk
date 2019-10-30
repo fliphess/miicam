@@ -12,6 +12,7 @@ LIBXML2URI     := $(shell cat $(SOURCES) | jq -r '.libxml.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(LIBXML2ARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading libxml source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(LIBXML2URI) || rm -f $@
 
 
@@ -20,10 +21,11 @@ $(SOURCEDIR)/$(LIBXML2ARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/libxml2: $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(BUILDDIR)/zlib
+	$(call box,"Building libxml2")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBXML2VERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIBXML2ARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(LIBXML2VERSION)			&& \
-	$(BUILDENV)							\
+	@cd $@-$(LIBXML2VERSION)			\
+	&& $(BUILDENV)						\
 		ARCH=arm						\
 		Z_CFLAGS="-DHAVE_ZLIB_H=1 -DHAVE_LIBZ=1 -I$(PREFIXDIR)/include" \
 		./configure						\
@@ -34,9 +36,9 @@ $(BUILDDIR)/libxml2: $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(BUILDDIR)/zlib
 			--with-zlib=$(PREFIXDIR)	\
 			--without-python			\
 			--without-iconv				\
-			--without-lzma				&& \
-		make -j$(PROCS)					&& \
-		make -j$(PROCS) install
+			--without-lzma				\
+		&& make -j$(PROCS)				\
+		&& make -j$(PROCS) install
 	@rm -rf $@-$(LIBXML2VERSION)
 	@touch $@
 

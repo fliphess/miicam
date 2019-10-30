@@ -12,6 +12,7 @@ PHPURI     := $(shell cat $(SOURCES) | jq -r '.php.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(PHPARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading php source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(PHPURI) || rm -f $@
 
 
@@ -20,11 +21,12 @@ $(SOURCEDIR)/$(PHPARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2 $(BUILDDIR)/libjpeg-turbo $(BUILDDIR)/libpng $(BUILDDIR)/pcre $(BUILDDIR)/libgd
+	$(call box,"Building php")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(PHPVERSION)
 	@tar -xjf $(SOURCEDIR)/$(PHPARCHIVE) -C $(BUILDDIR)
 	@sed -i -e '/.*hp_ini_register_extensions.*/d' $@-$(PHPVERSION)/main/main.c
-	@cd $@-$(PHPVERSION)					&& \
-	$(BUILDENV)								\
+	@cd $@-$(PHPVERSION)					\
+	&& $(BUILDENV)							\
 	LIBS='-ldl'								\
 		./configure							\
 			--prefix=$(PREFIXDIR)			\
@@ -70,9 +72,9 @@ $(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2
 			--enable-zip					\
 			--disable-mbregex				\
 			--disable-opcache				\
-			--disable-all					&& \
-		make -j$(PROCS)						&& \
-		make -j$(PROCS) install-binaries
+			--disable-all					\
+		&& make -j$(PROCS)					\
+		&& make -j$(PROCS) install-binaries
 	@rm -rf $@-$(PHPVERSION)
 	@touch $@
 

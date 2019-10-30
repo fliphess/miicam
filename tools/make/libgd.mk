@@ -12,6 +12,7 @@ LIBGDURI     := $(shell cat $(SOURCES) | jq -r '.libgd.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(LIBGDARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading libgd source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(LIBGDURI) || rm -f $@
 
 
@@ -20,10 +21,11 @@ $(SOURCEDIR)/$(LIBGDARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/libgd: $(SOURCEDIR)/$(LIBGDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libjpeg-turbo $(BUILDDIR)/libpng
+	$(call box,"Building libgd")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBGDVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIBGDARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(LIBGDVERSION)				&& \
-	$(BUILDENV)							\
+	@cd $@-$(LIBGDVERSION)				\
+	&& $(BUILDENV)						\
 	ARCH=arm							\
 		./configure						\
 			--prefix=$(PREFIXDIR)		\
@@ -35,9 +37,9 @@ $(BUILDDIR)/libgd: $(SOURCEDIR)/$(LIBGDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/lib
 			--enable-shared				\
 			--without-tiff				\
 			--without-freetype			\
-			--without-fontconfig		&& \
-		make -j$(PROCS)					&& \
-		make -j$(PROCS) install
+			--without-fontconfig		\
+		&& make -j$(PROCS)				\
+		&& make -j$(PROCS) install
 	@rm -rf $@-$(LIBGDVERSION)
 	@touch $@
 

@@ -38,6 +38,16 @@ WEBCONTENTDIR  := $(TOPDIR)/sdcard/firmware/www
 WEBSITEARCHIVE := website.tgz
 SOURCES        := $(TOPDIR)/sources.json
 
+#################################################################
+## Functions                                                   ##
+#################################################################
+
+include tools/make/functions.mk
+
+
+#################################################################
+## Results                                                     ##
+#################################################################
 
 LIBS :=                              \
 	$(BUILDDIR)/chuangmi_ircut       \
@@ -123,7 +133,6 @@ all:                                 \
 	$(BUILDDIR)/rtspd                \
 	third-party
 
-
 #################################################################
 ## DIRS                                                        ##
 #################################################################
@@ -161,45 +170,56 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 
 
 #################################################################
-## UTILS                                                       ##
+## LIBS                                                        ##
 #################################################################
 
 $(BUILDDIR)/chuangmi_utils:
+	$(call box,"Compiling miicam library $(@F)")
 	@mkdir -p $(BUILDDIR)
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_utils.so -fPIC $(TOOLSDIR)/lib/chuangmi_utils.c && \
-	touch $@
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_utils.so -fPIC $(TOOLSDIR)/lib/chuangmi_utils.c
+	@touch $@
 
 $(BUILDDIR)/chuangmi_ircut: $(BUILDDIR)/chuangmi_utils
+	$(call box,"Compiling miicam library $(@F)")
 	@mkdir -p $(BUILDDIR)
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_ircut.so -fPIC $(TOOLSDIR)/lib/chuangmi_ircut.c && \
-	touch $@
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_ircut.so -fPIC $(TOOLSDIR)/lib/chuangmi_ircut.c
+	@touch $@
 
 $(BUILDDIR)/chuangmi_isp328: $(BUILDDIR)/chuangmi_utils
+	$(call box,"Compiling miicam library $(@F)")
 	@mkdir -p $(BUILDDIR)
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_isp328.so -fPIC $(TOOLSDIR)/lib/chuangmi_isp328.c && \
-	touch $@
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_isp328.so -fPIC $(TOOLSDIR)/lib/chuangmi_isp328.c
+	@touch $@
 
 $(BUILDDIR)/chuangmi_pwm: $(BUILDDIR)/chuangmi_utils
+	$(call box,"Compiling miicam library $(@F)")
 	@mkdir -p $(BUILDDIR)
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_pwm.so -fPIC $(TOOLSDIR)/lib/chuangmi_pwm.c && \
-	touch $@
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_pwm.so -fPIC $(TOOLSDIR)/lib/chuangmi_pwm.c
+	@touch $@
 
 $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/chuangmi_utils
+	$(call box,"Compiling miicam library $(@F)")
 	@mkdir -p $(BUILDDIR)
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c && \
-	touch $@
+	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c
+	@touch $@
+
+
+#################################################################
+## UTILS                                                       ##
+#################################################################
 
 $(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
+	$(call box,"Compiling miicam utility $(@F)")
 	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
 	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
 	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
@@ -213,8 +233,8 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
 		-l chuangmi_utils  \
 		-l chuangmi_isp328 \
 		-l chuangmi_led    \
-		-l chuangmi_pwm && \
-	touch $(BUILDDIR)/$(@F)
+		-l chuangmi_pwm
+	@touch $(BUILDDIR)/$(@F)
 
 
 #################################################################
@@ -222,6 +242,7 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
 #################################################################
 
 $(GMUTILS): $(BUILDDIR)/popt
+	$(call box,"Compiling miicam libraries")
 	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
 	cd $(GMLIBDIR)               \
 	&& $(TARGET)-gcc             \
@@ -239,8 +260,8 @@ $(GMUTILS): $(BUILDDIR)/popt
 		-l popt                  \
 		-l rt                    \
 		-l pthread               \
-	&& $(TARGET)-strip $(TOOLSDIR)/bin/$(@F) \
-	&& touch $@
+	&& $(TARGET)-strip $(TOOLSDIR)/bin/$(@F)
+	@touch $@
 
 
 #################################################################
@@ -248,12 +269,12 @@ $(GMUTILS): $(BUILDDIR)/popt
 #################################################################
 
 $(SOURCEDIR)/$(WEBSITEARCHIVE):
-	echo "*** Downloading webui content" \
-	&& $(TOPDIR)/bin/download-website.sh
+	$(call box,"Downloading webui source code")
+	$(TOPDIR)/bin/download-website.sh
 
 $(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
-	mkdir -p $(WEBCONTENTDIR)                         \
-	&& echo "*** Unpacking webui to $(WEBCONTENTDIR)" \
+	$(call box,"Unpacking webui to $(WEBCONTENTDIR)")
+	@mkdir -p $(WEBCONTENTDIR)                         \
 	&& tar -xzf $(SOURCEDIR)/$(WEBSITEARCHIVE) -C $(WEBCONTENTDIR)
 
 
@@ -314,9 +335,11 @@ include tools/make/OUTPUT.mk
 .PHONY: sources install images clean
 
 sources:
+	$(call box,"Downloading current third-party sources")
 	bin/download-sources.py --file $(SOURCES)
 
 install: all
+	$(call box,"Running make install")
 	@mkdir -p $(BINARIESDIR) \
 	\
 	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
@@ -336,6 +359,7 @@ install: all
 
 
 images: all install
+	$(call box,"Running make images")
 	@cd $(TOPDIR) \
 	\
 	&& echo "*** Removing older version of MiiCam.tgz and MiiCam.zip" \
@@ -357,6 +381,7 @@ images: all install
 
 
 clean:
+	$(call box,"Running make clean")
 	@cd $(TOPDIR) \
 	\
 	&& echo "*** Removing directories with build artifacts" \

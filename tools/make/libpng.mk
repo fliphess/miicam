@@ -12,6 +12,7 @@ LIBPNGURI     := $(shell cat $(SOURCES) | jq -r '.libpng.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(LIBPNGARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading libpng source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(LIBPNGURI) || rm -f $@
 
 
@@ -20,17 +21,18 @@ $(SOURCEDIR)/$(LIBPNGARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/libpng: $(SOURCEDIR)/$(LIBPNGARCHIVE) $(BUILDDIR)/zlib
+	$(call box,"Building libpng")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPNGVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIBPNGARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(LIBPNGVERSION)			&& \
-	$(BUILDENV)						\
+	@cd $@-$(LIBPNGVERSION)			\
+	&& $(BUILDENV)					\
 		./configure					\
 			--prefix=$(PREFIXDIR)	\
 			--disable-static		\
 			--enable-shared			\
-			--host=$(TARGET)		&& \
-		make -j$(PROCS)				&& \
-		make -j$(PROCS) install
+			--host=$(TARGET)		\
+		&& make -j$(PROCS)			\
+		&& make -j$(PROCS) install
 	@rm -rf $@-$(LIBPNGVERSION)
 	@touch $@
 

@@ -12,6 +12,7 @@ JQURI     := $(shell cat $(SOURCES) | jq -r '.jq.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(JQARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading jq source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(JQURI) || rm -f $@
 
 
@@ -20,20 +21,21 @@ $(SOURCEDIR)/$(JQARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/jq: $(SOURCEDIR)/$(JQARCHIVE)
+	$(call box,"Building jq")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(JQVERSION)
-	tar -xzf $(SOURCEDIR)/$(JQARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(JQVERSION)						&& \
-	autoreconf -fi 							&& \
-	$(BUILDENV)								\
+	@tar -xzf $(SOURCEDIR)/$(JQARCHIVE) -C $(BUILDDIR)
+	@cd $@-$(JQVERSION)					 	\
+	&& autoreconf -fi 						\
+	&& $(BUILDENV)							\
 		./configure							\
 			--with-oniguruma=builtin		\
 			--disable-maintainer-mode		\
 			--disable-valgrind				\
 			--prefix=$(PREFIXDIR)			\
-			--host=$(TARGET)				&& \
-		make -j$(PROCS)						&& \
-		make -j$(PROCS) install
-	rm -rf $@-$(JQVERSION)
+			--host=$(TARGET)				\
+		&& make -j$(PROCS)					\
+		&& make -j$(PROCS) install
+	@rm -rf $@-$(JQVERSION)
 	@touch $@
 
 

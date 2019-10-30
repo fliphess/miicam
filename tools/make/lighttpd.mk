@@ -12,6 +12,7 @@ LIGHTTPDURI     := $(shell cat $(SOURCES) | jq -r '.lighttpd.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(LIGHTTPDARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading lighttpd source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(LIGHTTPDURI) || rm -f $@
 
 
@@ -20,10 +21,11 @@ $(SOURCEDIR)/$(LIGHTTPDARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/pcre
+	$(call box,"Building lighttpd")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIGHTTPDVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIGHTTPDARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(LIGHTTPDVERSION)			&& \
-	$(BUILDENV)							\
+	@cd $@-$(LIGHTTPDVERSION)			\
+	&& $(BUILDENV)						\
 		./configure					 	\
 			--prefix=$(PREFIXDIR)		\
 			--host=$(TARGET)			\
@@ -34,9 +36,9 @@ $(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDI
 			--disable-static			\
 			--enable-shared				\
 			--without-mysql				\
-			--without-bzip2				&& \
-		make -j$(PROCS)					&& \
-		make -j$(PROCS) install
+			--without-bzip2				\
+		&& make -j$(PROCS)				\
+		&& make -j$(PROCS) install
 	@rm -rf $@-$(LIGHTTPDVERSION)
 	@touch $@
 

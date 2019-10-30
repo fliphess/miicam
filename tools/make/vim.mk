@@ -12,6 +12,7 @@ VIMURI     := $(shell cat $(SOURCES) | jq -r '.vim.uri' )
 #################################################################
 
 $(SOURCEDIR)/$(VIMARCHIVE): $(SOURCEDIR)
+	$(call box,"Downloading vim source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(VIMURI) || rm -f $@
 
 
@@ -20,18 +21,19 @@ $(SOURCEDIR)/$(VIMARCHIVE): $(SOURCEDIR)
 #################################################################
 
 $(BUILDDIR)/vim: $(SOURCEDIR)/$(VIMARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/readline $(BUILDDIR)/zlib
+	$(call box,"Building vim")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(VIMVERSION)
 	@tar -xzf $(SOURCEDIR)/$(VIMARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(VIMVERSION)						&& \
-	export vim_cv_tgetent=zero					&& \
-	export vim_cv_toupper_broken="set"			&& \
-	export vim_cv_terminfo="yes"				&& \
-	export vim_cv_getcwd_broken="yes"			&& \
-	export vim_cv_tty_group=0					&& \
-	export vim_cv_tty_mode="0750"				&& \
-	export vim_cv_stat_ignores_slash="yes"		&& \
-	export vim_cv_memmove_handles_overlap="yes"	&& \
-	$(BUILDENV)									\
+	@cd $@-$(VIMVERSION)						\
+	&& export vim_cv_tgetent=zero				\
+	&& export vim_cv_toupper_broken="set"		\
+	&& export vim_cv_terminfo="yes"				\
+	&& export vim_cv_getcwd_broken="yes"		\
+	&& export vim_cv_tty_group=0				\
+	&& export vim_cv_tty_mode="0750"			\
+	&& export vim_cv_stat_ignores_slash="yes"	\
+	&& export vim_cv_memmove_handles_overlap="yes" \
+	&& $(BUILDENV)								\
 	CC="$(TARGET)-gcc"							\
 		./configure								\
 			--host=$(TARGET)					\
@@ -48,9 +50,9 @@ $(BUILDDIR)/vim: $(SOURCEDIR)/$(VIMARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/read
 			--disable-netbeans					\
 			--with-features=normal				\
 			--with-tlib=ncurses					\
-			--without-x							&& \
-		make VIMRCLOC=/etc VIMRUNTIMEDIR=/tmp/sd/firmware/share/vim CC=$(TARGET)-gcc -j$(PROCS) && \
-		make -j$(PROCS) install
+			--without-x							\
+		&& make VIMRCLOC=/etc VIMRUNTIMEDIR=/tmp/sd/firmware/share/vim CC=$(TARGET)-gcc -j$(PROCS) \
+		&& make -j$(PROCS) install
 	@rm -rf $@-$(VIMVERSION)
 	@touch $@
 
