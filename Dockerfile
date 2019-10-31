@@ -43,6 +43,7 @@ RUN echo "*** Install required packages" \
  && apt-get -qq update       \
  && apt-get -qq install -y   \
       autoconf               \
+      cmake                  \
       ca-certificates        \
       bison                  \
       build-essential        \

@@ -20,7 +20,7 @@ $(SOURCEDIR)/$(LIGHTTPDARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/pcre
+$(BUILDDIR)/lighttpd: $(SOURCEDIR)/$(LIGHTTPDARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/pcre $(BUILDDIR)/openssl
 	$(call box,"Building lighttpd")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIGHTTPDVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LIGHTTPDARCHIVE) -C $(BUILDDIR)

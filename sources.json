@@ -10,14 +10,14 @@
         "uri": "http://xmlsoft.org/sources/libxml2-2.9.9.tar.gz"
     },
     "libjpeg": {
-        "version": "1.5.3",
-        "archive": "libjpeg-turbo-1.5.3.tar.gz",
-        "uri": "http://prdownloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-1.5.3.tar.gz"
+        "version": "2.0.3",
+        "archive": "libjpeg-turbo-2.0.3.tar.gz",
+        "uri": "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/2.0.3.tar.gz"
     },
     "libpng": {
-        "version": "1.6.36",
-        "archive": "libpng-1.6.36.tar.gz",
-        "uri": "https://prdownloads.sourceforge.net/libpng/libpng-1.6.36.tar.gz"
+        "version": "1.6.37",
+        "archive": "libpng-1.6.37.tar.gz",
+        "uri": "https://github.com/glennrp/libpng/archive/v1.6.37.tar.gz"
     },
     "libgd": {
         "version": "2.2.5",
