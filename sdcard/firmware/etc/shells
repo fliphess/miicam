@@ -1,6 +1,5 @@
 # /etc/shells: valid login shells
 /bin/sh
-/bin/bash
 /tmp/sd/firmware/bin/bash
 /bin/ash
 /bin/busybox
