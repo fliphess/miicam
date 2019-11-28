@@ -27,7 +27,6 @@ then
     exit
 fi
 
-
 ## Load the config file
 . "${SD_MOUNTDIR}/config.cfg"
 
@@ -38,7 +37,6 @@ then
     do_vg_boot
     exit
 fi
-
 
 ## Bail out if disabled in configuration
 if [ "${DISABLE_HACK}" -eq 1 ]
@@ -67,12 +65,24 @@ EOF
 ## Mounting newer busybox in place                                              ##
 ##################################################################################
 
-echo "*** Mounting newer busybox"
+echo "*** Mounting newer busybox on /bin/busybox"
 
 if ! mountpoint -q /bin/busybox
 then
     mount --rbind /tmp/sd/firmware/bin/busybox /bin/busybox
 fi
+
+##################################################################################
+## Mounting bash in place                                                       ##
+##################################################################################
+
+echo "*** Mounting bash to /bin/bash"
+
+if ! mountpoint -q /bin/bash
+then
+    mount --rbind /tmp/sd/firmware/bin/bash /bin/bash
+fi
+
 ##################################################################################
 ## Syslog                                                                       ##
 ##################################################################################
@@ -121,7 +131,6 @@ then
     mount --rbind /tmp/root /root
 fi
 
-
 ##################################################################################
 ## WIFI                                                                         ##
 ##################################################################################
@@ -134,7 +143,6 @@ then
     sh "${SD_MOUNTDIR}/firmware/scripts/configure_wifi"
 fi
 
-
 ##################################################################################
 ## Mount GMLIB configuration                                                    ##
 ##################################################################################
@@ -145,7 +153,6 @@ if [ -f /tmp/sd/firmware/etc/gmlib.cfg ]
 then
     mount --rbind /tmp/sd/firmware/etc/gmlib.cfg /gm/config/gmlib.cfg
 fi
-
 
 ##################################################################################
 ## Set root Password                                                            ##
@@ -159,7 +166,6 @@ then
 else
     echo "WARN: root password must be set for SSH and or Telnet access"
 fi
-
 
 ##################################################################################
 ## Set time zone                                                                ##
@@ -178,7 +184,6 @@ then
     echo "${TIMEZONE}" > /tmp/etc/TZ
     export TZ="${TIMEZONE}"
 fi
-
 
 ##################################################################################
 ## Set hostname and format /etc/hosts                                           ##
@@ -217,7 +222,6 @@ then
     cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf
 fi
 
-
 ##################################################################################
 ## Disable Cloud Services and OTA                                               ##
 ##################################################################################
@@ -233,7 +237,6 @@ then
 else
     sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" stop
 fi
-
 
 ##################################################################################
 ## Start enabled Services                                                       ##
