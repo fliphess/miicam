@@ -65,16 +65,3 @@ Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting
 
 If something is not documented, [please let me know](https://github.com/miicam/MiiCam/issues) so I can extend the documentation.
 
-
-Please always do some proper research yourself first and only create issues if you are very sure it's a bug in the camera and not either human error or another issue that is related to your home setup instead of the camera.
-
-If you need help setting up, ask the friendly people on the discord channel for some advice. If you answer their questions properly and give them the required information, they might be willing to point you in the right direction.
-
-I'm not that good (read: not socially equipped) with helping people setting up their home automation, I'd rather work on new functionality for the camera.
-
-If your issue is not related to the camera or does not contain enough information to start searching for the issue,
-I might respond itchy or close and lock issues straight after creation to prevent the issue tracker from filling up.
-If you think it's an actual bug and I was to quick with closing your issue, please don't be offended but create a new bugreport with more details on why you think it's a bug or send me a message on discord.
-
-Keep in mind that the issue tracker is not a helpdesk or community forum, but a bug tracker for an open source project.
-
