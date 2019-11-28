@@ -24,11 +24,6 @@
         "archive": "libgd-2.2.5.tar.gz",
         "uri": "https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.gz"
     },
-    "file": {
-        "version": "FILE5_32",
-        "archive": "file-FILE5_32.tar.gz",
-        "uri": "https://github.com/file/file/archive/file-FILE5_32.tar.gz"
-    },
     "pcre": {
         "version": "8.43",
         "archive": "pcre-8.43.zip",

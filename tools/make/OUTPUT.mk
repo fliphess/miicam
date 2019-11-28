@@ -22,7 +22,6 @@ THIRD_PARTY_BINS :=				\
 	ffmpeg					  	\
 	ffprobe					 	\
 	filan					   	\
-	file						\
 	fromdos					 	\
 	infocmp					 	\
 	jq						  	\
@@ -73,7 +72,6 @@ THIRD_PARTY_LIBS :=				\
 	libjpeg.so.8.2.2			\
 	libturbojpeg.a				\
 	libturbojpeg.so.0.2.0		\
-	libmagic.so.1.0.0			\
 	libmenu.a					\
 	libncurses++.a				\
 	libncurses.a				\
@@ -159,8 +157,6 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libjpeg.so.8				\
 	libturbojpeg.so				\
 	libturbojpeg.so.0			\
-	libmagic.so					\
-	libmagic.so.1				\
 	libpcap.so					\
 	libpcap.so.1				\
 	libpcre.so					\
