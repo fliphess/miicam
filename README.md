@@ -11,12 +11,24 @@
 ```
 MiiCam is retiring!
 
-Maintaining a webcam project like this one in a secure manner is hard. As this camera is getting older, it needs more and more attention to determine whether it is still safe to use this firmware and I don't feel motivated enough to keep doing this while I'm almost not using the camera anymore. It's not a very powerfull camera and at this point this limits my ideas and options for my home automation setup, which is why I bought newer, more powerfull camera's with more options that didn't have the limitations I experience with the chuangmi camera.
+Maintaining a webcam project like this one in a secure manner is hard.
+As this camera is getting older, it needs more and more attention to determine whether it is still safe to use this firmware
+and I don't feel motivated enough to keep doing this while I'm almost not using the camera anymore.
 
-In a few months, I will stop maintaining this project. If other developers using this firmware are interested in taking over: I'm open to answering all questions and helping with project based tasks and advice on how to step in. Please contact me on discourse.
+It's not a very powerfull camera and at this point this limits my ideas and options for my home automation setup,
+which is why I bought newer, more powerfull camera's with more options
+that didn't have the limitations I experience with the chuangmi camera.
 
-If nobody else wants to take over the maintenance of this firmware, on October 1st 2020 I will archive the project.
-To protect the lesser skilled from downloading very insecure and outdated firmwares years after I archived the project, I will remove all current CI pipelines, development containers, prebuilds and releases and the nightly builds as well.
+In a few months, I will stop maintaining this project.
+If other developers using this firmware are interested in taking over: I'm open to answering all questions
+and helping with project based tasks and advice on how to step in.
+Please contact me on discourse.
+
+If nobody else wants to take over the maintenance of this firmware,
+on October 1st 2020 I will archive the project.
+
+To protect the lesser skilled from downloading very insecure and outdated firmwares years after I archived the project,
+I will remove all current CI pipelines, development containers, prebuilds and releases and the nightly builds as well.
 ```
 
 This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
