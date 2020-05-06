@@ -28,12 +28,6 @@ ENV WEBROOT="${TOPDIR}/sdcard/firmware/www"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-####################################################
-## Source utils in profile                        ##
-####################################################
-
-RUN echo "source /env/tools/dev/helpers.sh" >> /root/.bashrc
-
 
 ####################################################
 ## Install dependencies and requirements          ##
@@ -43,6 +37,7 @@ RUN echo "*** Install required packages" \
  && apt-get -qq update       \
  && apt-get -qq install -y   \
       autoconf               \
+      cmake                  \
       ca-certificates        \
       bison                  \
       build-essential        \
@@ -77,12 +72,7 @@ RUN echo "*** Install required packages" \
       zip                    \
  && apt-get clean
 
-####################################################
-## Configure locales                              ##
-####################################################
-
-RUN locale-gen en_US.UTF-8
-
+RUN pip3 install miicam-updater --upgrade
 
 ####################################################
 ## Download and unpack toolchain                  ##
@@ -96,6 +86,17 @@ RUN echo "*** Unpacking Toolchain"       \
  && cd /usr/src/arm-linux-3.3            \
  && tar xzf /tmp/toolchain.tgz
 
+####################################################
+## Source utils in profile                        ##
+####################################################
+
+RUN echo "source /env/tools/dev/helpers.sh" >> /root/.bashrc
+
+####################################################
+## Configure locales                              ##
+####################################################
+
+RUN locale-gen en_US.UTF-8
 
 ####################################################
 ## Set workdir and copy files                     ##

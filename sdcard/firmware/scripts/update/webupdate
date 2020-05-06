@@ -65,7 +65,7 @@ check_versions()
 download_release()
 {
     echo "Getting latest website download location"
-    local WEBSITE_URLS="$( ${CURL} https://api.github.com/repos/miicam/miicamweb/releases/latest | jq '.assets | to_entries[] | .value.browser_download_url' )"
+    local WEBSITE_URLS="$( ${CURL} https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.assets | to_entries[] | .value.browser_download_url' )"
 
     [ "x${WEBSITE_URLS}" == "x" ] && die "Website content urls not found! Exiting upgrade"
 
@@ -77,7 +77,8 @@ download_release()
     cd /tmp/sd
     for URL in ${WEBSITE_URLS}
     do
-        ${WGET} -q -t 5 -T 10 -O "${WEBSITETGZ}" -c "$URL" || die "Failed to download from $URL"
+        OUTPUT="/tmp/sd/$( basename "$URL" )"
+        ${WGET} -q -t 5 -T 10 -O "${OUTPUT}" -c "$URL" || die "Failed to download from $URL"
     done
 
     [ -f "${WEBSITETGZ}" ] || die "Failed to download ${WEBSITETGZ}"
@@ -126,6 +127,8 @@ update_release()
         tar xzf "$WEBSITETGZ" -C "${WEBSITEDIR}.new" || die "Failed to unpack $WEBSITETGZ"
         NEWVERSION="$( webversion --file "${WEBSITEDIR}.new/public/static/version.json" )"
     fi
+
+    local LATEST_VERSION="$(  webversion --latest  )" || die "Failed to retrieve the tag of the latest version"
 
     if [ -n "$NEWVERSION" ] && [ "$NEWVERSION" == "$LATEST_VERSION" ]
     then

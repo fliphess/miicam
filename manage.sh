@@ -34,6 +34,8 @@ function usage()
 
       --release        - Create a new tag and release a new package version
 
+      --open-links     - Open all download links in the browser
+
     Download toolchain: https://fliphess.com/toolchain/
     Repo: https://github.com/MiiCam/MiiCam
 
@@ -155,7 +157,16 @@ EOF
         if [ ! -f "$SSLDIR/server.crt" ]
         then
             ## Create a certificate
-            openssl x509 -req -in "$SSLDIR/server.csr" -CA "$SSLDIR/rootCA.pem" -CAkey "$SSLDIR/rootCA.key" -CAcreateserial -out "$SSLDIR/server.crt" -days 500 -sha256 -extfile "$SSLDIR/v3.ext"
+            openssl x509 \
+                -req \
+                -in "$SSLDIR/server.csr" \
+                -CA "$SSLDIR/rootCA.pem" \
+                -CAkey "$SSLDIR/rootCA.key" \
+                -CAcreateserial \
+                -out "$SSLDIR/server.crt" \
+                -days 500 \
+                -sha256 \
+                -extfile "$SSLDIR/v3.ext"
         fi
 
         if [ ! -f "$SSLDIR/server.pem" ]
@@ -174,9 +185,22 @@ EOF
     fi
 }
 
+function open_links()
+{
+    [ -f "$SCRIPTPATH/sources.json" ] || die "Sources file $SCRIPTPATH/sources.json not found!"
 
+    local LINKS="$( cat "$SCRIPTPATH/sources.json" | jq -r 'values[].website' )"
+
+    echo "Opening links in browser....."
+    for link in ${LINKS}; do
+        open "$link"
+    done
+}
+
+## Release a new version
 function release()
 {
+   [ -x "$( command -v gitsem )" ] || die "This script depends on gitsem: go get github.com/Clever/gitsem"
    [ "$( git rev-parse --abbrev-ref HEAD )" == "master" ] || die "You are not on the master branch"
    [ "$( git diff --stat )" == '' ] || die "Git repo is dirrrrrrrty"
 
@@ -212,6 +236,12 @@ function main()
         --newshell)
             build_docker
             shell
+        ;;
+        --release)
+            release
+        ;;
+        --open-links)
+            open_links
         ;;
         --gencert)
             gencert

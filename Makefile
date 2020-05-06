@@ -96,7 +96,6 @@ THIRD_PARTY_SOFTWARE :=              \
 	$(BUILDDIR)/socat                \
 	$(BUILDDIR)/fromdos              \
 	$(BUILDDIR)/jq                   \
-	$(BUILDDIR)/file                 \
 	$(BUILDDIR)/logrotate            \
 	$(BUILDDIR)/sftp                 \
 	$(BUILDDIR)/dropbear             \
@@ -324,7 +323,6 @@ include tools/make/strace.mk
 include tools/make/lsof.mk
 include tools/make/fromdos.mk
 include tools/make/jq.mk
-include tools/make/file.mk
 include tools/make/ffmpeg.mk
 include tools/make/OUTPUT.mk
 
@@ -343,16 +341,16 @@ install: all
 	@mkdir -p $(BINARIESDIR) \
 	\
 	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
-	&& cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(THIRD_PARTY_SBINS) && cp $(THIRD_PARTY_SBINS) $(BINARIESDIR) \
-	&& cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(THIRD_PARTY_BINS)  && cp $(THIRD_PARTY_BINS)  $(BINARIESDIR) \
-	&& cd $(PREFIXDIR)/bin  && cp $(THIRD_PARTY_BIN_EXTRAS) $(BINARIESDIR) \
+	&& cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(THIRD_PARTY_SBINS) && cp $(THIRD_PARTY_SBINS) $(BINARIESDIR)/. \
+	&& cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(THIRD_PARTY_BINS)  && cp $(THIRD_PARTY_BINS)  $(BINARIESDIR)/. \
+	&& cd $(PREFIXDIR)/bin  && cp $(THIRD_PARTY_BIN_EXTRAS) $(BINARIESDIR)/. \
 	\
 	&& echo "*** Copying third party libraries and extras to $(LIBRARIESDIR)" \
-	&& cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(THIRD_PARTY_LIBS) && cp $(THIRD_PARTY_LIBS) $(LIBRARIESDIR) \
-	&& cd $(PREFIXDIR)/lib  && cp $(THIRD_PARTY_LIB_EXTRAS) $(LIBRARIESDIR) \
+	&& cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(THIRD_PARTY_LIBS) && cp $(THIRD_PARTY_LIBS) $(LIBRARIESDIR)/. \
+	&& cd $(PREFIXDIR)/lib  && cp $(THIRD_PARTY_LIB_EXTRAS) $(LIBRARIESDIR)/. \
 	\
 	&& echo "*** Copying our own binaries to $(BINARIESDIR)" \
-	&& cd $(TOOLSDIR)/bin   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR) \; \
+	&& cd $(TOOLSDIR)/bin   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR)/. \; \
 	\
 	&& echo "*** Copying our own libraries to $(BINARIESDIR)" \
 	&& cd $(TOOLSDIR)/lib   && find . -maxdepth 1 -type f -name '*.so' -exec $(TARGET)-strip {} \; -exec cp {} $(LIBRARIESDIR) \;

@@ -12,40 +12,39 @@ THIRD_PARTY_SBINS :=			\
 
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=				\
-    arm-php                     \
-    arm-php-cgi                 \
-    bash                        \
-    busybox                     \
-    clear                       \
-    dbclient                    \
-    dropbearkey                 \
-    ffmpeg                      \
-    ffprobe                     \
-    filan                       \
-    file                        \
-    fromdos                     \
-    infocmp                     \
-    jq                          \
-    lsof                        \
-    nano                        \
-    openssl                     \
-    pcregrep                    \
-    pcretest                    \
-    procan                      \
-    rsync                       \
-    scp                         \
-    sftp-server                 \
-    socat                       \
-    strace                      \
-    tabs                        \
-    tic                         \
-    todos                       \
-    toe                         \
-    tput                        \
-    tset                        \
-    vim                         \
-    wget						\
-    xxd                         \
+	arm-php					 	\
+	arm-php-cgi				 	\
+	bash						\
+	busybox					 	\
+	clear					   	\
+	dbclient					\
+	dropbearkey				 	\
+	ffmpeg					  	\
+	ffprobe					 	\
+	filan					   	\
+	fromdos					 	\
+	infocmp					 	\
+	jq						  	\
+	lsof						\
+	nano						\
+	openssl					 	\
+	pcregrep					\
+	pcretest					\
+	procan					  	\
+	rsync					   	\
+	scp						 	\
+	sftp-server				 	\
+	socat					   	\
+	strace					  	\
+	tabs						\
+	tic						 	\
+	todos					   	\
+	toe						 	\
+	tput						\
+	tset						\
+	vim						 	\
+	wget						\
+	xxd
 
 ## Extra tools and symlinks that should not be stripped but copied too
 THIRD_PARTY_BIN_EXTRAS :=		\
@@ -69,8 +68,10 @@ THIRD_PARTY_LIBS :=				\
 	libform.a					\
 	libgd.so.3.0.5				\
 	libhistory.so.7.0			\
-	libjpeg.so.62.2.0			\
-	libmagic.so.1.0.0			\
+	libjpeg.a					\
+	libjpeg.so.8.2.2			\
+	libturbojpeg.a				\
+	libturbojpeg.so.0.2.0		\
 	libmenu.a					\
 	libncurses++.a				\
 	libncurses.a				\
@@ -80,14 +81,13 @@ THIRD_PARTY_LIBS :=				\
 	libpcre.so.1.2.11			\
 	libpcrecpp.so.0.0.1			\
 	libpcreposix.so.0.0.6		\
-	libpng16.so.16.36.0			\
+	libpng16.so.16.37.0			\
 	libpopt.so.0.0.0			\
 	libpostproc.so.55.1.100		\
 	libreadline.so.7.0			\
 	libssl.a					\
 	libswresample.so.3.1.100	\
 	libswscale.so.5.1.100		\
-	libturbojpeg.so.0.1.0		\
 	libx264.so.157				\
 	libxml2.so.$(LIBXML2VERSION)	\
 	libz.a						\
@@ -154,9 +154,9 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libhistory.so				\
 	libhistory.so.7				\
 	libjpeg.so					\
-	libjpeg.so.62				\
-	libmagic.so					\
-	libmagic.so.1				\
+	libjpeg.so.8				\
+	libturbojpeg.so				\
+	libturbojpeg.so.0			\
 	libpcap.so					\
 	libpcap.so.1				\
 	libpcre.so					\
@@ -178,8 +178,6 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libswresample.so.3			\
 	libswscale.so				\
 	libswscale.so.5				\
-	libturbojpeg.so				\
-	libturbojpeg.so.0			\
 	libx264.so					\
 	libxml2.so					\
 	libxml2.so.2				\

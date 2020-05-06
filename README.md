@@ -8,6 +8,29 @@
 
 # MiiCam hack project
 
+```
+MiiCam is retiring!
+
+Maintaining a webcam project like this one in a secure manner is hard.
+As this camera is getting older, it needs more and more attention to determine whether it is still safe to use this firmware
+and I don't feel motivated enough to keep doing this while I'm almost not using the camera anymore.
+
+It's not a very powerfull camera and at this point this limits my ideas and options for my home automation setup,
+which is why I bought newer, more powerfull camera's with more options
+that didn't have the limitations I experience with the chuangmi camera.
+
+In a few months, I will stop maintaining this project.
+If other developers using this firmware are interested in taking over: I'm open to answering all questions
+and helping with project based tasks and advice on how to step in.
+Please contact me on discourse.
+
+If nobody else wants to take over the maintenance of this firmware,
+on October 1st 2020 I will archive the project.
+
+To protect the lesser skilled from downloading very insecure and outdated firmwares years after I archived the project,
+I will remove all current CI pipelines, development containers, prebuilds and releases and the nightly builds as well.
+```
+
 This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
 With this firmware an alternate method of using this webcam is created that does not require an internet uplink.
@@ -64,17 +87,4 @@ I've spend many hours documenting anything I ran into.
 Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
 
 If something is not documented, [please let me know](https://github.com/miicam/MiiCam/issues) so I can extend the documentation.
-
-
-Please always do some proper research yourself first and only create issues if you are very sure it's a bug in the camera and not either human error or another issue that is related to your home setup instead of the camera.
-
-If you need help setting up, ask the friendly people on the discord channel for some advice. If you answer their questions properly and give them the required information, they might be willing to point you in the right direction.
-
-I'm not that good (read: not socially equipped) with helping people setting up their home automation, I'd rather work on new functionality for the camera.
-
-If your issue is not related to the camera or does not contain enough information to start searching for the issue,
-I might respond itchy or close and lock issues straight after creation to prevent the issue tracker from filling up.
-If you think it's an actual bug and I was to quick with closing your issue, please don't be offended but create a new bugreport with more details on why you think it's a bug or send me a message on discord.
-
-Keep in mind that the issue tracker is not a helpdesk or community forum, but a bug tracker for an open source project.
 

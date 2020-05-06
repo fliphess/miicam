@@ -26,7 +26,8 @@ $(BUILDDIR)/socat: $(SOURCEDIR)/$(SOCATARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/
 	@tar -xzf $(SOURCEDIR)/$(SOCATARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(SOCATVERSION)				\
 	&& $(BUILDENV)						\
-	CPPFLAGS="-I$(PREFIXDIR)/include -DNETDB_INTERNAL=-1" \
+		CPPFLAGS="-I$(PREFIXDIR)/include -DNETDB_INTERNAL=-1" \
+		LIBS="-L$(PREFIXDIR)/lib"       \
 		./configure						\
 			--host=$(TARGET)			\
 			--prefix=$(PREFIXDIR)		\
