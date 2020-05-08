@@ -14,9 +14,6 @@ cache:
   directories:
     - /home/travis/.cache/miicam/src
 
-services:
-- docker
-
 jobs:
   include:
   - name: Build
@@ -29,6 +26,18 @@ jobs:
     - docker run -i -v "$(pwd):/result" -v "${CACHEDIR}:/env/src" --detach=false --rm --tty=true miicam/miicam /bin/bash -c 'make images clean && cp /env/MiiCam.* /result/'
     after_success:
     - test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
+
+    services:
+    - docker
+    deploy:
+      provider: releases
+      api_key:
+        secure: tQzN8M2tmdruwXiISw3rXMoz9ZNNOIabOC9MCxjihbQiQ5rXC3dqRlqtq3YC5PIg+FkfPuTH7OLH9QrC1N2O6sPD8VKsDkFMHyY3NG6AXfvpBVAP+u0RfH2hOxVQyMQ5DnvSFlGcYkef3X7OypRHcFSJSx5+IZHkPFkOpSxVQJu3PCGicO4qFRa2ALev/hosLO8zH8TN0cJi8353EXqH6f6mHoJTsLI0WpcZ0Bql4g1QqlEb6cs34rJB53ydboClv8E1fIG1E15k83kTa5J7hoGUVHfzWP0sode1vZbdr7gpMtAzL+kpuHTOZ+YsS63HxC+M7lw4UPKBDZ1v0nPPX1rW177kGOMBzCHlqXhgK3fhMpZ9BZ58gFklFa4tqrbJSLq2jNYm4EWK7JM5TycMhkl4EwqEe4UdxXgj28WeehsBUChGqAS6ofpvHCf/mVg3cF7Px/MVhChA4JVPl8UV0sY5jlQwGXuEaNh10+yq0faSH9kWwkdCX3aeq2CXi5h5eB+Lac4Wt0YlnEmqZAVv1N01TqD29naXEuzJ2P5xw9rc1nWV1wiRmu1TQ+kwmoEbjGscIMxFO1tUfa1lPm30Ik1yKmitA5oIZTYGyXW9lPegsMOHxpkuTAZzw6KhCKUrdrP2XdPFT7fjelZe5fB/U4aEb8Y+S5OPYyaQQq1wVkI=
+      file_glob: true
+      file: MiiCam.*
+      skip_cleanup: true
+      on:
+        tags: true
 
   - name: Documentation
     before_install:
@@ -64,12 +73,3 @@ notifications:
     on_failure: always
     on_start: never
 
-deploy:
-  provider: releases
-  api_key:
-    secure: tQzN8M2tmdruwXiISw3rXMoz9ZNNOIabOC9MCxjihbQiQ5rXC3dqRlqtq3YC5PIg+FkfPuTH7OLH9QrC1N2O6sPD8VKsDkFMHyY3NG6AXfvpBVAP+u0RfH2hOxVQyMQ5DnvSFlGcYkef3X7OypRHcFSJSx5+IZHkPFkOpSxVQJu3PCGicO4qFRa2ALev/hosLO8zH8TN0cJi8353EXqH6f6mHoJTsLI0WpcZ0Bql4g1QqlEb6cs34rJB53ydboClv8E1fIG1E15k83kTa5J7hoGUVHfzWP0sode1vZbdr7gpMtAzL+kpuHTOZ+YsS63HxC+M7lw4UPKBDZ1v0nPPX1rW177kGOMBzCHlqXhgK3fhMpZ9BZ58gFklFa4tqrbJSLq2jNYm4EWK7JM5TycMhkl4EwqEe4UdxXgj28WeehsBUChGqAS6ofpvHCf/mVg3cF7Px/MVhChA4JVPl8UV0sY5jlQwGXuEaNh10+yq0faSH9kWwkdCX3aeq2CXi5h5eB+Lac4Wt0YlnEmqZAVv1N01TqD29naXEuzJ2P5xw9rc1nWV1wiRmu1TQ+kwmoEbjGscIMxFO1tUfa1lPm30Ik1yKmitA5oIZTYGyXW9lPegsMOHxpkuTAZzw6KhCKUrdrP2XdPFT7fjelZe5fB/U4aEb8Y+S5OPYyaQQq1wVkI=
-  file_glob: true
-  file: MiiCam.*
-  skip_cleanup: true
-  on:
-    tags: true
