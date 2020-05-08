@@ -1,12 +1,4 @@
 
-# If we're in a bash shell, load the bashrc
-if [ "$BASH" ]; then
-  if [ -f ~/.bashrc ]; then
-    . ~/.bashrc
-  fi
-fi
-
-
 # Set the LD library path
 export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
 
