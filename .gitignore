@@ -23,14 +23,23 @@ sdcard/firmware/share/ssl/v3.ext
 sdcard/firmware/root/.ssh
 sdcard/firmware/www/vendor
 sdcard/firmware/www/composer.lock
+
 sdk/
 MiiCam.zip
 MiiCam.zip.md5sum
 MiiCam.tgz
 MiiCam.tgz.md5sum
+
 .idea/
 .vscode
 tmp/
 *.sw[pod]
+
+## Docs
 docs/docs-repo
 docs/deploy_key
+
+## Web
+web/vendor
+web/build
+web/composer.lock

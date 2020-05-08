@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Snapshot</title>
+
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+    <link rel="stylesheet" href="/static/css/chuangmi.css">
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/polyfill.min.js"></script>
+    <script src="/static/js/bootstrap-vue.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+
+  </head>
+
+  <body>
+      <ul class="topnav">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/snapshot.html">Snapshot</a></li>
+        <li><a href="/settings.html">Settings</a></li>
+        <li><a href="/system.html">System</a></li>
+        <li><a href="/services.html">Services</a></li>
+        <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/config.html">Config Editor</a></li>
+        <li><a href="/apidocs.html">API Docs</a></li>
+        <li><a href="/update.html">Update</a></li>
+        <li class="right"><a class="active">Snapshot</a></li>
+      </ul>
+    <div class="content">
+
+        <div style="padding:0 16px;">
+            <h1>Snapshot</h1>
+            <p>View, Take and Save snapshots of the rtsp stream.</p>
+
+            <div id="app">
+                <b-alert variant="danger"
+                    dismissible
+                    :show="error_show"
+                    @dismissed="error_show=false">
+                    {{ error_message }}
+                </b-alert>
+
+                <b-alert variant="success"
+                    dismissible
+                    :show="success_show"
+                    @dismissed="success_show=false">
+                    {{ success_message }}
+                </b-alert>
+
+                <b-alert variant="primary"
+                    dismissible
+                    :show="video_show"
+                    @dismissed="video_show=false">
+                    The latest video can be downloaded: <a v-bind:href="video_url" target="_blank" rel="noopener noreferrer">Here</a>
+                </b-alert>
+
+                <div id="buttons">
+                    <b-button-group>
+                    <b-button v-on:click="RequestSnapshot">Request Snapshot</b-button>
+                    <b-button v-on:click="RefreshImage">Refresh Image</b-button>
+                    <b-button v-on:click="RequestVideo">Request Recording</b-button>
+                    <b-button v-on:click="DownloadVideo">Download Last Video</b-button>
+                    </b-button-group>
+                </div>
+                <br/>
+                <img img v-bind:src="image_url" />
+                <br/>
+            </div>
+        </div>
+
+        <script>
+            const app = new Vue({
+                el: '#app',
+                data: {
+                    error_show: false,
+                    error_message: null,
+                    success_show: false,
+                    success_message: null,
+                    image_url: "",
+                    video_show: false,
+                    video_url: "",
+                },
+                mounted: function() {
+                    this.refresh();
+                    this.interval = setInterval(this.refresh, 10000);
+                },
+                methods: {
+                    handle_success: function(message) {
+                        this.success_show    = true;
+                        this.error_show      = false;
+                        this.success_message = message;
+                    },
+                    handle_error: function(message)  {
+                        this.video_show    = false;
+                        this.success_show  = false;
+                        this.error_show    = true;
+                        this.error_message = message;
+                    },
+                    refresh: function() {
+                        axios.get(`/api/snapshot/get_url`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.image_url = response.data.url;
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    },
+                    DownloadVideo: function() {
+                        axios.get(`/api/record/get_url`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.video_url = response.data.url;
+                                this.video_show = true;
+                            } else {
+                                this.video_show = false;
+                                this.handle_error("Failed to retrieve video download url from /api/record/get_url");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    },
+                    RequestVideo: function() {
+                        axios.get(`/api/record/create`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.handle_success("Recording requested");
+                            } else {
+                                this.handle_error("Failed to start recording video from /api/record/create");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    },
+                    RefreshImage: function() {
+                        axios.get(`/api/snapshot/get_url`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.handle_success("Snapshot image refreshed with most recent one");
+                                this.image_url = response.data.url;
+                            } else {
+                                this.handle_error("Failed to retrieve snapshot image url from /api/snapshot/get_url");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    },
+                    RequestSnapshot: function() {
+                        axios.get(`/api/snapshot/create`)
+                        .then(response => {
+                            if (response.data.success != false) {
+                                this.handle_success("Snapshot requested and image refreshed with most recent one");
+                                this.image_url = response.data.url;
+                            } else {
+                                this.handle_error("Failed to retrieve snapshot image url from /api/snapshot/get_url");
+                            }
+                        })
+                        .catch(error => {
+                            this.handle_error(error.response.data.message);
+                        });
+                    }
+                }
+            });
+        </script>
+
+    </div>
+  </body>
+</html>

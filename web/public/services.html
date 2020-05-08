@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Services</title>
+
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-vue.css"/>
+    <link rel="stylesheet" href="/static/css/chuangmi.css">
+
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/polyfill.min.js"></script>
+    <script src="/static/js/bootstrap-vue.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+  </head>
+
+  <body>
+      <ul class="topnav">
+        <li><a href="/index.html">Home</a></li>
+        <li><a href="/snapshot.html">Snapshot</a></li>
+        <li><a href="/settings.html">Settings</a></li>
+        <li><a href="/system.html">System</a></li>
+        <li><a href="/services.html">Services</a></li>
+        <li><a href="/logviewer.html">Log viewer</a></li>
+        <li><a href="/config.html">Config Editor</a></li>
+        <li><a href="/apidocs.html">API Docs</a></li>
+        <li><a href="/update.html">Update</a></li>
+        <li class="right"><a class="active">Services</a></li>
+      </ul>
+    <div class="content">
+        <div style="padding:0 16px;">
+            <h1>Services</h1>
+            <p>An overview of running services. Click on the table line to open the control modal to manage the services.</p>
+            <div id="app">
+
+                <b-alert variant="danger"
+                     dismissible
+                     :show="show_alert"
+                     @dismissed="show_alert=false">
+                     {{ alert_message }}
+                </b-alert>
+
+                <b-alert variant="success"
+                     dismissible
+                     :show="show_output"
+                     @dismissed="show_output=false">
+                     {{ output }}
+                 </b-alert>
+
+                <p v-if="services.length == 0">Waiting for incoming data....</p>
+
+                <table style="width:50%" id="table-services">
+                    <thead>
+                        <tr>
+                            <th @click="sort('name')">Name</th>
+                            <th @click="sort('running')">Running</th>
+                            <th @click="sort('managed')">Managed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="service in sorted" v-on:click="select(service)" v-b-modal="'ServiceModal'" >
+                            <td>{{ service.name }}</td>
+                            <td>{{ service.running }}</td>
+                            <td>{{ service.managed }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    <b-button-group>
+                        <b-button @click="prevPage">Previous</b-button>
+                        <b-button @click="nextPage">Next</b-button>
+                    </b-button-group>
+                    <p>Current Page: {{ currentPage }}</p>
+                </p>
+
+                <!-- service modal -->
+                <b-modal ref="ServiceModalRef" id="ServiceModal" title="Manage service">
+                    <p v-if="service.managed">Select a button to trigger an action.</p>
+                    <b-button-group v-if="service.managed">
+                        <b-button @click="manage('start', service)">Start</b-button>
+                        <b-button @click="manage('stop', service)">Stop</b-button>
+                        <b-button @click="manage('restart', service)">Restart</b-button>
+                        <b-button @click="manage('status', service)">Status</b-button>
+                    </b-button-group>
+
+                    <p v-if="service.managed == false">This service is not manageable from the http ui</p>
+                </b-modal>
+            </div>
+        </div>
+
+        <script>
+            const app = new Vue({
+                el: '#app',
+                data: {
+                    show_alert: false,
+                    show_output: false,
+                    alert_message: "",
+                    services: [],
+                    output: "",
+                    service: "",
+                    currentSort:'name',
+                    currentSortDir:'asc',
+                    pageSize:8,
+                    currentPage:1
+                },
+                created: function() {
+                    var url = `/api/services/state`;
+                    axios.get(url)
+                        .then(response => {
+                            this.services = response.data;
+                        })
+                        .catch(error => {
+                            this.show_alert = true;
+                            this.alert_message = error.response.data.message;
+                        });
+                },
+                methods: {
+                    manage: function(action, service) {
+                            var url = "/api/services/" + service.name + "/" + action;
+                            this.$refs.ServiceModalRef.hide();
+
+                            axios.get(url)
+                                .then(response => {
+                                    this.output = response.data;
+                                    this.show_output = true;
+                                })
+                                .catch(error => {
+                                    this.show_alert = true;
+                                    this.alert_message = error.response.data.message;
+                                });
+                    },
+                    select: function(service) {
+                        this.service = service;
+                    },
+                    sort: function(s) {
+                        if (s === this.currentSort)
+                            this.currentSortDir = this.currentSortDir==='asc'?'desc':'asc';
+                        this.currentSort = s;
+                    },
+                    nextPage: function() {
+                        if ((this.currentPage*this.pageSize) < this.services.length) this.currentPage++;
+                    },
+                    prevPage: function() {
+                        if (this.currentPage > 1) this.currentPage--;
+                    },
+                },
+                computed:{
+                    sorted: function() {
+                        return this.services.sort((a,b) => {
+                            let modifier = 1;
+                            if(this.currentSortDir === 'desc') modifier = -1;
+                            if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
+                            if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+                            return 0;
+                        }).filter((row, index) => {
+                            let start = (this.currentPage-1)*this.pageSize;
+                            let end = this.currentPage*this.pageSize;
+                            if(index >= start && index < end) return true;
+                        });
+                    }
+                }
+            });
+        </script>
+
+
+
+
+
+    </div>
+  </body>
+</html>
