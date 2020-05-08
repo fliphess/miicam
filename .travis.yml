@@ -38,13 +38,14 @@ jobs:
     - chmod 600 docs/deploy-key
     - eval `ssh-agent -s`
     - ssh-add docs/deploy-key
-    install:
     - pip install -r docs/requirements.txt
-    - git clone git@github.com:miicam/miicam.github.io.git docs/docs-repo
+
     script:
-    - cd docs && mkdocs build --verbose --clean --strict
-    after_success:
+    - git clone git@github.com:miicam/miicam.github.io.git docs/docs-repo
+    - cd docs
+    - mkdocs build --verbose --clean --strict
     - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then cd docs/docs-repo && git add . && git commit -am "Update documention by travis" && git push -u origin master; fi;
+
     after_script:
     - ssh-add -D
     - rm docs/deploy-key
