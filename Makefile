@@ -155,11 +155,11 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 	cd $(RTSPDDIR) 				&& \
 	$(TARGET)-gcc 				\
 		-DLOG_USE_COLOR			\
-		-Wall					\
+		-Wall				\
 		-I$(GMLIBDIR)/inc		\
 		$(RTSPDDIR)/$(@F).c		\
-		$(RTSPDDIR)/log/log.c	\
-		$(RTSPDDIR)/librtsp.a	\
+		$(RTSPDDIR)/log/log.c		\
+		$(RTSPDDIR)/librtsp.a		\
 		-L$(GMLIBDIR)/lib		\
 		-lpthread -lm -lrt -lgm -o $(TOOLSDIR)/bin/rtspd && \
 		$(TARGET)-strip $(TOOLSDIR)/bin/rtspd

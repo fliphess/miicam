@@ -11,13 +11,17 @@ URLS_FOUND=0
 ## Retry until urls are retrieved               ##
 ##################################################
 
+ARTIFACTS="https://api.github.com/repos/miicam/miicam/releases/latest"
+JQ_STRING='.assets | to_entries[] | select(.value.browser_download_url | contains("website")) | .value.browser_download_url'
+
 until [ "$TRIES" -ge "$RETRIES" ] || [ "$URLS_FOUND" -eq 2 ]
 do
     URLS_FOUND=0
-    WEBSITE_URLS="$( curl -s https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.assets | to_entries[] | .value.browser_download_url' )"
+    WEBSITE_URLS="$( curl -s "${ARTIFACTS}" | jq -r "${JQ_STRING}" )"
+
     for URL in $WEBSITE_URLS
     do
-        if ( echo "$URL" | grep -qE "https://github.com/miicam/MiiCamWeb/releases/download/([0-9]+)/website." )
+        if ( echo "$URL" | grep -qE "https://github.com/miicam/MiiCam/releases/download/v([0-9\.]+)/website." )
         then
             echo "Found: $URL"
             URLS_FOUND="$(( $URLS_FOUND +1 ))"

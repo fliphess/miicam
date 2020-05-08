@@ -99,19 +99,3 @@ jobs:
     after_script:
     - ssh-add -D
     - rm ${TRAVIS_BUILD_DIR}/docs/deploy-key
-
-after_success:
-- wget -O /tmp/send.sh "${WEBHOOK}" && chmod +x /tmp/send.sh && /tmp/send.sh success $DISCORD_WEBHOOK_URL
-
-after_failure:
-- wget -O /tmp/send.sh "${WEBHOOK}" && chmod +x /tmp/send.sh && /tmp/send.sh failure $DISCORD_WEBHOOK_URL
-
-notifications:
-  email: false
-  webhooks:
-    urls:
-    - "$WEBHOOK_URL"
-    on_success: change
-    on_failure: always
-    on_start: never
-
