@@ -59,7 +59,7 @@ jobs:
     - composer dump-autoload --classmap-authoritative
     - find ${TRAVIS_BUILD_DIR}/web/vendor -type l -delete
     - printf '{"tag":"%s","commit":"%s","commit_message":"%s","build_log":"%s"}' "$TRAVIS_TAG" "$TRAVIS_COMMIT" "$TRAVIS_COMMIT_MESSAGE" "$TRAVIS_BUILD_WEB_URL" > ${TRAVIS_BUILD_DIR}/web/public/static/version.json
-    - tar -czf website.tgz -C ${TRAVIS_BUILD_DIR} app libs public vendor
+    - tar -czf website.tgz -C ${TRAVIS_BUILD_DIR}/web app libs public vendor
     - md5sum website.tgz > website.md5sum
 
     before_deploy:
