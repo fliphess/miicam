@@ -34,6 +34,8 @@ function usage()
 
       --release        - Create a new tag and release a new package version
 
+      --run-http-tests - Run the http testsuite to check all web endpoints
+
       --open-links     - Open all download links in the browser
 
     Download toolchain: https://fliphess.com/toolchain/
@@ -209,6 +211,19 @@ function release()
    echo "Don't forget to push your tags :)"
 }
 
+## Run http testsuite
+function run_http_tests()
+{
+    if ! ( awk -F/ '$2 == "docker"' /proc/self/cgroup 2>/dev/null | read )
+    then
+        run '/env/manage.sh --run-http-tests'
+    else
+        cd /env/
+        export CAMERA_HOSTNAME="$( cat /env/tools/dev/host.cfg )"
+        nosetests -v tests/http/
+    fi
+}
+
 ## Spawn a shell in the container environment
 function shell()
 {
@@ -245,6 +260,9 @@ function main()
         ;;
         --gencert)
             gencert
+        ;;
+        --run-http-tests)
+            run_http_tests
         ;;
         --all)
             build_docker

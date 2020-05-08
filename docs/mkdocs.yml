@@ -44,7 +44,6 @@ nav:
   - Development:
     - development/development.md
     - development/How-to-build-the-binaries-for-the-webcam-hack.md
-    - development/Nightly-Builds.md
     - development/Test-Framework.md
     - development/helpers.md
     - development/Debug-Tools.md

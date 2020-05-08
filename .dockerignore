@@ -30,6 +30,8 @@ MiiCam.tgz
 MiiCam.tgz.md5sum
 sdk/
 tmp/
+docs/
+web/
 .idea
 tf_recovery.img
 *.sw[pod]

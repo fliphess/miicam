@@ -28,7 +28,6 @@ ENV WEBROOT="${TOPDIR}/sdcard/firmware/www"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-
 ####################################################
 ## Install dependencies and requirements          ##
 ####################################################
@@ -54,6 +53,7 @@ RUN echo "*** Install required packages" \
       lib32z1-dev            \
       libcurl4-openssl-dev   \
       libssl-dev             \
+      libyaml-dev            \
       locales                \
       make                   \
       ncurses-dev            \
@@ -73,7 +73,8 @@ RUN echo "*** Install required packages" \
       zip                    \
  && apt-get clean
 
-RUN pip3 install miicam-updater --upgrade
+COPY tests/requirements.txt /env/tests/requirements.txt
+RUN pip3 install -r /env/tests/requirements.txt
 
 ####################################################
 ## Download and unpack toolchain                  ##

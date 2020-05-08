@@ -3,7 +3,6 @@
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/MiiCam/MiiCam.svg)](https://github.com/miicam/MiiCam/pulse)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/MiiCam/MiiCam.svg)](https://github.com/miicam/MiiCam)
 [![GitHub All Releases](https://img.shields.io/github/downloads/MiiCam/MiiCam/total.svg)](https://github.com/miicam/MiiCam/releases)
-[![Anaconda-Server Badge](https://anaconda.org/miicam/miicam-nightly/badges/version.svg)](https://anaconda.org/miicam/miicam-nightly/files)
 
 
 # MiiCam hack project
@@ -28,7 +27,7 @@ If nobody else wants to take over the maintenance of this firmware,
 on October 1st 2020 I will archive the project.
 
 To protect the lesser skilled from downloading very insecure and outdated firmwares years after I archived the project,
-I will remove all current CI pipelines, development containers, prebuilds and releases and the nightly builds as well.
+I will remove all current CI pipelines, development containers, prebuilds and releases as well.
 ```
 
 This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.

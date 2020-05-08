@@ -1,11 +1,11 @@
 # Test Framework
 
-In the [MiiCamTest](https://github.com/miicam/MiiCamTest) repo you can find 2 testsuites that are used to determine if the current version is master is ready for release.
+In the test directory you can find 2 testsuites that are used to determine if the current version is master is ready for release.
 
 There are 2 testsuites:
 
 - An HTTP testsuite that needs to run off-camera
-- A bats unittest suite for testing the inner workings of the camera.
+- A bats unittest suite for testing the inner workings of the camera. (work in progress)
 
 
 ## HTTP Testsuite
@@ -26,7 +26,7 @@ To run the http testsuite, folow the instructions below :)
 
 Before you start, make sure:
 
-- You have `python3, pip3 and virtualenvwrapper` installed.
+- You have `docker,python3, pip3 and virtualenvwrapper` installed.
 - You have a running camera with a functional web interface using the default `admin` password in `config.cfg` (`HTTP_API_PASS="drgsrethsfdghs"`).
 - Set the hostname or ip address of your camera in `CAMERA_HOSTNAME` in your environment:
   ```

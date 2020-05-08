@@ -65,7 +65,10 @@ check_versions()
 download_release()
 {
     echo "Getting latest website download location"
-    local WEBSITE_URLS="$( ${CURL} https://api.github.com/repos/miicam/miicamweb/releases/latest | jq -r '.assets | to_entries[] | .value.browser_download_url' )"
+
+    local API="https://api.github.com/repos/miicam/miicam/releases/latest"
+    local JQ_STRING='.assets | to_entries[] | select(.value.browser_download_url | contains("website")) | .value.browser_download_url'
+    local WEBSITE_URLS="$( curl -s "${API}" | jq -r "${JQ_STRING}" )"
 
     [ "x${WEBSITE_URLS}" == "x" ] && die "Website content urls not found! Exiting upgrade"
 
@@ -145,74 +148,6 @@ update_release()
 
 
 ###################################################################
-## Download and Update functions to download latest nighly       ##
-###################################################################
-
-download_nightly()
-{
-    echo "Getting latest nightly download location"
-    local LATEST_VERSION="$( webversion --nightly )" || die "Failed to retrieve the tag of the latest version"
-    local LATEST_URI="https://api.anaconda.org/download/MiiCam/miicamweb/${LATEST_VERSION}/MiiCamWeb-nightly-${LATEST_VERSION}.tar.gz"
-
-    echo "Removing older downloads"
-    [ -f "${WEBSITETGZ}" ] && rm "${WEBSITETGZ}"
-
-    echo "Downloading latest release files"
-    cd /tmp/sd
-    ${WGET} -q -t 5 -T 10 -O "${WEBSITETGZ}" -c "${LATEST_URI}" || die "Failed to download from $URL"
-
-    [ -f "${WEBSITETGZ}" ] || die "Failed to download ${WEBSITETGZ}"
-
-    return 0
-}
-
-verify_nightly()
-{
-    local ANACONDA_SUM="$( ${CURL} https://api.anaconda.org/package/MiiCam/MiiCamweb/files | jq -r '. | to_entries[] | "\(.value.version) \(.value.md5)"'  | sort | tail -n 1 | awk '{ print $NF }' )"
-    local LOCAL_SUM="$( md5sum "${WEBSITETGZ}" | cut -d' ' -f1 )"
-
-    if [ "${ANACONDA_SUM}" == "${LOCAL_SUM}"]
-    then
-        echo "Sums OK: ${ANACONDA_SUM}"
-        return 0
-    else
-        echo "An error appeared during download: The sums don't match!"
-        echo "Sum on anaconda: ${ANACONDA_SUM}"
-        echo "Local Sum:       ${LOCAL_SUM}"
-        return 1
-    fi
-}
-
-update_nightly()
-{
-    echo "*** Downloading the latest webui release"
-    download_nightly
-    verify_nightly
-
-    ## Create the new webdir
-    test -d "${WEBSITEDIR}.new" && rm -rf "${WEBSITEDIR}.new"
-    mkdir "${WEBSITEDIR}.new" || die "*** Failed to create directory ${WEBSITEDIR}.new"
-
-    ## Remove the backup dest dir
-    test -d "${WEBSITEDIR}.old" && rm -rf "${WEBSITEDIR}.old"
-
-    ## Unpack the tarbal
-    if [ -f "$WEBSITETGZ" ]
-    then
-        echo "*** Unpacking $WEBSITETGZ"
-        tar xzf "$WEBSITETGZ" -C "${WEBSITEDIR}.new" || die "Failed to unpack $WEBSITETGZ"
-    fi
-
-    echo "*** Swapping downloaded web ui version with the current one"
-    mv "${WEBSITEDIR}" "${WEBSITEDIR}.old" && \
-    mv "${WEBSITEDIR}.new" "${WEBSITEDIR}" && \
-    echo "*** Update completed"
-
-    return 0
-}
-
-
-###################################################################
 ## The main function                                             ##
 ###################################################################
 
@@ -222,21 +157,17 @@ main()
         --update)
             update_release
             ;;
-        --nightly)
-            update_nightly
-            ;;
         --rollback)
             rollback
             ;;
         *)
-            echo "Usage: $0 [--update|--nightly|--rollback]"
+            echo "Usage: $0 [--update|--rollback]"
             echo "Update the web interface if needed"
             echo
             echo "--update                - Check the version and download if required"
             echo
             echo "--rollback              - Rollback to the latest version (If possible)"
             echo
-            echo "--nightly (Expert-only) - Download the latest nightly build"
             exit 0
         ;;
     esac
