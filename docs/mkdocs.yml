@@ -40,6 +40,7 @@ nav:
     - configuration/Configuring-FTP.md
     - configuration/Using-cronjobs.md
     - configuration/Integrating-the-cam-in-your-home-automation.md
+    - configuration/Using-this-camera-with-obs.md
   - Development:
     - development/development.md
     - development/How-to-build-the-binaries-for-the-webcam-hack.md
