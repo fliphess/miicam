@@ -7,8 +7,11 @@ git:
 
 env:
   global:
-    - 'CACHEDIR=/home/travis/.cache/miicam/src'
-    - 'WEBHOOK=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh'
+  - 'CACHEDIR=/home/travis/.cache/miicam/src'
+  - 'WEBHOOK=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh'
+  jobs:
+  - ELEMENT=Build
+  - ELEMENT=Documentation
 
 cache:
   directories:
@@ -17,13 +20,10 @@ cache:
 services:
 - docker
 
-stages:
-- Build
-- Documentation
-
 jobs:
   include:
-  - stage: Build
+  - name: Build
+    env: ELEMENT=Build
     before_install:
     - docker ps -a
     - docker pull quay.io/miicam/miicam
@@ -34,7 +34,8 @@ jobs:
     after_success:
     - test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
 
-  - stage: Documentation
+  - name: Documentation
+    env: ELEMENT=Documentation
     before_install:
     - openssl aes-256-cbc -K $encrypted_92725ca94bf5_key -iv $encrypted_92725ca94bf5_iv -in docs/deploy-key.enc -out docs/deploy-key -d
     - git config --global user.name "Travis Deploy Bot"
