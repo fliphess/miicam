@@ -43,3 +43,19 @@ docs/deploy_key
 web/vendor
 web/build
 web/composer.lock
+
+## updater / python
+tools/updater/miicam_updater/__version__.py
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+eggs/
+.eggs/
+sdist/
+*.egg-info/
+.installed.cfg
+*.egg

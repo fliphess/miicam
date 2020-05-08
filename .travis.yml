@@ -1,7 +1,4 @@
-sudo: required
 dist: bionic
-language: python
-python: 3.6
 git:
   submodules: false
 
@@ -21,6 +18,8 @@ jobs:
   ##############################################################################
 
   - name: Webui
+    sudo: required
+
     language: php
     php:
       - '7.3.17'
@@ -57,6 +56,9 @@ jobs:
   ## Build stage                                                              ##
   ##############################################################################
   - name: Build
+    sudo: required
+    language: python
+    python: 3.6
     before_install:
     - docker ps -a
     - docker pull quay.io/miicam/miicam
@@ -82,6 +84,7 @@ jobs:
   ##############################################################################
 
   - name: Documentation
+    sudo: false
     before_install:
     - openssl aes-256-cbc -K $encrypted_92725ca94bf5_key -iv $encrypted_92725ca94bf5_iv -in ${TRAVIS_BUILD_DIR}/docs/deploy-key.enc -out ${TRAVIS_BUILD_DIR}/docs/deploy-key -d
     - git config --global user.name "Travis Deploy Bot"
@@ -99,3 +102,32 @@ jobs:
     after_script:
     - ssh-add -D
     - rm ${TRAVIS_BUILD_DIR}/docs/deploy-key
+
+  ##############################################################################
+  ## Build updater util and send to pypi                                      ##
+  ##############################################################################
+
+  - name: Updater Utility
+    sudo: false
+    language: python
+    python:
+    - 3.7
+    cache: .pip
+    env:
+    - "PYTHONPATH=${TRAVIS_BUILD_DIR}/tools/updater"
+
+    before_script:
+    - pip install ${TRAVIS_BUILD_DIR}/tools/updater
+
+    script:
+    - pytest ${TRAVIS_BUILD_DIR}/tools/updater/miicam_updater/tests.py
+
+    deploy:
+      provider: pypi
+      user: miicam
+      password:
+        secure: doroVqkGJ4YldJoRf4dSrWXuQjtuPggzV9sM7wa0DkHw4p42Cj+KdkN5MnDGvKgTOxVntEEu3hWEkHm4iRM2wb/rvvNwKc4PV/XU8iJELSJobJwVVAmmA2cxRAk5CVr9tx8stdpKzR+o/T79xzOMmg5u3wRjXrc15v7WLV4flvY9UpsQRe7QfAfS5ggp4JCeiz6TJcJUEX/16jrMcedm4pwwoMHxSaqzoXkmldkTmrY/m745+11l6LrA4TlloyPDEaL4XlFY8OZmfzlYO89wfF+sGbwVwq5yAwPtw25x5lIGTCd+xn8G9+Aze/SJJX+374RHN2Q+U5LYi3eoTcOUcksY2RqrbgNCUXJRSR0yCsjA3Q1kqUDfe2ZZLwTSiela2Pn7bxNjvZzs2GBmRBebNiiM42D9R6QYRv4C5MWQBLd26UbnvoRSWAd0/hmXlYIJR+g9I5evgaY1yJkB4j8Mc5t1RUc5zRg/tmsxUq5OjqCdcBSze0SJv0Hj7o2iLYIjD9aefXl5HgBmTPPt9VlUS+t0BgNbJoCnlDDdzVq8H6AgLh6r1V0kkdoHlrXAj9CN/SN28Uzh8+jAVuCRyRn78mRrnFfvfJI1kPcUDPtaSD7OMRQW/C2guFlcScbQKNl7VqN/boSHuJyvMg5bPt7AUicQKCzYB6O1oAFwg4WzDp0=
+      on:
+        tags: true
+        master: true
+
