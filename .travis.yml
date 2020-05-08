@@ -36,6 +36,7 @@ jobs:
     - printf '{"tag":"%s","commit":"%s","commit_message":"%s","build_log":"%s"}' "$TRAVIS_TAG" "$TRAVIS_COMMIT" "$TRAVIS_COMMIT_MESSAGE" "$TRAVIS_BUILD_WEB_URL" > ${TRAVIS_BUILD_DIR}/web/public/static/version.json
     - tar -czf website.tgz -C ${TRAVIS_BUILD_DIR}/web app libs public vendor
     - md5sum website.tgz > website.md5sum
+    - cp website.* ${CACHEDIR}/
 
     before_deploy:
     - git config --local user.name "Travis Releases Build Bot"
@@ -104,6 +105,7 @@ jobs:
     script:
     - git clone git@github.com:miicam/miicam.github.io.git ${TRAVIS_BUILD_DIR}/docs/docs-repo
     - cd ${TRAVIS_BUILD_DIR}/docs && mkdocs build --verbose --clean --strict
+    - cp ${CACHEDIR}/website.* ${TRAVIS_BUILD_DIR}/docs/docs-repo
     - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then cd ${TRAVIS_BUILD_DIR}/docs/docs-repo && git add . && git commit -am "Update documention by travis" && git push -u origin master; fi;
 
     after_script:
