@@ -1,0 +1,72 @@
+site_name: MiiCam Documentation
+site_description: 'Documentation for the MiiCam Project'
+site_author: 'Flip Hess'
+site_url: 'https://miicam.github.io'
+site_dir: docs-repo
+
+repo_name: 'MiiCam/MiiCam'
+repo_url: 'https://github.com/MiiCam/MiiCam'
+edit_uri: https://github.com/miicam/MiiCam/edit/master/docs/
+docs_dir: content/
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - How does this hack work: How-does-this-hack-work.md
+  - Flashing the firmware: Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working.md
+  - Troubleshooting Guide: Troubleshooting.md
+  - Security Considerations: Security-Considerations.md
+  - Screenshots: Screenshots.md
+  - License: Licensing.md
+  - Getting Help: Getting-help.md
+  - Discord: Discord.md
+  - Planned Features: Planned-features.md
+  - Code of Conduct: Code-of-Conduct.md
+  - Configuration:
+    - configuration/Accessing-the-camera.md
+    - configuration/Configuration-file-options.md
+    - configuration/Camera-Options.md
+    - configuration/Configuring-RTSP.md
+    - configuration/Setting-up-motion-detection.md
+    - configuration/Using-Auto-Night-Mode.md
+    - configuration/Configuring-MQTT.md
+    - configuration/Configuring-the-HTTP-service.md
+    - configuration/Creating-an-SSL-certificate-for-use-on-this-camera.md
+    - configuration/Time-settings.md
+    - configuration/Configuring-the-shell-environment.md
+    - configuration/Configuring-your-terminal-profile.md
+    - configuration/System-Logging-and-Logfiles.md
+    - configuration/Configuring-Restartd.md
+    - configuration/Configuring-FTP.md
+    - configuration/Using-cronjobs.md
+    - configuration/Integrating-the-cam-in-your-home-automation.md
+  - Development:
+    - development/development.md
+    - development/How-to-build-the-binaries-for-the-webcam-hack.md
+    - development/Nightly-Builds.md
+    - development/Test-Framework.md
+    - development/helpers.md
+    - development/Debug-Tools.md
+    - development/Adding-software-to-the-build.md
+    - development/Convert-recorded-video.md
+
+
+theme:
+  name: 'material'
+  logo: 'images/logo.png'
+  favicon: 'images/favicon.ico'
+  feature:
+    tabs: true
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+  palette:
+    primary: 'blue'
+    accent: 'purple'
+
+markdown_extensions:
+  - admonition
+  - smarty
+  - codehilite
+  - toc:
+      permalink: true
