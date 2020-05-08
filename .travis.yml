@@ -59,6 +59,7 @@ jobs:
     sudo: required
     language: python
     python: 3.6
+
     before_install:
     - docker ps -a
     - docker pull quay.io/miicam/miicam
@@ -69,6 +70,7 @@ jobs:
 
     services:
     - docker
+
     deploy:
       provider: releases
       api_key:
@@ -85,6 +87,11 @@ jobs:
 
   - name: Documentation
     sudo: false
+    language: python
+    python:
+    - 3.7
+    cache: .pip
+
     before_install:
     - openssl aes-256-cbc -K $encrypted_92725ca94bf5_key -iv $encrypted_92725ca94bf5_iv -in ${TRAVIS_BUILD_DIR}/docs/deploy-key.enc -out ${TRAVIS_BUILD_DIR}/docs/deploy-key -d
     - git config --global user.name "Travis Deploy Bot"
@@ -92,7 +99,7 @@ jobs:
     - chmod 600 ${TRAVIS_BUILD_DIR}/docs/deploy-key
     - eval `ssh-agent -s`
     - ssh-add ${TRAVIS_BUILD_DIR}/docs/deploy-key
-    - pip install -r ${TRAVIS_BUILD_DIR}/docs/requirements.txt
+    - pip3 install -r ${TRAVIS_BUILD_DIR}/docs/requirements.txt
 
     script:
     - git clone git@github.com:miicam/miicam.github.io.git ${TRAVIS_BUILD_DIR}/docs/docs-repo
@@ -117,7 +124,7 @@ jobs:
     - "PYTHONPATH=${TRAVIS_BUILD_DIR}/tools/updater"
 
     before_script:
-    - pip install ${TRAVIS_BUILD_DIR}/tools/updater
+    - pip3 install ${TRAVIS_BUILD_DIR}/tools/updater
 
     script:
     - pytest ${TRAVIS_BUILD_DIR}/tools/updater/miicam_updater/tests.py
