@@ -28,14 +28,16 @@ $(BUILDDIR)/nano: $(SOURCEDIR)/$(NANOARCHIVE) $(BUILDDIR)/ncurses
 	&& $(BUILDENV)						\
 	CFLAGS="-O2 -Wall"					\
 	CPPFLAGS="-P -I$(PREFIXDIR)/include -I$(PREFIXDIR)/include/ncurses -L$(PREFIXDIR)/lib/" \
-		./configure						\
-			--host=$(TARGET)			\
+		./configure				\
+			--host=$(TARGET)		\
 			--prefix=$(PREFIXDIR)		\
-			--disable-mouse				\
-			--disable-browser			\
-			--disable-nls				\
-			--disable-dependency-tracking \
-		&& make -j$(PROCS)					\
+			--disable-mouse			\
+			--disable-browser		\
+			--disable-nls			\
+			--disable-extra                 \
+			--disable-dependency-tracking 	\
+			--disable-utf8                  \
+		&& make -j$(PROCS)			\
 		&& make -j$(PROCS) install
 	@rm -rf $@-$(NANOVERSION)
 	@touch $@

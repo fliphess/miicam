@@ -86,7 +86,6 @@ THIRD_PARTY_SOFTWARE :=              \
 	$(BUILDDIR)/x264                 \
 	$(BUILDDIR)/ncurses              \
 	$(BUILDDIR)/readline             \
-	$(BUILDDIR)/bash                 \
 	$(BUILDDIR)/busybox              \
 	$(BUILDDIR)/wget                 \
 	$(BUILDDIR)/dosfstools           \
@@ -100,7 +99,6 @@ THIRD_PARTY_SOFTWARE :=              \
 	$(BUILDDIR)/sftp                 \
 	$(BUILDDIR)/dropbear             \
 	$(BUILDDIR)/lighttpd             \
-	$(BUILDDIR)/vim                  \
 	$(BUILDDIR)/nano                 \
 	$(BUILDDIR)/php                  \
 	$(BUILDDIR)/rsync                \
@@ -306,7 +304,6 @@ include tools/make/libpopt.mk
 include tools/make/h264.mk
 include tools/make/ncurses.mk
 include tools/make/readline.mk
-include tools/make/bash.mk
 include tools/make/busybox.mk
 include tools/make/dosfstools.mk
 include tools/make/tcpdump.mk
@@ -316,7 +313,6 @@ include tools/make/logrotate.mk
 include tools/make/dropbear.mk
 include tools/make/lighttpd.mk
 include tools/make/php.mk
-include tools/make/vim.mk
 include tools/make/nano.mk
 include tools/make/rsync.mk
 include tools/make/strace.mk
@@ -338,7 +334,7 @@ sources:
 
 install: all
 	$(call box,"Running make install")
-	@mkdir -p $(BINARIESDIR) \
+	@mkdir -p $(BINARIESDIR) $(LIBRARIESDIR) \
 	\
 	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
 	&& cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(THIRD_PARTY_SBINS) && cp $(THIRD_PARTY_SBINS) $(BINARIESDIR)/. \

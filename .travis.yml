@@ -1,12 +1,14 @@
-
 sudo: required
-dist: xenial
+dist: bionic
 language: python
-python:  3.6
+python: 3.6
+git:
+  submodules: false
 
 env:
   global:
     - 'CACHEDIR=/home/travis/.cache/miicam/src'
+    - 'WEBHOOK=https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh'
 
 cache:
   directories:
@@ -15,21 +17,47 @@ cache:
 services:
 - docker
 
-before_install:
-- docker ps -a
-- docker pull quay.io/miicam/miicam
-- docker build --cache-from quay.io/miicam/miicam -t miicam/miicam .
+stages:
+- Build
+- Documentation
 
-script:
-- mkdir -p "${CACHEDIR}"
-- docker run -i -v "$(pwd):/result" -v "${CACHEDIR}:/env/src" --detach=false --rm --tty=true miicam/miicam /bin/bash -c 'make images clean && cp /env/MiiCam.* /result/'
+jobs:
+  include:
+  - stage: Build
+    before_install:
+    - docker ps -a
+    - docker pull quay.io/miicam/miicam
+    - docker build --cache-from quay.io/miicam/miicam -t miicam/miicam .
+    script:
+    - mkdir -p "${CACHEDIR}"
+    - docker run -i -v "$(pwd):/result" -v "${CACHEDIR}:/env/src" --detach=false --rm --tty=true miicam/miicam /bin/bash -c 'make images clean && cp /env/MiiCam.* /result/'
+    after_success:
+    - test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
+
+  - stage: Documentation
+    before_install:
+    - openssl aes-256-cbc -K $encrypted_92725ca94bf5_key -iv $encrypted_92725ca94bf5_iv -in docs/deploy-key.enc -out docs/deploy-key -d
+    - git config --global user.name "Travis Deploy Bot"
+    - git config --global user.email "miicam@fliphess.com"
+    - chmod 600 docs/deploy-key
+    - eval `ssh-agent -s`
+    - ssh-add docs/deploy-key
+    install:
+    - pip install -r docs/requirements.txt
+    - git clone git@github.com:miicam/miicam.github.io.git docs/docs-repo
+    script:
+    - cd docs && mkdocs build --verbose --clean --strict
+    after_success:
+    - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then cd docs/docs-repo && git add . && git commit -am "Update documention by travis" && git push -u origin master; fi;
+    after_script:
+    - ssh-add -D
+    - rm docs/deploy-key
 
 after_success:
-- wget -O /tmp/send.sh https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x /tmp/send.sh && /tmp/send.sh success $DISCORD_WEBHOOK_URL
-- test $TRAVIS_EVENT_TYPE = "cron" && bash .ci/nightly-build.sh
+- wget -O /tmp/send.sh "${WEBHOOK}" && chmod +x /tmp/send.sh && /tmp/send.sh success $DISCORD_WEBHOOK_URL
 
 after_failure:
-- wget -O /tmp/send.sh https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh && chmod +x /tmp/send.sh && /tmp/send.sh failure $DISCORD_WEBHOOK_URL
+- wget -O /tmp/send.sh "${WEBHOOK}" && chmod +x /tmp/send.sh && /tmp/send.sh failure $DISCORD_WEBHOOK_URL
 
 notifications:
   email: false

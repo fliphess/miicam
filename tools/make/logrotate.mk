@@ -25,11 +25,11 @@ $(BUILDDIR)/logrotate: $(SOURCEDIR)/$(LOGROTATEARCHIVE) $(BUILDDIR)/popt
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LOGROTATEVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LOGROTATEARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(LOGROTATEVERSION)		  	\
-	&& $(BUILDENV)						\
-		./configure						\
-			--host=$(TARGET)			\
+	&& $(BUILDENV)					\
+		./configure				\
+			--host=$(TARGET)		\
 			--prefix="$(PREFIXDIR)"	 	\
-		&& make -j$(PROCS)			 	\
+		&& make -j$(PROCS)		 	\
 		&& make -j$(PROCS) install
 	@rm -rf $@-$(LIBPCAPVERSION)
 	@touch $@

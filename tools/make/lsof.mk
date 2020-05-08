@@ -24,15 +24,15 @@ $(BUILDDIR)/lsof: $(PREFIXDIR)/bin $(SOURCEDIR)/$(LSOFARCHIVE)
 	$(call box,"Building lsof source code")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LSOFVERSION)
 	@tar -xzf $(SOURCEDIR)/$(LSOFARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(LSOFVERSION)									\
+	@cd $@-$(LSOFVERSION)						\
 		&& export LSOF_CC="$(TOOLCHAINDIR)/$(TARGET)-gcc"	\
-		&& export LSOF_ARCH="$(TARGET)"						\
-		&& $(BUILDENV)										\
-		./Configure -n linux								\
-		&& make -j$(PROCS)									\
-		&& cp lsof $(PREFIXDIR)/bin/lsof
-	@rm -rf $@-$(LSOFVERSION)
-	@touch $@
+		&& export LSOF_ARCH="$(TARGET)"				\
+		&& $(BUILDENV)						\
+		./Configure -n linux					\
+		&& make -j$(PROCS)					\
+		&& cp lsof $(PREFIXDIR)/bin/lsof			\
+	&& rm -rf $@-$(LSOFVERSION)					\
+	&& touch $@
 
 
 #################################################################

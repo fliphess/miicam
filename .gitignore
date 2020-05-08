@@ -32,3 +32,5 @@ MiiCam.tgz.md5sum
 .vscode
 tmp/
 *.sw[pod]
+docs/docs-repo
+docs/deploy_key

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ####################################################
 ## Build environment (for manual devving)         ##
@@ -48,6 +48,7 @@ RUN echo "*** Install required packages" \
       gawk                   \
       gettext                \
       git                    \
+      groff                  \
       jq                     \
       libtool                \
       lib32z1-dev            \
@@ -58,9 +59,9 @@ RUN echo "*** Install required packages" \
       ncurses-dev            \
       openssl                \
       pkg-config             \
-      python3     python     \
-      python3-pip python-pip \
-      python3-dev python-dev \
+      python3                \
+      python3-pip            \
+      python3-dev            \
       rsync                  \
       texi2html              \
       texinfo                \

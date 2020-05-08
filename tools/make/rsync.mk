@@ -24,12 +24,12 @@ $(BUILDDIR)/rsync: $(PREFIXDIR)/bin $(SOURCEDIR)/$(RSYNCARCHIVE)
 	$(call box,"Building rsync")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(RSYNCVERSION)
 	@tar -xzf $(SOURCEDIR)/$(RSYNCARCHIVE) -C $(BUILDDIR)
-	@cd $@-$(RSYNCVERSION)					\
-	&& $(BUILDENV)							\
-		./configure							\
-			--host=$(TARGET)				\
-			--target=$(TARGET)				\
-		&& make -j$(PROCS)					\
+	@cd $@-$(RSYNCVERSION)				\
+	&& $(BUILDENV)					\
+		./configure				\
+			--host=$(TARGET)		\
+			--target=$(TARGET)		\
+		&& make -j$(PROCS)			\
 		&& cp rsync $(PREFIXDIR)/bin/rsync
 	@rm -rf $(BUILDDIR)/$@-$(RSYNCVERSION)
 	@touch $@
