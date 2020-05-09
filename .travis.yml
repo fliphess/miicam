@@ -14,45 +14,6 @@ cache:
 jobs:
   include:
   ##############################################################################
-  ## Build web ui                                                             ##
-  ##############################################################################
-
-  - name: WebUI
-    sudo: required
-
-    language: php
-    php:
-    - 7.3.17
-
-    before_install:
-    - composer global require hirak/prestissimo mediamonks/composer-vendor-cleaner
-
-    script:
-    - cd ${TRAVIS_BUILD_DIR}/web
-    - composer install --no-dev --ignore-platform-reqs --no-interaction --prefer-source
-    - php /home/travis/.config/composer/vendor/mediamonks/composer-vendor-cleaner/bin/clean --dir ${TRAVIS_BUILD_DIR}/web/vendor/
-    - composer dump-autoload --classmap-authoritative
-    - find ${TRAVIS_BUILD_DIR}/web/vendor -type l -delete
-    - printf '{"tag":"%s","commit":"%s","commit_message":"%s","build_log":"%s"}' "$TRAVIS_TAG" "$TRAVIS_COMMIT" "$TRAVIS_COMMIT_MESSAGE" "$TRAVIS_BUILD_WEB_URL" > ${TRAVIS_BUILD_DIR}/web/public/static/version.json
-    - tar -czf website.tgz -C ${TRAVIS_BUILD_DIR}/web app libs public vendor
-    - md5sum website.tgz > website.md5sum
-
-    before_deploy:
-    - git config --local user.name "Travis Releases Build Bot"
-    - git config --local user.email "miicam@fliphess.com"
-    - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
-
-    deploy:
-      provider: releases
-      api_key:
-        secure: tQzN8M2tmdruwXiISw3rXMoz9ZNNOIabOC9MCxjihbQiQ5rXC3dqRlqtq3YC5PIg+FkfPuTH7OLH9QrC1N2O6sPD8VKsDkFMHyY3NG6AXfvpBVAP+u0RfH2hOxVQyMQ5DnvSFlGcYkef3X7OypRHcFSJSx5+IZHkPFkOpSxVQJu3PCGicO4qFRa2ALev/hosLO8zH8TN0cJi8353EXqH6f6mHoJTsLI0WpcZ0Bql4g1QqlEb6cs34rJB53ydboClv8E1fIG1E15k83kTa5J7hoGUVHfzWP0sode1vZbdr7gpMtAzL+kpuHTOZ+YsS63HxC+M7lw4UPKBDZ1v0nPPX1rW177kGOMBzCHlqXhgK3fhMpZ9BZ58gFklFa4tqrbJSLq2jNYm4EWK7JM5TycMhkl4EwqEe4UdxXgj28WeehsBUChGqAS6ofpvHCf/mVg3cF7Px/MVhChA4JVPl8UV0sY5jlQwGXuEaNh10+yq0faSH9kWwkdCX3aeq2CXi5h5eB+Lac4Wt0YlnEmqZAVv1N01TqD29naXEuzJ2P5xw9rc1nWV1wiRmu1TQ+kwmoEbjGscIMxFO1tUfa1lPm30Ik1yKmitA5oIZTYGyXW9lPegsMOHxpkuTAZzw6KhCKUrdrP2XdPFT7fjelZe5fB/U4aEb8Y+S5OPYyaQQq1wVkI=
-      file_glob: true
-      file: website.*
-      skip_cleanup: true
-      on:
-        tags: true
-
-  ##############################################################################
   ## Build stage                                                              ##
   ##############################################################################
   - name: Build

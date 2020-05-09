@@ -6,16 +6,16 @@ PROCS        := $(shell nproc --all )
 
 DOWNLOADCMD := curl -qs --http1.1 -L --retry 10 --output
 
-BUILDENV :=                 \
-	AR=$(TARGET)-ar         \
-	AS=$(TARGET)-as         \
-	CC=$(TARGET)-gcc        \
-	CXX=$(TARGET)-g++       \
-	LD=${TARGET}-ld         \
-	NM=$(TARGET)-nm         \
-	RANLIB=$(TARGET)-ranlib \
-	STRIP=$(TARGET)-strip   \
-	CFLAGS="-fPIC"          \
+BUILDENV :=			\
+	AR=$(TARGET)-ar		\
+	AS=$(TARGET)-as		\
+	CC=$(TARGET)-gcc	\
+	CXX=$(TARGET)-g++	\
+	LD=${TARGET}-ld		\
+	NM=$(TARGET)-nm		\
+	RANLIB=$(TARGET)-ranlib	\
+	STRIP=$(TARGET)-strip	\
+	CFLAGS="-fPIC"		\
 	CPPFLAGS="-I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib" \
 	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
 
@@ -33,9 +33,10 @@ UTILSDIR       := $(TOOLSDIR)/utils
 
 BINARIESDIR    := $(TOPDIR)/sdcard/firmware/bin
 LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
-WEBCONTENTDIR  := $(TOPDIR)/sdcard/firmware/www
 
-WEBSITEARCHIVE := website.tgz
+WEBSOURCEDIR   := $(TOPDIR)/web
+WEBDESTDIR     := $(TOPDIR)/sdcard/firmware/www
+
 SOURCES        := $(TOPDIR)/sources.json
 
 #################################################################
@@ -49,68 +50,68 @@ include tools/make/functions.mk
 ## Results                                                     ##
 #################################################################
 
-LIBS :=                              \
-	$(BUILDDIR)/chuangmi_ircut       \
-	$(BUILDDIR)/chuangmi_isp328      \
-	$(BUILDDIR)/chuangmi_pwm         \
-	$(BUILDDIR)/chuangmi_led         \
+LIBS :=					\
+	$(BUILDDIR)/chuangmi_ircut	\
+	$(BUILDDIR)/chuangmi_isp328	\
+	$(BUILDDIR)/chuangmi_pwm	\
+	$(BUILDDIR)/chuangmi_led	\
 	$(BUILDDIR)/chuangmi_utils
 
-UTILS :=                             \
-	$(BUILDDIR)/chuangmi_ctrl        \
-	$(BUILDDIR)/take_snapshot        \
-	$(BUILDDIR)/take_video           \
-	$(BUILDDIR)/ir_cut               \
-	$(BUILDDIR)/ir_led               \
-	$(BUILDDIR)/blue_led             \
-	$(BUILDDIR)/yellow_led           \
-	$(BUILDDIR)/mirrormode           \
-	$(BUILDDIR)/nightmode            \
-	$(BUILDDIR)/flipmode             \
-	$(BUILDDIR)/camera_adjust        \
+UTILS :=				\
+	$(BUILDDIR)/chuangmi_ctrl	\
+	$(BUILDDIR)/take_snapshot	\
+	$(BUILDDIR)/take_video		\
+	$(BUILDDIR)/ir_cut		\
+	$(BUILDDIR)/ir_led		\
+	$(BUILDDIR)/blue_led		\
+	$(BUILDDIR)/yellow_led		\
+	$(BUILDDIR)/mirrormode		\
+	$(BUILDDIR)/nightmode		\
+	$(BUILDDIR)/flipmode		\
+	$(BUILDDIR)/camera_adjust	\
 	$(BUILDDIR)/auto_night_mode
 
-GMUTILS :=                           \
-	$(BUILDDIR)/audio_playback       \
-	$(BUILDDIR)/encode_with_osd      \
+GMUTILS :=				\
+	$(BUILDDIR)/audio_playback	\
+	$(BUILDDIR)/encode_with_osd	\
 	$(BUILDDIR)/osd
 
-THIRD_PARTY_SOFTWARE :=              \
-	$(BUILDDIR)/zlib                 \
-	$(BUILDDIR)/libxml2              \
-	$(BUILDDIR)/libjpeg-turbo        \
-	$(BUILDDIR)/libpng               \
-	$(BUILDDIR)/libgd                \
-	$(BUILDDIR)/pcre                 \
-	$(BUILDDIR)/popt                 \
-	$(BUILDDIR)/x264                 \
-	$(BUILDDIR)/ncurses              \
-	$(BUILDDIR)/readline             \
-	$(BUILDDIR)/busybox              \
-	$(BUILDDIR)/wget                 \
-	$(BUILDDIR)/dosfstools           \
-	$(BUILDDIR)/libpcap              \
-	$(BUILDDIR)/tcpdump              \
-	$(BUILDDIR)/openssl              \
-	$(BUILDDIR)/socat                \
-	$(BUILDDIR)/fromdos              \
-	$(BUILDDIR)/jq                   \
-	$(BUILDDIR)/logrotate            \
-	$(BUILDDIR)/sftp                 \
-	$(BUILDDIR)/dropbear             \
-	$(BUILDDIR)/lighttpd             \
-	$(BUILDDIR)/nano                 \
-	$(BUILDDIR)/php                  \
-	$(BUILDDIR)/rsync                \
-	$(BUILDDIR)/lsof                 \
-	$(BUILDDIR)/strace               \
+THIRD_PARTY_SOFTWARE :=			\
+	$(BUILDDIR)/zlib		\
+	$(BUILDDIR)/libxml2		\
+	$(BUILDDIR)/libjpeg-turbo	\
+	$(BUILDDIR)/libpng		\
+	$(BUILDDIR)/libgd		\
+	$(BUILDDIR)/pcre		\
+	$(BUILDDIR)/popt		\
+	$(BUILDDIR)/x264		\
+	$(BUILDDIR)/ncurses		\
+	$(BUILDDIR)/readline		\
+	$(BUILDDIR)/busybox		\
+	$(BUILDDIR)/wget		\
+	$(BUILDDIR)/dosfstools		\
+	$(BUILDDIR)/libpcap		\
+	$(BUILDDIR)/tcpdump		\
+	$(BUILDDIR)/openssl		\
+	$(BUILDDIR)/socat		\
+	$(BUILDDIR)/fromdos		\
+	$(BUILDDIR)/jq			\
+	$(BUILDDIR)/logrotate		\
+	$(BUILDDIR)/sftp		\
+	$(BUILDDIR)/dropbear		\
+	$(BUILDDIR)/lighttpd		\
+	$(BUILDDIR)/nano		\
+	$(BUILDDIR)/php			\
+	$(BUILDDIR)/rsync		\
+	$(BUILDDIR)/lsof		\
+	$(BUILDDIR)/strace		\
 	$(BUILDDIR)/ffmpeg
 
 libs: $(LIBS)
 
 third-party: $(THIRD_PARTY_SOFTWARE)
 
-website: $(WEBCONTENTDIR)
+website: $(BUILDDIR)/website
 
 utils: $(UTILS)
 
@@ -118,16 +119,16 @@ libs: $(LIBS)
 
 gmutils: $(GMUTILS)
 
-all:                                 \
-	sources                          \
-	libs                             \
-	utils                            \
-	gmutils                          \
-	website                          \
-	sdcard/config.cfg                \
-	sdcard/manufacture.bin           \
-	sdcard/firmware/etc/os-release   \
-	$(BUILDDIR)/rtspd                \
+all:					\
+	sources				\
+	libs				\
+	utils				\
+	gmutils				\
+	website				\
+	sdcard/config.cfg		\
+	sdcard/manufacture.bin		\
+	sdcard/firmware/etc/os-release	\
+	$(BUILDDIR)/rtspd		\
 	third-party
 
 #################################################################
@@ -147,20 +148,20 @@ $(PREFIXDIR)/lib:
 	@mkdir -p $(PREFIXDIR)/lib
 
 #################################################################
-## RTSPD													   ##
+## RTSPD                                                       ##
 #################################################################
 
 $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
-	cd $(RTSPDDIR) 				&& \
-	$(TARGET)-gcc 				\
-		-DLOG_USE_COLOR			\
-		-Wall				\
-		-I$(GMLIBDIR)/inc		\
-		$(RTSPDDIR)/$(@F).c		\
-		$(RTSPDDIR)/log/log.c		\
-		$(RTSPDDIR)/librtsp.a		\
-		-L$(GMLIBDIR)/lib		\
+	cd $(RTSPDDIR)			\
+	&& $(TARGET)-gcc		\
+		-DLOG_USE_COLOR		\
+		-Wall			\
+		-I$(GMLIBDIR)/inc	\
+		$(RTSPDDIR)/$(@F).c	\
+		$(RTSPDDIR)/log/log.c	\
+		$(RTSPDDIR)/librtsp.a	\
+		-L$(GMLIBDIR)/lib	\
 		-lpthread -lm -lrt -lgm -o $(TOOLSDIR)/bin/rtspd && \
 		$(TARGET)-strip $(TOOLSDIR)/bin/rtspd
 	@touch $@
@@ -241,38 +242,24 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
 $(GMUTILS): $(BUILDDIR)/popt
 	$(call box,"Compiling miicam libraries")
 	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
-	cd $(GMLIBDIR)               \
-	&& $(TARGET)-gcc             \
-		-Wall                    \
-		-I $(GMLIBDIR)/inc       \
-		-I $(TOOLSDIR)/lib       \
-		-I $(PREFIXDIR)/include  \
-		-L $(TOOLSDIR)/lib       \
-		-L $(GMLIBDIR)/lib       \
-		-L $(PREFIXDIR)/lib      \
-		-o $(TOOLSDIR)/bin/$(@F) \
-		$(GMLIBDIR)/$(@F).c      \
-		-l gm                    \
-		-l m                     \
-		-l popt                  \
-		-l rt                    \
-		-l pthread               \
+	cd $(GMLIBDIR)			\
+	&& $(TARGET)-gcc		\
+		-Wall			\
+		-I $(GMLIBDIR)/inc	\
+		-I $(TOOLSDIR)/lib	\
+		-I $(PREFIXDIR)/include	\
+		-L $(TOOLSDIR)/lib	\
+		-L $(GMLIBDIR)/lib	\
+		-L $(PREFIXDIR)/lib	\
+		-o $(TOOLSDIR)/bin/$(@F)\
+		$(GMLIBDIR)/$(@F).c	\
+		-l gm 			\
+		-l m			\
+		-l popt			\
+		-l rt			\
+		-l pthread		\
 	&& $(TARGET)-strip $(TOOLSDIR)/bin/$(@F)
 	@touch $@
-
-
-#################################################################
-## WEB INTERFACE                                               ##
-#################################################################
-
-$(SOURCEDIR)/$(WEBSITEARCHIVE):
-	$(call box,"Downloading webui source code")
-	$(TOPDIR)/bin/download-website.sh
-
-$(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
-	$(call box,"Unpacking webui to $(WEBCONTENTDIR)")
-	@mkdir -p $(WEBCONTENTDIR)                         \
-	&& tar -xzf $(SOURCEDIR)/$(WEBSITEARCHIVE) -C $(WEBCONTENTDIR)
 
 
 #################################################################
@@ -280,7 +267,7 @@ $(WEBCONTENTDIR): $(SOURCEDIR)/$(WEBSITEARCHIVE)
 #################################################################
 
 sdcard/config.cfg:
-	$(TOPDIR)/sdcard/firmware/scripts/update/configupdate $(TOPDIR)/sdcard/config.cfg
+	$(TOPDIR)/sdcard/firmware/scripts/configupdate $(TOPDIR)/sdcard/config.cfg
 
 sdcard/manufacture.bin:
 	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
@@ -322,6 +309,34 @@ include tools/make/jq.mk
 include tools/make/ffmpeg.mk
 include tools/make/OUTPUT.mk
 
+
+#################################################################
+## WEB INTERFACE                                               ##
+#################################################################
+
+$(BUILDDIR)/website:
+	$(call box,"Building webui from $(WEBSOURCEDIR) to $(WEBDESTDIR)")
+	@mkdir -p $(WEBDESTDIR)
+	@cd $(WEBSOURCEDIR) \
+	\
+	&& echo '*** Running composer install in $(WEBSOURCEDIR)' \
+	&& composer install --no-dev --ignore-platform-reqs --no-interaction --prefer-dist \
+	\
+	&& echo "***Removing all unneeded crap from the vendor dir" \
+	&& php $(HOME)/.composer/vendor/mediamonks/composer-vendor-cleaner/bin/clean --dir vendor/ >/dev/null \
+	\
+	&& echo "*** Recreating class mappings" \
+	&& composer dump-autoload --classmap-authoritative \
+	\
+	&& echo '*** Removing symlinks from $(WEBSOURCEDIR)/vendor to prevent fat32 symlink issues' \
+	&& find $(WEBSOURCEDIR)/vendor -type l -delete \
+	\
+	&& echo '*** Copying files to $(WEBDESTDIR)' \
+	&& cp -r app libs public vendor $(WEBDESTDIR)/. \
+	\
+	&& touch $@
+
+
 #################################################################
 ##                                                             ##
 #################################################################
@@ -330,7 +345,7 @@ include tools/make/OUTPUT.mk
 
 sources:
 	$(call box,"Downloading current third-party sources")
-	bin/download-sources.py --file $(SOURCES)
+	$(TOPDIR)/bin/download-sources.py --file $(SOURCES)
 
 install: all
 	$(call box,"Running make install")
@@ -379,7 +394,7 @@ clean:
 	@cd $(TOPDIR) \
 	\
 	&& echo "*** Removing directories with build artifacts" \
-	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(WEBCONTENTDIR) $(PREFIXDIR) $(BUILDDIR) \
+	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(WEBDESTDIR) $(PREFIXDIR) $(BUILDDIR) \
 	\
 	&& echo "*** Removing all own-brewed binaries" \
 	&& find $(TOOLSDIR)/bin -maxdepth 1 -type f -delete \

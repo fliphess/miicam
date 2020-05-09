@@ -20,7 +20,7 @@ $(SOURCEDIR)/$(PHPARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2 $(BUILDDIR)/libjpeg-turbo $(BUILDDIR)/libpng $(BUILDDIR)/pcre $(BUILDDIR)/libgd
+$(BUILDDIR)/php: $(SOURCEDIR)/$(PHPARCHIVE) $(BUILDDIR)/zlib $(BUILDDIR)/libxml2 $(BUILDDIR)/libjpeg-turbo $(BUILDDIR)/libpng $(BUILDDIR)/pcre $(BUILDDIR)/libgd $(BUILDDIR)/openssl
 	$(call box,"Building php")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(PHPVERSION)
 	@tar -xjf $(SOURCEDIR)/$(PHPARCHIVE) -C $(BUILDDIR)

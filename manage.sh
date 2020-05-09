@@ -36,6 +36,8 @@ function usage()
 
       --run-http-tests - Run the http testsuite to check all web endpoints
 
+      --run-web        - Start a php development server for the local files
+
       --open-links     - Open all download links in the browser
 
     Download toolchain: https://fliphess.com/toolchain/
@@ -211,6 +213,52 @@ function release()
    echo "Don't forget to push your tags :)"
 }
 
+## Symlink config in /tmp/sd to prepare for running the web interface
+function setup_web()
+{
+    if [ "${NO_SETUP}" == "1" ]
+    then
+	return 0
+    fi
+
+    echo "*** Setting up global composer requirements"
+    composer global require hirak/prestissimo mediamonks/composer-vendor-cleaner
+
+    echo "*** Creating directories"
+    mkdir -p /tmp/sd/log /tmp/sd/firmware/www/public
+
+    echo "*** Creating config file"
+    sdcard/firmware/scripts/configupdate "/tmp/sd/config.cfg"
+
+    echo "*** Creating logfiles"
+    echo syslog >> /tmp/sd/log/syslog
+    echo webserver >> /tmp/sd/log/lighttpd.log
+    echo webapp >>  /tmp/sd/log/webapp.log
+    echo bootlog >> /tmp/sd/log/ft_boot.log
+    echo motion >> /tmp/sd/log/motion.log
+    echo "rtspd.log" >> /tmp/sd/log/rtspd.log
+
+    echo "*** Setting up local composer requirements"
+    cd web
+    composer install --no-dev --ignore-platform-reqs --no-interaction --prefer-source
+
+    echo "*** Cleaning up"
+    php $HOME/.config/composer/vendor/mediamonks/composer-vendor-cleaner/bin/clean --dir vendor/ >/dev/null
+
+    echo "*** Recreating classmap"
+    composer dump-autoload --classmap-authoritative
+}
+
+
+## Run the php inbuild webserver in our www directory
+function run_web()
+{
+    log "*** Starting local php webserver."
+    cd "${SCRIPTPATH}"
+    php -S localhost:8080 -t web/public
+}
+
+
 ## Run http testsuite
 function run_http_tests()
 {
@@ -264,6 +312,9 @@ function main()
         --run-http-tests)
             run_http_tests
         ;;
+        --run-web)
+	    setup_web && run_web
+	;;
         --all)
             build_docker
             build

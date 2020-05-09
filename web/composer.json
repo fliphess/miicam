@@ -1,15 +1,29 @@
 {
-	"require": {
-		"monolog/monolog": "^1.17",
-		"slim/slim": "^3.11",
-		"vlucas/phpdotenv": "^2.5"
-	},
-	"config": {
-		"preferred-install": "dist"
-	},
-	"autoload": {
-		"psr-4": {
-			"": "libs/"
-		}
-	}
+    "require": {
+        "monolog/monolog": "^1.17",
+        "slim/slim": "^3.11",
+        "vlucas/phpdotenv": "^2.5"
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "autoload": {
+        "files": [
+	    "libs/camera.php",
+    	    "libs/leds.php",
+  	    "libs/logviewer.php",
+            "libs/recording.php",
+       	    "libs/services.php",
+	    "libs/system.php"
+        ],
+        "classmap": [
+	    "libs"
+        ],
+        "psr-4": {
+            "libs\\": "libs/"
+        },
+	"psr-0": {
+	    "libs": "libs"
+        }
+    }
 }

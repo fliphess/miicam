@@ -44,7 +44,7 @@ function log() {
 
 
 function get_password() {
-    log $( grep ROOT_PASS sdcard/firmware/scripts/update/configupdate )
+    log $( grep ROOT_PASS sdcard/firmware/scripts/configupdate )
 }
 
 ###############################################

@@ -36,7 +36,6 @@ $(BUILDDIR)/libxml2: $(SOURCEDIR)/$(LIBXML2ARCHIVE) $(BUILDDIR)/zlib
 			--with-zlib=$(PREFIXDIR)	\
 			--without-python			\
 			--without-iconv				\
-			--without-lzma				\
 		&& make -j$(PROCS)				\
 		&& make -j$(PROCS) install
 	@rm -rf $@-$(LIBXML2VERSION)

@@ -2,9 +2,10 @@
 
 ini_set('memory_limit','15M');
 
+// * Load the dependencies
 require '../../vendor/autoload.php';
-require '../../libs/autoload.php';
 
+// * Used for serving assets in development
 if (PHP_SAPI == 'cli-server') {
     $url  = parse_url($_SERVER['REQUEST_URI']);
     $file = __DIR__ . $url['path'];

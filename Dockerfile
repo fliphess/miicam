@@ -40,6 +40,7 @@ RUN echo "*** Install required packages" \
       ca-certificates        \
       bison                  \
       build-essential        \
+      composer               \
       cpio                   \
       curl                   \
       file                   \
@@ -58,6 +59,7 @@ RUN echo "*** Install required packages" \
       make                   \
       ncurses-dev            \
       openssl                \
+      php-curl               \
       pkg-config             \
       python3                \
       python3-pip            \
@@ -73,8 +75,19 @@ RUN echo "*** Install required packages" \
       zip                    \
  && apt-get clean
 
+####################################################
+## Install python requirements                    ##
+####################################################
+
 COPY tests/requirements.txt /env/tests/requirements.txt
 RUN pip3 install -r /env/tests/requirements.txt
+
+####################################################
+## Install composer requirments                   ##
+####################################################
+
+RUN echo "*** Installing composer requirements" \
+ && composer global require hirak/prestissimo mediamonks/composer-vendor-cleaner
 
 ####################################################
 ## Download and unpack toolchain                  ##
