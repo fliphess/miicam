@@ -17,12 +17,12 @@ jobs:
   ## Build web ui                                                             ##
   ##############################################################################
 
-  - name: Webui
+  - name: WebUI
     sudo: required
 
     language: php
     php:
-      - '7.3.17'
+    - 7.3.17
 
     before_install:
     - composer global require hirak/prestissimo mediamonks/composer-vendor-cleaner
@@ -36,7 +36,6 @@ jobs:
     - printf '{"tag":"%s","commit":"%s","commit_message":"%s","build_log":"%s"}' "$TRAVIS_TAG" "$TRAVIS_COMMIT" "$TRAVIS_COMMIT_MESSAGE" "$TRAVIS_BUILD_WEB_URL" > ${TRAVIS_BUILD_DIR}/web/public/static/version.json
     - tar -czf website.tgz -C ${TRAVIS_BUILD_DIR}/web app libs public vendor
     - md5sum website.tgz > website.md5sum
-    - cp website.* ${CACHEDIR}/
 
     before_deploy:
     - git config --local user.name "Travis Releases Build Bot"
@@ -105,38 +104,9 @@ jobs:
     script:
     - git clone git@github.com:miicam/miicam.github.io.git ${TRAVIS_BUILD_DIR}/docs/docs-repo
     - cd ${TRAVIS_BUILD_DIR}/docs && mkdocs build --verbose --clean --strict
-    - cp ${CACHEDIR}/website.* ${TRAVIS_BUILD_DIR}/docs/docs-repo
     - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then cd ${TRAVIS_BUILD_DIR}/docs/docs-repo && git add . && git commit -am "Update documention by travis" && git push -u origin master; fi;
 
     after_script:
     - ssh-add -D
     - rm ${TRAVIS_BUILD_DIR}/docs/deploy-key
-
-  ##############################################################################
-  ## Build updater util and send to pypi                                      ##
-  ##############################################################################
-
-  - name: Updater Utility
-    sudo: false
-    language: python
-    python:
-    - 3.7
-    cache: .pip
-    env:
-    - "PYTHONPATH=${TRAVIS_BUILD_DIR}/tools/updater"
-
-    before_script:
-    - pip3 install ${TRAVIS_BUILD_DIR}/tools/updater
-
-    script:
-    - pytest ${TRAVIS_BUILD_DIR}/tools/updater/miicam_updater/tests.py
-
-    deploy:
-      provider: pypi
-      user: miicam
-      password:
-        secure: doroVqkGJ4YldJoRf4dSrWXuQjtuPggzV9sM7wa0DkHw4p42Cj+KdkN5MnDGvKgTOxVntEEu3hWEkHm4iRM2wb/rvvNwKc4PV/XU8iJELSJobJwVVAmmA2cxRAk5CVr9tx8stdpKzR+o/T79xzOMmg5u3wRjXrc15v7WLV4flvY9UpsQRe7QfAfS5ggp4JCeiz6TJcJUEX/16jrMcedm4pwwoMHxSaqzoXkmldkTmrY/m745+11l6LrA4TlloyPDEaL4XlFY8OZmfzlYO89wfF+sGbwVwq5yAwPtw25x5lIGTCd+xn8G9+Aze/SJJX+374RHN2Q+U5LYi3eoTcOUcksY2RqrbgNCUXJRSR0yCsjA3Q1kqUDfe2ZZLwTSiela2Pn7bxNjvZzs2GBmRBebNiiM42D9R6QYRv4C5MWQBLd26UbnvoRSWAd0/hmXlYIJR+g9I5evgaY1yJkB4j8Mc5t1RUc5zRg/tmsxUq5OjqCdcBSze0SJv0Hj7o2iLYIjD9aefXl5HgBmTPPt9VlUS+t0BgNbJoCnlDDdzVq8H6AgLh6r1V0kkdoHlrXAj9CN/SN28Uzh8+jAVuCRyRn78mRrnFfvfJI1kPcUDPtaSD7OMRQW/C2guFlcScbQKNl7VqN/boSHuJyvMg5bPt7AUicQKCzYB6O1oAFwg4WzDp0=
-      on:
-        tags: true
-        branch: master
 
