@@ -3,7 +3,8 @@
 ## MiiCam is retiring!
 
 Maintaining a webcam project like this one in a secure manner is a lot of work!
-As this camera is getting older, it needs more and more attention to determine keep it up to date and (semi) "secure"
+As this camera is getting older, it needs more and more attention to determine keep it up to date and (semi) "secure".
+
 Because I'm not using the camera that much myself, I will sunset the project on October 1st 2020.
 
 In a few months, I will stop maintaining this project.
