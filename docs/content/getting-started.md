@@ -11,14 +11,10 @@ Before getting started with this hack, know that some basic linux knowledge and 
     Copying just the files in the repository to your sd card without building the binaries wil **Not** work.
 
 As the large static binaries do not work well with git, the repository itself does not contain the compiled binaries.
-The binaries will be build by travis and uploaded to github on every release.
-
-For new users it is recommended to use the precompiled binaries that are created with every release.
-You can download the release builds from the [github releases page](https://github.com/MiiCam/MiiCam/releases).
 
 ### Build the binaries
 
-If you prefer to build the binaries yourself, have a look at the [building documentation](/development/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to do it yourself.
+To build the binaries yourself, have a look at the [building documentation](/development/How-to-build-the-binaries-for-the-webcam-hack) to find instructions on how to build a firmware.
 
 ## Flash the U-boot version
 
@@ -29,7 +25,6 @@ To work around this issue, you can downgrade the firmware to a working version [
 ### Prepare the SD card
 
 Format a micro SD card in fat32 (vfat) format and copy the content of the **sdcard/** folder in the root of your SD card.
-
 
 ### Configure the Chuangmi camera on the SD card
 

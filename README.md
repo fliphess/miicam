@@ -7,28 +7,21 @@
 
 # MiiCam hack project
 
-```
-MiiCam is retiring!
 
-Maintaining a webcam project like this one in a secure manner is hard.
-As this camera is getting older, it needs more and more attention to determine whether it is still safe to use this firmware
-and I don't feel motivated enough to keep doing this while I'm almost not using the camera anymore.
+## MiiCam is retiring!
 
-It's not a very powerfull camera and at this point this limits my ideas and options for my home automation setup,
-which is why I bought newer, more powerfull camera's with more options
-that didn't have the limitations I experience with the chuangmi camera.
+Maintaining a webcam project like this one in a secure manner is a lot of work!
+As this camera is getting older, it needs more and more attention to determine keep it up to date and (semi) "secure"
+Because I'm not using the camera that much myself, I will archive the project on October 1st 2020.
 
 In a few months, I will stop maintaining this project.
-If other developers using this firmware are interested in taking over: I'm open to answering all questions
-and helping with project based tasks and advice on how to step in.
-Please contact me on discourse.
 
-If nobody else wants to take over the maintenance of this firmware,
-on October 1st 2020 I will archive the project.
+I've already removed the prebuild releases as the older were getting really old...
+I recommend the poweruser to build their own firmware using the instructions,
+and less tech savy users to start looking for a better and more modern camera.
 
-To protect the lesser skilled from downloading very insecure and outdated firmwares years after I archived the project,
-I will remove all current CI pipelines, development containers, prebuilds and releases as well.
-```
+
+## What is this project
 
 This projects provides an alternate firmware for the Xiaomi Chuangmi 720p IP Camera's.
 These camera's, based on the Grain Media GM8136S SOC, normally only work using the cloudbased app.
@@ -46,16 +39,9 @@ Tave a look in the documentation for [all the available options and features](ht
 
 ## Installation on the Chuangmi 720P camera
 
-To install the hack on your SD card, use the compiled sources and a SD card with a max size of 32GB.
+To install the hack on your SD card, some tech ninja linux hacking skills are required!
+Build the required firmware from the git repository and use a SD card with a max size of 32GB.
 Copying the files in the repository to your sd card without building the binaries wil **Not** work.
-
-In the docs you can find [instructions on how to install the hack](https://miicam.github.io/getting-started).
-
-
-### Download the firmware hack
-
-For new users it is recommended to use the precompiled binaries that are created with every release.
-You can download the release builds from the [github releases page](https://github.com/MiiCam/MiiCam/releases).
 
 
 ### Build the binaries
@@ -72,11 +58,7 @@ The longer version [can be read on its own page](https://miicam.github.io/Securi
 
 ## Issues and bugs
 
-If you discover bugs, please [create an issue](https://github.com/miicam/MiiCam/issues), so we can look for a fix :)
-If you can fix it yourself, feel very welcome to create pull requests.
-
-If there is a bug in the documentation, [create an issue in the docs repo](https://github.com/miicam/MiiCamDocs/issues).
-And for the web interface, [create an issue in the repo for the web interface](https://github.com/miicam/MiiCamWeb/).
+If you discover bugs, please [create a Pull Request fixxing the bug](https://github.com/miicam/MiiCam/pulls), so we can merge your fix :)
 
 
 ## Getting Help
@@ -85,5 +67,6 @@ I've spend many hours documenting anything I ran into.
 
 Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
 
-If something is not documented, [please let me know](https://github.com/miicam/MiiCam/issues) so I can extend the documentation.
+You will find out I'm not a very helpful guy for people using the camera: This is because I am not using the camera anymore and will archive the project soon.
+
 
