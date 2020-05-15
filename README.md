@@ -11,11 +11,11 @@
 
 Maintaining a webcam project like this one in a secure manner is a lot of work!
 As this camera is getting older, it needs more and more attention to determine keep it up to date and (semi) "secure"
-Because I'm not using the camera that much myself, I will archive the project on October 1st 2020.
+Because I'm not using the camera that much myself anymore, I will archive the project on October 1st 2020.
 
 In a few months, I will stop maintaining this project.
 
-I've already removed the prebuild releases as the older were getting really old...
+I've already removed the prebuild releases as the older releases were getting really old...
 I recommend the poweruser to build their own firmware using the instructions,
 and less tech savy users to start looking for a better and more modern camera.
 
@@ -39,33 +39,37 @@ Tave a look in the documentation for [all the available options and features](ht
 ## Installation on the Chuangmi 720P camera
 
 To install the hack on your SD card, some tech ninja linux hacking skills are required!
-Build the required firmware from the git repository and use a SD card with a max size of 32GB.
-Copying the files in the repository to your sd card without building the binaries wil **Not** work.
+
+Build the required firmware from the git repository by compiling the binaries is docker.
+
+Use a SD card with a max size of 32GB formatted with `FAT32`. (Larger cards and SDXC or SDUC cards are not always working)
+
+For a working firmware, you need the compiled binaries,
+simply copying the files in the repository to your sd card without building the firmware in docker wil **Not** work.
 
 
 ### Build the binaries
 
-If you prefer to build the binaries yourself, [have a look at the instructions using docker](https://miicam.github.io/development/How-to-build-the-binaries-for-the-webcam-hack).
+To build the binaries yourself, [have a look at the instructions for building a firmware using docker](https://miicam.github.io/development/How-to-build-the-binaries-for-the-webcam-hack).
 
+
+### Upgrading the binaries
+
+To upgrade the firmware, pull the repo, clean and rebuild:
+
+```
+git pull && ./manage --all
+```
 
 ## Security considerations
 
 The short version: **DO NOT EVER PUBLICLY EXPOSE THIS WEBCAM TO THE INTERNETZ!**
-
 The longer version [can be read on its own page](https://miicam.github.io/Security-Considerations).
 
-
-## Issues and bugs
-
-If you discover bugs, please [create a Pull Request fixxing the bug](https://github.com/miicam/MiiCam/pulls), so we can merge your fix :)
+In fact, forget the theme park and **DO NOT USE THIS WEBCAM FIRMWARE AT ALL BECAUSE IT IS BEING SUNSET SOON!**
 
 
-## Getting Help
-
-I've spend many hours documenting anything I ran into.
+## Troubleshooting
 
 Please read the [troubleshooting guide](https://miicam.github.io/Troubleshooting) for solving the most common issues.
-
-You will find out I'm not a very helpful guy for people using the camera: This is because I am not using the camera anymore and will archive the project soon.
-
 
